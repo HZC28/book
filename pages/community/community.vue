@@ -17,8 +17,8 @@
 				</view>
 			</view>
 			<view class="ci-bom">
-				<view>回复{{item.huifu}}</view>
-				<view>点赞{{item.num}}</view>
+				<view @click="toComment(item.id)">评论{{item.huifu}}</view>
+				<view @click="praise">点赞{{item.num}}</view>
 			</view>
 		</view>
 	</view>
@@ -32,6 +32,7 @@
 					{
 						head:"",
 						name:"12",
+						id:"001",
 						num:123,
 						title:"绝世武神",
 						huifu:"343",
@@ -44,6 +45,7 @@
 					{
 						head:"",
 						name:"123",
+						id:"002",
 						num:123,
 						huifu:"343",
 						title:"绝世武神",
@@ -56,6 +58,7 @@
 					{
 						head:"",
 						name:"123",
+						id:"003",
 						num:123,
 						huifu:"343",
 						title:"绝世武神",
@@ -68,6 +71,7 @@
 					{
 						head:"",
 						name:"123",
+						id:"004",
 						num:123,
 						huifu:"343",
 						title:"绝世武神",
@@ -79,6 +83,14 @@
 					}
 				]
 			}
+		},
+		methods:{
+			toComment(id){
+				
+			},
+			praise(){
+				
+			}
 		}
 	}
 </script>
@@ -88,7 +100,7 @@
 		.community-item{
 			width: 92%;
 			margin:0 auto;
-			border-radius: 20rpx;
+			border-radius: 30rpx;
 			margin-top: 30rpx;
 			padding: 20rpx 30rpx;
 			background:#FFFFFF;
