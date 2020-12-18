@@ -84,7 +84,7 @@
 	</view>
 </template>
 <script>
-	var interval,timeInter,dianliangInter;
+let interval,timeInter,dianliangInter;
 import zhuti from '../../zhuti'
 export default{
 	data(){
@@ -115,12 +115,16 @@ export default{
 		clearInterval(dianliangInter)
 		uni.hideLoading();
 		//页面卸载的时候将通知栏显示出来
+		// #ifdef APP-PLUS
 		plus.navigator.setFullscreen(false);
+		// #endif
 	},
 	created() {
 		var this_ = this;
+		// #ifdef APP-PLUS
 		//获取状态栏高度给顶部占位节点
 		plus.navigator.setFullscreen(true);
+		// #endif
 		var zt = uni.getStorageSync('zhuti');//主题索引
 		if(zt){
 			this.dqzhuti = zt;
@@ -143,15 +147,21 @@ export default{
 	},
 	onShow() {
 		//页面显示的时候将通知栏隐藏掉
+		// #ifdef APP-PLUS 
 		plus.navigator.setFullscreen(true);
+		// #endif
 	},
 	onHide() {
 		//页面隐藏的时候将通知栏显示出来
+		// #ifdef APP-PLUS 
 		plus.navigator.setFullscreen(false);
+		// #endif
 	},
 	onLoad(e) {
+		// #ifdef APP-PLUS 
 		plus.navigator.setStatusBarStyle('dark');
 		plus.navigator.setStatusBarBackground('#FF0000');
+		// #endif
 		this.dianliang();
 		this.getTimes();
 		//每分钟获取一次电量
@@ -196,6 +206,7 @@ export default{
 		},
 		//获取系统电量
 		dianliang(){
+			// #ifdef APP-PLUS 
 			var this_ = this;
 			if (uni.getSystemInfoSync().platform != 'ios'){
 				var main = plus.android.runtimeMainActivity();
@@ -224,6 +235,7 @@ export default{
 				var level =dev.batteryLevel();
 				this_.battery = level*100;
 			}
+			// #endif
 		},
 		getTimes(){
 			var times = new Date();

@@ -1,7 +1,7 @@
 <template>
 	<view class="content">
 		<button @click="addClound">
-			add
+			reader
 		</button>
 	</view>
 </template>
@@ -11,6 +11,7 @@
 		data() {
 			return {
 				title: 'Hello',
+				title:"三体",
 				obj:{
 					name:"asda",
 					tel:"1231wa"
@@ -20,14 +21,15 @@
 		onLoad() {
 
 		},
+		onNavigationBarSearchInputClicked(){
+			uni.navigateTo({
+				url:"/pages/search/search"
+			})
+		},
 		methods: {
 			addClound(){
-				console.log(JSON.stringify(this.obj))
-				uniCloud.callFunction({
-					name:"add",
-					data:this.obj
-				}).then(res=>{
-					console.log(res.result)
+				uni.navigateTo({
+					url:"/pages/reader/book-baseinfo/book-baseinfo?bookName="+this.title+"&id='001'"
 				})
 			}
 		}

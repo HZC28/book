@@ -1,5 +1,9 @@
 <template>
 	<view class="user">
+		<view class="exit">
+			<image src="../../static/icon/tuichu.png" mode="" @click="exit()"></image>
+			<!-- <text>退出登录</text> -->
+		</view>
 		<view class="personInfo">
 			<view class="userImg">
 				<!-- <uni-icons type=""></uni-icons> -->
@@ -36,7 +40,7 @@
 					<text>想法</text>
 				</view>
 				<view class="reader-item">
-					<image src="../../static/icon/shucheng.png" mode=""></image>
+					<image src="../../static/icon/shouchang.png" mode=""></image>
 					<text>收藏</text>
 				</view>
 				<view class="reader-item">
@@ -95,22 +99,39 @@
 		data(){
 			return{
 				name:"name",
-				me:"我们读书,就不孤独我们读书,就不孤独我们读书,就不孤独我们读书,就不孤独我们读书,就不孤独我们读书,就不孤独",
+				me:"就不孤独我们读书,就不孤独我们读书,就不孤独",
 				imgurl:""
+			}
+		},
+		methods:{
+			exit(){
+				uni.navigateTo({
+					url:"/pages/login/login"
+				})
 			}
 		}
 	}
 </script>
 
 <style scoped lang="scss">
+	.exit{
+		display: flex;
+		justify-content: flex-end;
+		padding: 30rpx;
+		image{
+			width:35rpx;
+			height:35rpx;
+		}
+	}
 	.personInfo{
 		display: flex;
-		background-color: #69f0f7;
-		height: 300rpx;
+		// background-color: #69f0f7;
+		// height: 300rpx;
+		padding: 20rpx 30rpx;
 		// justify-content: center;
 		align-items: center;
 		.userImg{
-			padding: 50rpx;
+			padding-right: 30rpx;
 			.img{
 				
 			}
@@ -121,6 +142,7 @@
 			justify-content: space-between;
 			.name{
 				
+				padding-bottom: 20rpx;
 			}
 			.me{
 				overflow: hidden;
@@ -133,8 +155,9 @@
 		width:96%;
 		margin:0 auto;
 		border-radius: 20rpx;
-		position: relative;
-		top: -40rpx;
+		margin-top: 30rpx;
+		// position: relative;
+		// top: -40rpx;
 		.reader-top{
 			display: flex;
 			align-items: center;
@@ -176,6 +199,7 @@
 		padding: 30rpx 10rpx;
 		width:96%;
 		margin:0 auto;
+		margin-top: 50rpx;
 		border-radius: 20rpx;
 		display: flex;
 		justify-content: center;
