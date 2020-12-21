@@ -19,7 +19,7 @@
 			}
 		},
 		onLoad() {
-
+			
 		},
 		onNavigationBarSearchInputClicked(){
 			uni.navigateTo({

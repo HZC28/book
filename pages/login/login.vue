@@ -6,7 +6,7 @@
     <view class="list">
       <view class="list-call">
         <image class="img" src="/static/shilu-login/1.png"></image>
-        <input class="sl-input" v-model="phone" type="number" maxlength="11" placeholder="输入手机号" />
+        <input class="sl-input" v-model="phone"  maxlength="11" placeholder="输入手机号" />
       </view>
       <view class="list-call">
         <image class="img" src="/static/shilu-login/2.png"></image>
@@ -30,15 +30,30 @@
   export default {
     data() {
       return {
-        phone: '',
-        password: ''
+        phone: 'admin',
+        password: '123456'
       };
     },
     methods: {
       login() {
-        uni.switchTab({
-        	url:"/pages/index/index"
-        })
+				uniCloud.callFunction({
+					name:"userLogin",
+					data:{
+						userName:this.phone,
+						password:this.password
+					}
+				}).then(res=>{
+					if(res.result.code==200){
+						let userInfo={}
+						userInfo.userName=this.phone;
+						userInfo.role=res.result.role;
+						uni.setStorageSync("userInfo",userInfo)
+						uni.switchTab({
+							url:"/pages/index/index"
+						})
+					}
+				})
+        
       }
     }
   }

@@ -2,7 +2,8 @@
 exports.main = async (event, context) => {
 	//event为客户端上传的参数
 	const db = uniCloud.database();
-	const collection = db.collection('user_table');
+	const collection = db.collection('userinfo');
+	let obj={}
 	const res = await collection.where({
 		userName:event.userName
 	}).get()
@@ -10,7 +11,8 @@ exports.main = async (event, context) => {
 	let code=res.data.length==0?401:200;
 	if(res.data.length!=0){
 		if(res.data[0].password==event.password){
-			msg="success"
+			msg="success";
+			obj.role=res.data[0].role
 			code=200
 		}else{
 			msg="密码有误"
@@ -18,9 +20,10 @@ exports.main = async (event, context) => {
 		}
 	}
 	console.log(res)
-	let obj={}
+	
 	obj.code=code
 	obj.msg=msg
+	
 	//返回数据给客户端
 	return obj
 };

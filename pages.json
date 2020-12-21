@@ -19,6 +19,11 @@
 				"navigationStyle":"custom"
 			}
 		},{
+			"path": "pages/reader/comment-detail/comment-detail",
+			"style": {
+				"navigationBarTitleText":"评论"
+			}
+		},{
 			"path": "pages/search/search",
 			"style": {
 				// "navigationBarTitleText":"搜索",
@@ -67,6 +72,12 @@
 			"style": {
 				"navigationBarTitleText":"",
 				"navigationStyle":"custom"
+			}
+		},
+		{
+			"path": "pages/reader/release/release",
+			"style": {
+				"navigationBarTitleText":"发表评论"
 			}
 		},
 		{

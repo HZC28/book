@@ -5,7 +5,7 @@
 				<image :src="baseInfo.img"></image>
 			</view>
 			<view class="book-base">
-				<view class="bookName">{{baseInfo.name}}</view>
+				<view class="bookName">{{baseInfo.bookName}}</view>
 				<view>{{baseInfo.author}}</view>
 				<view class="introduction">{{baseInfo.introduction}}</view>
 				<u-rate size="44" :current="baseInfo.score" :disabled="true"></u-rate>
@@ -22,15 +22,16 @@
 				<text>评论</text>
 				<text  @click="allComment">全部评论<u-icon name="arrow-right"></u-icon></text>
 			</view>
-			<view class="comment-item"  v-for="i in 4">
-				<view class="title">三体的文采和细节</view>
-				<view class="content">由两大家族资助的科研团队在百慕大三角洲发现了一种从未被记录过的新物质，经过研究，发现这种物质作用极其强大，甚至能被一些人吸</view>
+			<view class="comment-item"  v-for="comment in comments">
+				<view class="title">{{comment.comentTitle}}</view>
+				<view class="content">{{comment.commentContent}}</view>
 				<view class="createinfo">
-					<view class="crateby">
-						<text style="margin-right: 10rpx;">任飘渺</text>
-						<u-rate size="32" :current="4" :disabled="true"></u-rate>
+					<view class="createby">
+						<text style="margin-right: 10rpx;">{{comment.comentBy}}</text>
+						<u-rate size="32" :current="comment.score" :disabled="true"></u-rate>
 					</view>
-					<view class="praise"><u-icon style="margin-right: 5rpx;" name="heart"></u-icon>8</view>
+					<!-- <view class="createTime">{{comment.commentTime}}</view> -->
+					<view class="praise"><u-icon style="margin-right: 5rpx;" name="heart"></u-icon>{{comment.commentPraise}}</view>
 				</view>
 			</view>
 		</view>
@@ -43,28 +44,61 @@
 		data(){
 			return{
 				baseInfo:{
-					img:"../../../static/image/book64141.jpg",
-					name:"吞噬灵体",
-					author:"唐家三少",
-					introduction:"2030年，由两大家族资助的科研团队在百慕大三角洲发现了一种从未被记录过的新物质，经过研究，发现这种物质作用极其强大，甚至能被一些人吸收，从而改变提升身体的素质，他们把这种物质称为灵，把能吸收这种物质的人叫做灵体，两大家族在决定如何使用这种物质的过程中发生分歧，至此两大家族关系破裂。两大家族在进一步研究灵的同时在全世界寻找灵体，两大家族的财力与权利相当，想要超越另一方只能在灵的研究和灵体的数量上下功夫，双方的对抗一直僵持不下，直到2036年一个S级灵体的出现",
-					score:"4.4"
+					// img:"../../../static/image/book64141.jpg",
+					// name:"吞噬灵体",
+					// author:"唐家三少",
+					// introduction:"2030年，由两大家族资助的科研团队在百慕大三角洲发现了一种从未被记录过的新物质，经过研究，发现这种物质作用极其强大，甚至能被一些人吸收，从而改变提升身体的素质，他们把这种物质称为灵，把能吸收这种物质的人叫做灵体，两大家族在决定如何使用这种物质的过程中发生分歧，至此两大家族关系破裂。两大家族在进一步研究灵的同时在全世界寻找灵体，两大家族的财力与权利相当，想要超越另一方只能在灵的研究和灵体的数量上下功夫，双方的对抗一直僵持不下，直到2036年一个S级灵体的出现",
+					// score:"4.4"
 				},
-				comment:[],
+				comments:[],
 				id:""
 			}
 		},
 		methods:{
+			// 获取基本信息
+			init(){
+				const db = uniCloud.database();//代码块为cdb
+				// 使用uni-clientDB
+				db.collection('book').where({
+					"bookid":this.id
+				}).get({getOne:true}).then((res)=>{
+						console.log(res.result.data.img.toString())
+						this.baseInfo=res.result.data
+				    // res 为数据库查询结果
+						uni.setNavigationBarTitle({
+								title:this.baseInfo.bookName
+						});
+				  }).catch((err)=>{
+						console.log(err)
+				  })
+					
+					
+					
+			},
+			// 获取评论
+			getComments(){
+				const db = uniCloud.database();//代码块为cdb
+				db.collection('comment').skip(1).limit(3).where({
+					"bookId":this.id
+				}).orderBy('commentTime','asc').get().then((res)=>{
+						this.comments=res.result.data
+						console.log(res.result.data)
+				  }).catch((err)=>{
+						console.log(err)
+				  })
+			},
 			allComment(){
 				uni.navigateTo({
 					url:"/pages/reader/allcomment/allcomment"
 				})
-			}
+			},
+			
 		},
 		onLoad(option){
-			this.id=option.id
-			uni.setNavigationBarTitle({
-					title:option.bookName
-			});
+			this.id="10001"
+			// 获取db引用
+			this.init()
+			this.getComments()
 		}
 	}
 </script>
@@ -166,6 +200,10 @@
 				width: 100%;
 				.createby{
 					flex:1;
+				}
+				.createTime{
+					flex:1;
+					margin-left: 15rpx;
 				}
 				.praise{
 					flex:1;
