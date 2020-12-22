@@ -99,8 +99,14 @@
 		data(){
 			return{
 				name:"name",
-				me:"就不孤独我们读书,就不孤独我们读书,就不孤独",
+				me:"我们读书,就不孤独我们读书,就不孤独",
 				imgurl:""
+			}
+		},
+		onLoad() {
+			let userInfo=uni.getStorageSync("userInfo");
+			if(userInfo){
+				
 			}
 		},
 		methods:{

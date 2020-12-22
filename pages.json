@@ -77,7 +77,22 @@
 		{
 			"path": "pages/reader/release/release",
 			"style": {
-				"navigationBarTitleText":"发表评论"
+				"navigationBarTitleText":"发表评论",
+				"app-plus":{
+					"titleNView":{
+						"padding-right":"20rpx",
+						// "backgroundColor":"#00ffff",
+						"buttons":[
+							{
+								"text":"发布",
+								"fontSize":"32rpx",
+								"color":"#2B85E4"
+								
+							}
+						]
+						
+					}
+				}
 			}
 		},
 		{
