@@ -95,7 +95,7 @@
 			
 		},
 		onLoad(option){
-			this.id="10001"
+			this.id=option.id
 			// 获取db引用
 			this.init()
 			this.getComments()

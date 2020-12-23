@@ -7,11 +7,11 @@
 		<view class="personInfo">
 			<view class="userImg">
 				<!-- <uni-icons type=""></uni-icons> -->
-				<u-image width="100rpx" height="100rpx" class="img" src="../../static/image/touxiang.png" shape="circle"></u-image>
+				<u-image width="100rpx" height="100rpx" class="img" :src="headPortrait" shape="circle"></u-image>
 			</view>
 			<view class="userInfo">
 				<view class="name">{{name}}</view>
-				<view class="me">{{me}}</view>
+				<view class="me">{{signature}}</view>
 			</view>
 		</view>
 		<!-- 基本的读者板块 -->
@@ -99,14 +99,16 @@
 		data(){
 			return{
 				name:"name",
-				me:"我们读书,就不孤独我们读书,就不孤独",
-				imgurl:""
+				signature:"我们读书,就不孤独我们读书,就不孤独",
+				headPortrait:""
 			}
 		},
 		onLoad() {
 			let userInfo=uni.getStorageSync("userInfo");
 			if(userInfo){
-				
+				this.name=userInfo.userName;
+				this.headPortrait=userInfo.headPortrait;
+				this.signature=userInfo.signature;
 			}
 		},
 		methods:{

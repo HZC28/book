@@ -39,7 +39,7 @@
 				uniCloud.callFunction({
 					name:"userLogin",
 					data:{
-						userName:this.phone,
+						account:this.phone,
 						password:this.password
 					}
 				}).then(res=>{
@@ -47,6 +47,8 @@
 						let userInfo={}
 						userInfo.userName=this.phone;
 						userInfo.role=res.result.role;
+						userInfo.headPortrait=res.result.headPortrait;
+						userInfo.signature=res.result.signature;
 						uni.setStorageSync("userInfo",userInfo)
 						uni.switchTab({
 							url:"/pages/index/index"

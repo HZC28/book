@@ -29,7 +29,7 @@
 		methods: {
 			addClound(){
 				uni.navigateTo({
-					url:"/pages/reader/book-baseinfo/book-baseinfo?bookName="+this.title+"&id='001'"
+					url:"/pages/reader/book-baseinfo/book-baseinfo?&id=10001"
 				})
 			}
 		}

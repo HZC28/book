@@ -5,7 +5,7 @@ exports.main = async (event, context) => {
 	const collection = db.collection('userinfo');
 	let obj={}
 	const res = await collection.where({
-		userName:event.userName
+		account:event.account
 	}).get()
 	let msg=res.data.length==0?"用户不存在":"";
 	let code=res.data.length==0?401:200;
@@ -13,6 +13,8 @@ exports.main = async (event, context) => {
 		if(res.data[0].password==event.password){
 			msg="success";
 			obj.role=res.data[0].role
+			obj.headPortrait=res.data[0].headPortrait
+			obj.signature=res.data[0].signature
 			code=200
 		}else{
 			msg="密码有误"
