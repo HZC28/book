@@ -70,8 +70,13 @@
 		},{
 			"path": "pages/community/community",
 			"style": {
-				"navigationBarTitleText":"",
+				"navigationBarTitleText":"社区",
 				"navigationStyle":"custom"
+			}
+		},{
+			"path": "pages/user/userinfo/userinfo",
+			"style": {
+				"navigationBarTitleText":"个人信息"
 			}
 		},
 		{

@@ -10,7 +10,8 @@ exports.main = async (event, context) => {
 		userName:event.account,
 		role:"reader",
 		headPortrait:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/userImg/touxiang.png",
-		money:"0"
+		money:"0",
+		sex:"无"
 	})
 	//返回数据给客户端
 	return event

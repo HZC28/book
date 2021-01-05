@@ -13,7 +13,9 @@
 				<view class="name">{{name}}</view>
 				<view class="me">{{signature}}</view>
 			</view>
+			
 		</view>
+		<text @click="toEdit()">编辑资料</text>
 		<!-- 基本的读者板块 -->
 		<view class="reader">
 			<view class="reader-top">
@@ -103,7 +105,7 @@
 				headPortrait:""
 			}
 		},
-		onLoad() {
+		onShow() {
 			let userInfo=uni.getStorageSync("userInfo");
 			if(userInfo){
 				this.name=userInfo.userName;
@@ -112,6 +114,11 @@
 			}
 		},
 		methods:{
+			toEdit(){
+				uni.navigateTo({
+					url:"/pages/user/userinfo/userinfo"
+				})
+			},
 			exit(){
 				uni.navigateTo({
 					url:"/pages/login/login"

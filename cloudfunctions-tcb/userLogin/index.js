@@ -13,6 +13,9 @@ exports.main = async (event, context) => {
 		if(res.data[0].password==event.password){
 			msg="success";
 			obj.role=res.data[0].role
+			obj.account=res.data[0].account
+			obj.userName=res.data[0].userName
+			obj.sex=res.data[0].sex
 			obj.headPortrait=res.data[0].headPortrait
 			obj.signature=res.data[0].signature
 			code=200

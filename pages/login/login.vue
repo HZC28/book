@@ -45,8 +45,10 @@
 				}).then(res=>{
 					if(res.result.code==200){
 						let userInfo={}
-						userInfo.userName=this.phone;
+						userInfo.userName=res.result.userName;
 						userInfo.role=res.result.role;
+						userInfo.account=res.result.account;
+						userInfo.sex=res.result.sex;
 						userInfo.headPortrait=res.result.headPortrait;
 						userInfo.signature=res.result.signature;
 						uni.setStorageSync("userInfo",userInfo)
