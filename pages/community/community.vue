@@ -84,7 +84,27 @@
 				]
 			}
 		},
+		created() {
+			this.getShareIdea()
+		},
+		onReachBottom() {
+			this.getShareIdea()
+		},
 		methods:{
+			getShareIdea(){
+				const db = uniCloud.database();//代码块为cdb
+				uni.showLoading({
+				    title: '加载中'
+				});
+				// 使用uni-clientDB
+				db.collection('shareIdea_table').get().then((res)=>{
+						console.log(res.result.data)
+						uni.hideLoading()
+				  }).catch((err)=>{
+						console.log(err)
+						uni.hideLoading()
+				  })
+			},
 			toComment(id){
 				
 			},
