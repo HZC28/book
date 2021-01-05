@@ -21,6 +21,9 @@
 		onLoad() {
 			
 		},
+		onPullDownRefresh() {
+			
+		},
 		onNavigationBarSearchInputClicked(){
 			uni.navigateTo({
 				url:"/pages/search/search"

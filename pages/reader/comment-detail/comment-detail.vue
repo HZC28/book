@@ -1,6 +1,10 @@
 <template>
 	<view class="comment-detail">
-		<view class="">1</view>
+		<view class="" v-for="comment in comments">
+			{{comment.headPortrait}}
+			<!-- <image :src="comment.headPortrait" mode=""></image> -->
+		</view>
+		
 	</view>
 </template>
 
@@ -11,7 +15,8 @@
 				bookId:"10001",
 				commentId:"1",
 				pageNum:1,
-				total:0
+				total:0,
+				comments:[]
 			}
 		},
 		onLoad(option) {
@@ -27,6 +32,7 @@
 					commentId:this.commentId
 				}).get().then(res=>{
 					console.log(res.result.data)
+					this.comments=res.result.data
 				})
 				db.collection("reply").where({
 					bookId:this.bookId,
