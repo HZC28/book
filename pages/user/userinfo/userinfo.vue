@@ -71,6 +71,7 @@
 				account:"",
 				userName:"",
 				headPortrait:"",
+				headPortraitChange:"",
 				signature:"",
 				signature1:'',
 				sex:"",
@@ -102,7 +103,57 @@
 				this.sex1=userInfo.sex
 			},
 			changeHeadPortrait(){
+				let self=this
+				uni.chooseImage({
+				    count: 1, //默认9
+				    sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+				    success: function (res) {
+				        console.log(JSON.stringify(res.tempFilePaths));
+								self.uploadImg(res.tempFilePaths)
+								
+				    }
+				});
 				
+			},
+			changeInfo(){
+				uniCloud.callFunction({
+					name:"changeUserInfo",
+					data:{
+						account:this.account,
+						headPortrait:this.headPortraitChange
+					}
+				}).then(res=>{
+					if(res.result.updated==1){
+						this.toast("修改成功");
+						let userInfo=uni.getStorageSync("userInfo")
+						userInfo.headPortrait=this.headPortraitChange
+						uni.setStorageSync("userInfo",userInfo)
+						this.init()
+					}
+				})
+			},
+			// 上传图片到云存储
+			async uploadImg(lists){
+				let num=Math.floor(Math.random() * 100)
+				let filename=new Date().getTime()+''+num
+				const result = await uniCloud.uploadFile({
+							filePath: lists[0],
+							cloudPath: 'userImg/'+filename+".jpg",
+				 }).then(res=>{
+					 let arr=[]
+					 console.log(res)
+					 arr.push(res.fileID)
+					 uniCloud.getTempFileURL({
+					     fileList: arr
+					 }).then(res1=>{
+						 console.log(res1)
+						 this.headPortraitChange=res1.fileList[0].tempFileURL
+						 console.log(res1.fileList[0].tempFileURL)
+						 this.changeInfo()
+					 })
+				 }).catch(err=>{
+					 console.log(err)
+				 });
 			},
 			radioChange(name){
 				console.log(name)
@@ -159,6 +210,7 @@
 			image{
 				width:200rpx;
 				height: 200rpx;
+				border-radius: 100rpx;
 			}
 		}
 		.info{
