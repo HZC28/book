@@ -14,13 +14,13 @@
 				<text>{{item.content}}</text>
 				<view class="imgbox">
 					<view class="img" v-if="item.images.length==3">
-						<image style="height: 200rpx;" :src="imgurl" mode="widthFix" v-for="imgurl in item.images"></image>
+						<image @click="previewImage(imgurl)" style="height: 200rpx;" :src="imgurl" mode="widthFix" v-for="imgurl in item.images"></image>
 					</view>
 					<view class="img" v-if="item.images.length==2">
-						<image style="height: 300rpx;" :src="imgurl" mode="widthFix" v-for="imgurl in item.images"></image>
+						<image @click="previewImage(imgurl)" style="height: 300rpx;" :src="imgurl" mode="widthFix" v-for="imgurl in item.images"></image>
 					</view>
 					<view class="img" v-if="item.images.length==1">
-						<image style="width: 400rpx;" :src="imgurl" mode="center" v-for="imgurl in item.images"></image>
+						<image @click="previewImage(imgurl)" style="width: 400rpx;border-radius: 10rpx;" :src="imgurl" mode="widthFix" v-for="imgurl in item.images"></image>
 					</view>
 				</view>
 			</view>
@@ -102,6 +102,13 @@
 			this.getShareIdea()
 		},
 		methods:{
+			previewImage(url){
+				let arr=[]
+				arr.push(url)
+				uni.previewImage({
+				   urls: arr
+				});
+			},
 			getShareIdea(){
 				const db = uniCloud.database();//代码块为cdb
 				uni.showLoading({

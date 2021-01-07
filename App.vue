@@ -19,6 +19,6 @@
 <style>
 	/*每个页面公共css */
 	page{
-		background: #FAFAFA;
+		background: #f7f7f7;
 	}
 </style>

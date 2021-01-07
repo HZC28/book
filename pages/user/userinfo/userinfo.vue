@@ -219,7 +219,7 @@
 				width: 100%;
 				height: 100rpx;
 				line-height: 100rpx;
-				border-top: 1rpx solid #C0C0C0;
+				// border-top: 1rpx solid #C0C0C0;
 				display: flex;
 				.left{
 					flex: 2;

@@ -15,8 +15,12 @@
 		},{
 			"path": "pages/community/detail/detail",
 			"style": {
-				"navigationBarTitleText":"",
-				"navigationStyle":"custom"
+				"navigationBarTitleText":"评论"
+			}
+		},{
+			"path": "pages/community/idea/idea",
+			"style": {
+				"navigationBarTitleText":"发表先得"
 			}
 		},{
 			"path": "pages/reader/comment-detail/comment-detail",

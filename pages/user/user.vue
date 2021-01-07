@@ -15,7 +15,7 @@
 			</view>
 			
 		</view>
-		<text @click="toEdit()">编辑资料</text>
+		<view class="edit" @click="toEdit()">编辑资料</view>
 		<!-- 基本的读者板块 -->
 		<view class="reader">
 			<view class="reader-top">
@@ -137,6 +137,11 @@
 			width:35rpx;
 			height:35rpx;
 		}
+	}
+	.edit{
+		padding-left: 20rpx;
+		font-size: 28rpx;
+		color: #F29100;
 	}
 	.personInfo{
 		display: flex;
