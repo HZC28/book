@@ -1,5 +1,8 @@
 <template>
 	<view class="community">
+		<view class="status_bar">
+			<!-- 这里是状态栏 -->
+		</view>
 		<view v-for="item in items" class="community-item">
 			<view class="ci-top">
 				<view class="head">
@@ -141,6 +144,10 @@
 </script>
 
 <style scoped lang="scss">
+	.status_bar {
+		height: var(--status-bar-height);
+		width: 100%;
+	}
 	.community{
 		.community-item{
 			width: 92%;

@@ -1,5 +1,8 @@
 <template>
 	<view class="user">
+		<view class="status_bar">
+			<!-- 这里是状态栏 -->
+		</view>
 		<view class="exit">
 			<image src="../../static/icon/tuichu.png" mode="" @click="exit()"></image>
 			<!-- <text>退出登录</text> -->
@@ -129,6 +132,10 @@
 </script>
 
 <style scoped lang="scss">
+	.status_bar {
+		height: var(--status-bar-height);
+		width: 100%;
+	}
 	.exit{
 		display: flex;
 		justify-content: flex-end;

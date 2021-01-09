@@ -48,6 +48,7 @@
 	export default {
 		data() {
 			return {
+				pagesNum:1,
 				classifion:{
 					classifyName:"玄幻灵异",
 					children:[
@@ -101,8 +102,15 @@
 		onLoad() {
 			
 		},
+		onReachBottom() {
+			this.init()
+		},
 		onPullDownRefresh() {
-			
+			this.pagesNum=1;
+			this.init()
+		},
+		created() {
+			this.init()
 		},
 		onNavigationBarSearchInputClicked(){
 			uni.navigateTo({
@@ -110,6 +118,21 @@
 			})
 		},
 		methods: {
+			init(){
+				let db=uniCloud.database()
+				let collection=db.collection('book')
+				uni.showLoading({
+					title: '',
+					mask: false
+				});
+				collection.skip(this.pagesNum).limit(10).get().then(res=>{
+					console.log(res)
+					this.pagesNum=this.pagesNum+10
+					uni.hideLoading()
+				}).catch(err=>{
+					uni.hideLoading()
+				})
+			},
 			addClound(){
 				uni.navigateTo({
 					url:"/pages/reader/book-baseinfo/book-baseinfo?&id=10001"

@@ -25,24 +25,26 @@
 		methods:{
 			// 上传图片到云存储
 			async uploadImg(lists, name){
-				 let num=Math.floor(Math.random() * 100)
-				let filename=new Date().getTime()+''+num
-				const result = await uniCloud.uploadFile({
-							filePath: lists[0].url,
-							cloudPath: 'upload/'+filename+".jpg",
-				 }).then(res=>{
-					 let arr=[];
-					 arr.push(res.fileID)
-					 this.cloudIds.push(res.fileID)
-					 uniCloud.getTempFileURL({
-					     fileList: arr
-					 }).then(res1=>{
-						 console.log(res1.fileList[0].tempFileURL)
-						 this.fileList.push(res1.fileList[0].tempFileURL)
-					 })
-				 }).catch(err=>{
-					 console.log(err)
-				 });
+				for(let i=0;i<lists.length;i++){
+					let num=Math.floor(Math.random() * 100)
+					let filename=new Date().getTime()+''+num
+					const result = await uniCloud.uploadFile({
+								filePath: lists[i].url,
+								cloudPath: 'upload/'+filename+".jpg",
+					 }).then(res=>{
+						 let arr=[];
+						 arr.push(res.fileID)
+						 this.cloudIds.push(res.fileID)
+						 uniCloud.getTempFileURL({
+						     fileList: arr
+						 }).then(res1=>{
+							 console.log(res1.fileList[0].tempFileURL)
+							 this.fileList.push(res1.fileList[0].tempFileURL)
+						 })
+					 }).catch(err=>{
+						 console.log(err)
+					 });
+				}
 			},
 			async getUrl(){
 				let result = await uniCloud.getTempFileURL({
