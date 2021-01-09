@@ -132,6 +132,10 @@
 				}).catch(err=>{
 					uni.hideLoading()
 				})
+				uniCloud.callFunction({
+					name:'getBookType'
+				}).then(res=>{
+				})
 			},
 			addClound(){
 				uni.navigateTo({
