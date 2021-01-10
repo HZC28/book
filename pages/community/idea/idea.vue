@@ -1,13 +1,25 @@
 <template>
 	<view class="release">
+		<view class="bookAuthor">
+			书籍/作者：
+			<u-tag class="tags" :type="tabType[index]" mode="dark" v-for="(t,index) in this.tabs" :text="t" closeable  @close="tagClick(index)" />
+			<u-button v-if="tabs.length<=3" class="tags" type="primary" size="mini" @click="openModel">添加标签</u-button>	
+		</view>
 		<u-input placeholder="评论标题" class="title" v-model="title" />
+		
 		<u-input type="textarea" placeholder="尽情发挥你的想象" v-model="content" class="content"></u-input>
 		<!-- <view class="score">
 			<text >评分:</text>
 			<u-rate  style="padding: 20rpx 0;" size="44" v-model="score"></u-rate>
 		</view> -->
-		<u-upload upload-text=""   @on-choose-complete="uploadImg" :auto-upload="false" @on-remove="removeImg"></u-upload>
-
+		<u-upload upload-text=""  @on-choose-complete="uploadImg" :auto-upload="false" @on-remove="removeImg"></u-upload>
+		<u-modal @confirm="addTab" class="model" title="添加标签名" v-model="show" :show-cancel-button="true">
+				<u-form style="padding:30rpx">
+					<u-form-item label="标签名:" label-width="120rpx">
+						<u-input class="tab" v-model="tab" maxlength="8" border placeholder="标签可以是书籍名或作者" />
+					</u-form-item>
+				</u-form>
+		</u-modal>
 	</view>
 </template>
 
@@ -19,30 +31,52 @@
 				content:"",
 				fileList: [],
 				cloudIds:[],
-				score:""
+				score:"",
+				show:false,
+				tab:"",
+				tabs:[],
+				tabType:["success","warning","error","info","primary"]
 			}
 		},
 		methods:{
+			tagClick(index){
+				this.tabs.splice(index,1)
+			},
+			openModel(){
+				this.show=true
+			},
+			addTab(){
+				if(this.tab==""){
+					this.toast("请添加标签名")
+					this.show=true
+					return
+				}
+				this.tabs.push(this.tab)
+				this.tab=""
+				this.show=false
+			},
 			// 上传图片到云存储
 			async uploadImg(lists, name){
-				 let num=Math.floor(Math.random() * 100)
-				let filename=new Date().getTime()+''+num
-				const result = await uniCloud.uploadFile({
-							filePath: lists[0].url,
-							cloudPath: 'upload/'+filename+".jpg",
-				 }).then(res=>{
-					 let arr=[];
-					 arr.push(res.fileID)
-					 this.cloudIds.push(res.fileID)
-					 uniCloud.getTempFileURL({
-					     fileList: arr
-					 }).then(res1=>{
-						 console.log(res1.fileList[0].tempFileURL)
-						 this.fileList.push(res1.fileList[0].tempFileURL)
-					 })
-				 }).catch(err=>{
-					 console.log(err)
-				 });
+				for(let i=0;i<lists.length;i++){
+					let num=Math.floor(Math.random() * 100)
+					let filename=new Date().getTime()+''+num
+					const result = await uniCloud.uploadFile({
+								filePath: lists[i].url,
+								cloudPath: 'upload/'+filename+".jpg",
+					 }).then(res=>{
+						 let arr=[];
+						 arr.push(res.fileID)
+						 this.cloudIds.push(res.fileID)
+						 uniCloud.getTempFileURL({
+						     fileList: arr
+						 }).then(res1=>{
+							 console.log(res1.fileList[0].tempFileURL)
+							 this.fileList.push(res1.fileList[0].tempFileURL)
+						 })
+					 }).catch(err=>{
+						 console.log(err)
+					 });
+				}
 			},
 			async getUrl(){
 				let result = await uniCloud.getTempFileURL({
@@ -121,6 +155,12 @@
 <style scoped lang="scss">
 	.release{
 		padding:0rpx 30rpx;
+		.bookAuthor{
+			.tags{
+				margin-right: 20rpx;
+				margin-bottom: 20rpx;
+			}
+		}
 		.title{
 			border-bottom: 1rpx solid #f5f5f5;
 			
@@ -133,6 +173,12 @@
 		}
 		.content{
 			margin-top: 15rpx;
+		}
+	}
+	.model{
+		padding: 0 20rpx;
+		.tab{
+			width: 200rpx;
 		}
 	}
 </style>

@@ -19,7 +19,7 @@ exports.main = async (event, context) => {
 		arr.push(obj)
 	})
 	
-	let res1=await collection.limit(4).where({
+	let res1=await collection.limit(6).where({
 		type:"武侠小说"
 	}).field({
 		'author':true,
@@ -29,11 +29,11 @@ exports.main = async (event, context) => {
 	}).get().then(res=>{
 		let obj={}
 		obj.type="武侠小说"
-		obj.bookList=res
+		obj.bookList=res.data
 		arr.push(obj)
 	})
 	
-	let res2=await collection.limit(4).where({
+	let res2=await collection.limit(6).where({
 		type:"悬疑/推理小说"
 	}).field({
 		'author':true,
@@ -44,7 +44,7 @@ exports.main = async (event, context) => {
 	}).get().then(res=>{
 		let obj={}
 		obj.type="悬疑/推理小说"
-		obj.bookList=res
+		obj.bookList=res.data
 		arr.push(obj)
 	})
 	//返回数据给客户端

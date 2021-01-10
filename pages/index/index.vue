@@ -1,26 +1,28 @@
 <template>
 	<view class="content">
-		<view class="theclassify" v-for="i in 3">
+		<!-- 书籍分类 -->
+		<view class="theclassify" v-for="classifion in classifions">
 			<view class="title">
-				分类•{{classifion.classifyName}}
+				分类•{{classifion.type}}
 			</view>
 			<view class="main">
-				<view class="bookInfo" v-for="i in 6">
+				<view class="bookInfo" @click="tobookInfo(book.bookid)" v-for="book in classifion.bookList">
 					<view class="left">
-						<image :src="classifion.children[0].imgUrl" mode=""></image>
+						<image :src="book.img" mode=""></image>
 					</view>
 					<view class="right">
 						<view class="name">
-							{{classifion.children[0].name}}
+							{{book.bookName}}
 						</view>
 						<view class="author">
-							{{classifion.children[0].author}}
+							{{book.author}}
 						</view>
 					</view>
 				</view>
 				
 			</view>
 		</view>
+		<!-- 书籍 -->
 		<view class="thebook" v-for="book in books">
 			<view class="top">
 				<view class="left">
@@ -29,7 +31,7 @@
 				<view class="right">
 					<view class="info">
 						<view class="bookName">{{book.bookName}}</view>
-						<view class="classify">{{book.classify}}</view>
+						<view class="classify">{{book.type}}</view>
 					</view>
 					<view class="author">
 						{{book.author}}
@@ -38,7 +40,7 @@
 			</view>
 			<view class="hr"></view>
 			<view class="bom">
-				{{book.content}}
+				{{book.introduction}}
 			</view>
 		</view>
 	</view>
@@ -49,54 +51,9 @@
 		data() {
 			return {
 				pagesNum:1,
-				classifion:{
-					classifyName:"玄幻灵异",
-					children:[
-						{
-							name:"太古神王",
-							id:"1",
-							author:"靳无痕",
-							imgUrl:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg"
-						}
-					]
-				},
-				books:[
-					{
-						bookName:"修仙",
-						classify:"悬疑",
-						content:"夏薇在这个夏天的中午终于充分的体会到了人倒霉了到底有多严重！那可真是喝口凉水都塞牙，放屁都砸脚后跟，系个鞋带都崴了脚，总而言之用广东话说就是衰到家了！",
-						author:"仙人掌的花",
-						img:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg"
-					},
-					{
-						bookName:"修仙",
-						classify:"悬疑",
-						content:"夏薇在这个夏天的中午终于充分的体会到了人倒霉了到底有多严重！那可真是喝口凉水都塞牙，放屁都砸脚后跟，系个鞋带都崴了脚，总而言之用广东话说就是衰到家了！",
-						author:"仙人掌的花",
-						img:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg"
-					},
-					{
-						bookName:"修仙",
-						classify:"悬疑",
-						content:"夏薇在这个夏天的中午终于充分的体会到了人倒霉了到底有多严重！那可真是喝口凉水都塞牙，放屁都砸脚后跟，系个鞋带都崴了脚，总而言之用广东话说就是衰到家了！",
-						author:"仙人掌的花",
-						img:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg"
-					},
-					{
-						bookName:"修仙",
-						classify:"悬疑",
-						content:"夏薇在这个夏天的中午终于充分的体会到了人倒霉了到底有多严重！那可真是喝口凉水都塞牙，放屁都砸脚后跟，系个鞋带都崴了脚，总而言之用广东话说就是衰到家了！",
-						author:"仙人掌的花",
-						img:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg"
-					},
-					{
-						bookName:"修仙",
-						classify:"悬疑",
-						content:"夏薇在这个夏天的中午终于充分的体会到了人倒霉了到底有多严重！那可真是喝口凉水都塞牙，放屁都砸脚后跟，系个鞋带都崴了脚，总而言之用广东话说就是衰到家了！",
-						author:"仙人掌的花",
-						img:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg"
-					}
-				]
+				classifions:[],
+				books:[],
+				total:0
 			}
 		},
 		onLoad() {
@@ -110,6 +67,7 @@
 			this.init()
 		},
 		created() {
+			this.getType()
 			this.init()
 		},
 		onNavigationBarSearchInputClicked(){
@@ -118,28 +76,45 @@
 			})
 		},
 		methods: {
-			init(){
+			async init(){
 				let db=uniCloud.database()
 				let collection=db.collection('book')
-				uni.showLoading({
-					title: '',
-					mask: false
-				});
-				collection.skip(this.pagesNum).limit(10).get().then(res=>{
-					console.log(res)
-					this.pagesNum=this.pagesNum+10
-					uni.hideLoading()
-				}).catch(err=>{
-					uni.hideLoading()
+				await collection.count().then(res=>{
+					console.log(res.result.total)
+					this.total=res.result.total
 				})
+				if(this.total>(this.pagesNum-1)*10){
+					uni.showLoading({
+						title: '',
+						mask: false
+					});
+					collection.skip(10*(this.pagesNum-1)).limit(10).get().then(res=>{
+						// console.log(this.pagesNum)
+						this.pagesNum=this.pagesNum+1;
+						// console.log(this.pagesNum)
+						this.books=this.books.concat(res.result.data)
+						uni.hideLoading()
+					}).catch(err=>{
+						uni.hideLoading()
+					})
+				}else{
+					
+				}
+				
+				
+			},
+			getType(){
+				
 				uniCloud.callFunction({
 					name:'getBookType'
 				}).then(res=>{
+					// console.log(res)
+					this.classifions=res.result
 				})
 			},
-			addClound(){
+			tobookInfo(id){
 				uni.navigateTo({
-					url:"/pages/reader/book-baseinfo/book-baseinfo?&id=10001"
+					url:"/pages/reader/book-baseinfo/book-baseinfo?&id="+id
 				})
 			}
 		}
@@ -164,9 +139,9 @@
 		.main{
 			display: flex;
 			flex-wrap: wrap;
-			
+			justify-content: space-between;
 			.bookInfo{
-				width: 50%;
+				// width: 50%;
 				display: flex;
 				align-items: center;
 				margin-bottom: 15rpx;
