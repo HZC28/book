@@ -5,14 +5,14 @@
 			<u-tag class="tags" :type="tabType[index]" mode="dark" v-for="(t,index) in this.tabs" :text="t" closeable  @close="tagClick(index)" />
 			<u-button v-if="tabs.length<=3" class="tags" type="primary" size="mini" @click="openModel">添加标签</u-button>	
 		</view>
-		<u-input placeholder="评论标题" class="title" v-model="title" />
+		<u-input placeholder="标题(可选)" class="title" v-model="title" />
 		
-		<u-input type="textarea" placeholder="尽情发挥你的想象" v-model="content" class="content"></u-input>
+		<u-input type="textarea" placeholder="尽情分享你的心得" v-model="content" class="content"></u-input>
 		<!-- <view class="score">
 			<text >评分:</text>
 			<u-rate  style="padding: 20rpx 0;" size="44" v-model="score"></u-rate>
 		</view> -->
-		<u-upload upload-text=""  @on-choose-complete="uploadImg" :auto-upload="false" @on-remove="removeImg"></u-upload>
+		<u-upload ref="uUpload" upload-text="" @on-choose-complete="uploadImg" :auto-upload="false" @on-remove="removeImg"></u-upload>
 		<u-modal @confirm="addTab" class="model" title="添加标签名" v-model="show" :show-cancel-button="true">
 				<u-form style="padding:30rpx">
 					<u-form-item label="标签名:" label-width="120rpx">
@@ -57,6 +57,9 @@
 			},
 			// 上传图片到云存储
 			async uploadImg(lists, name){
+				console.log(lists)
+				this.fileList=[]
+				this.cloudIds=[]
 				for(let i=0;i<lists.length;i++){
 					let num=Math.floor(Math.random() * 100)
 					let filename=new Date().getTime()+''+num
@@ -72,6 +75,7 @@
 						 }).then(res1=>{
 							 console.log(res1.fileList[0].tempFileURL)
 							 this.fileList.push(res1.fileList[0].tempFileURL)
+							 console.log(this.fileList)
 						 })
 					 }).catch(err=>{
 						 console.log(err)
@@ -107,14 +111,14 @@
 					this.toast("没有输入评论内容")
 					return false
 				}
-				if(this.score==''){
-					this.toast("请先评分再发布")
+				if(this.tabs.length===0){
+					this.toast("请至少添加一个标签")
 					return false
 				}
 				if(!userInfo){
 					uni.showModal({
 					    title: '提示',
-					    content: '您还没有登录,无法发布评论',
+					    content: '您还没有登录,无法发布心得',
 							confirmText:"去登录",
 					    success: function (res) {
 					        if (res.confirm) {
@@ -136,13 +140,17 @@
 				if(!this.vrification()){return}
 				console.log(`${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`)
 				let userInfo=uni.getStorageSync("userInfo")
+				console.log(this.fileList)
 				uniCloud.callFunction({
-					name:"releaseComment",
+					name:"releaseIdea",
 					data:{
-						comentBy:userInfo.userName,
-						comentTitle:this.title,
-						commentContent:this.content,
-						score:this.score
+						account:userInfo.account,
+						headPortrait:userInfo.headPortrait,
+						ideaBy:userInfo.userName,
+						ideaTitle:this.title,
+						ideaContent:this.content,
+						tabs:this.tabs,
+						ideaImg:this.fileList
 					}
 				}).then(res=>{
 					console.log(res)

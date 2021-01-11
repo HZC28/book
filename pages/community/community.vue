@@ -3,33 +3,33 @@
 		<view class="status_bar">
 			<!-- 这里是状态栏 -->
 		</view>
-		<view v-for="item in items" class="community-item">
+		<view v-for="idea in ideas" class="community-item">
 			<view class="ci-top">
 				<view class="head">
-					<image src="../../static/image/book1018082.jpg" mode=""></image>
+					<image :src="idea.headPortrait" mode=""></image>
 				</view>
 				<view class="detail">
-					<text class="name">{{item.name}}</text>
-					<text class="title">{{item.title}}</text>
+					<text class="name">{{idea.ideaBy}}</text>
+					<text class="title">{{idea.ideaTime}}</text>
 				</view>
 			</view>
 			<view class="ci-center">
-				<text>{{item.content}}</text>
+				<text @click="toComment(idea.ideaId)">{{idea.ideaContent}}</text>
 				<view class="imgbox">
-					<view class="img" v-if="item.images.length==3">
-						<image @click="previewImage(imgurl)" style="height: 200rpx;" :src="imgurl" mode="widthFix" v-for="imgurl in item.images"></image>
+					<view class="img" v-if="idea.ideaImg.length==3">
+						<image @click="previewImage(imgurl)" style="height: 200rpx;" :src="imgurl" mode="widthFix" v-for="imgurl in idea.ideaImg"></image>
 					</view>
-					<view class="img" v-if="item.images.length==2">
-						<image @click="previewImage(imgurl)" style="height: 300rpx;" :src="imgurl" mode="widthFix" v-for="imgurl in item.images"></image>
+					<view class="img" v-if="idea.ideaImg.length==2">
+						<image @click="previewImage(imgurl)" style="height: 300rpx;" :src="imgurl" mode="widthFix" v-for="imgurl in idea.ideaImg"></image>
 					</view>
-					<view class="img" v-if="item.images.length==1">
-						<image @click="previewImage(imgurl)" style="width: 400rpx;border-radius: 10rpx;" :src="imgurl" mode="widthFix" v-for="imgurl in item.images"></image>
+					<view class="img" v-if="idea.ideaImg.length==1">
+						<image @click="previewImage(imgurl)" style="width: 400rpx;border-radius: 10rpx;" :src="imgurl" mode="widthFix" v-for="imgurl in idea.ideaImg"></image>
 					</view>
 				</view>
 			</view>
 			<view class="ci-bom">
-				<view @click="toComment(item.id)">评论{{item.huifu}}</view>
-				<view @click="praise">点赞{{item.num}}</view>
+				<view @click="toComment(idea.ideaId)">评论{{idea.ideaReply}}</view>
+				<view @click="praise">点赞{{idea.ideaPraise}}</view>
 			</view>
 		</view>
 		<view class="release" @click="release()">
@@ -42,60 +42,7 @@
 	export default{
 		data(){
 			return{
-				items:[
-					{
-						head:"",
-						name:"12",
-						id:"001",
-						num:123,
-						title:"绝世武神",
-						huifu:"343",
-						content:"为你才开始打内存卡省的，大苏打大多都是十大动物弹道式导弹说",
-						images:[
-							"../../static/image/book1018082.jpg",
-							"../../static/image/book1018082.jpg",
-							"../../static/image/book1018082.jpg"
-						]
-					},
-					{
-						head:"",
-						name:"123",
-						id:"002",
-						num:123,
-						huifu:"343",
-						title:"绝世武神",
-						content:"为你才开始打内存卡省的，大苏打大多都是十大动物弹道式导弹说",
-						images:[
-							"../../static/image/book1018082.jpg",
-							"../../static/image/book1018082.jpg"
-						]
-					},
-					{
-						head:"",
-						name:"123",
-						id:"003",
-						num:123,
-						huifu:"343",
-						title:"绝世武神",
-						content:"为你才开始打内存卡省的，大苏打大多都是十大动物弹道式导弹说",
-						images:[
-							"../../static/image/book1018082.jpg",
-							"../../static/image/book1018082.jpg"
-						]
-					},
-					{
-						head:"",
-						name:"123",
-						id:"004",
-						num:123,
-						huifu:"343",
-						title:"绝世武神",
-						content:"为你才开始打内存卡省的，大苏打大多都是十大动物弹道式导弹说",
-						images:[
-							"../../static/image/book1018082.jpg"
-						]
-					}
-				]
+				ideas:[]
 			}
 		},
 		created() {
@@ -120,6 +67,7 @@
 				// 使用uni-clientDB
 				db.collection('shareIdea_table').get().then((res)=>{
 						console.log(res.result.data)
+						this.ideas=res.result.data;
 						uni.hideLoading()
 				  }).catch((err)=>{
 						console.log(err)

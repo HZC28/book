@@ -20,12 +20,29 @@
 		},{
 			"path": "pages/community/idea/idea",
 			"style": {
-				"navigationBarTitleText":"发表先得"
+				"navigationBarTitleText":"发表心得",
+				"app-plus":{
+					"titleNView":{
+						"padding-right":"20rpx",
+						// "backgroundColor":"#00ffff",
+						"buttons":[
+							{
+								"text":"发布",
+								"fontSize":"32rpx",
+								"color":"#2B85E4"
+								
+							}
+						]
+						
+					}
+					}
 			}
 		},{
 			"path": "pages/reader/comment-detail/comment-detail",
 			"style": {
-				"navigationBarTitleText":"评论"
+				"navigationBarTitleText":"评论",
+				"navigationStyle":"custom"
+				
 			}
 		},{
 			"path": "pages/search/search",
