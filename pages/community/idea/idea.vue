@@ -146,6 +146,7 @@
 					data:{
 						account:userInfo.account,
 						headPortrait:userInfo.headPortrait,
+						accountId:userInfo.accountId,
 						ideaBy:userInfo.userName,
 						ideaTitle:this.title,
 						ideaContent:this.content,

@@ -14,16 +14,20 @@
 				</view>
 			</view>
 			<view class="ci-center">
+				<text @click="toComment(idea.ideaId)">{{idea.ideaTitle}}</text>
 				<text @click="toComment(idea.ideaId)">{{idea.ideaContent}}</text>
 				<view class="imgbox">
-					<view class="img" v-if="idea.ideaImg.length==3">
-						<image @click="previewImage(imgurl)" style="height: 200rpx;" :src="imgurl" mode="widthFix" v-for="imgurl in idea.ideaImg"></image>
-					</view>
+					<!-- <view class="img" v-if="idea.ideaImg.length==3">
+						<image @click="previewImage(imgurl)" style="height: 200rpx;" :src="imgurl" mode="aspectFill" v-for="imgurl in idea.ideaImg"></image>
+					</view> -->
 					<view class="img" v-if="idea.ideaImg.length==2">
-						<image @click="previewImage(imgurl)" style="height: 300rpx;" :src="imgurl" mode="widthFix" v-for="imgurl in idea.ideaImg"></image>
+						<image @click="previewImage(idea.ideaImg)" style="height: 300rpx;" :src="imgurl" mode="aspectFill" v-for="imgurl in idea.ideaImg"></image>
 					</view>
 					<view class="img" v-if="idea.ideaImg.length==1">
-						<image @click="previewImage(imgurl)" style="width: 400rpx;border-radius: 10rpx;" :src="imgurl" mode="widthFix" v-for="imgurl in idea.ideaImg"></image>
+						<image @click="previewImage(idea.ideaImg)" style="width: 400rpx;border-radius: 10rpx;" :src="imgurl" mode="aspectFill" v-for="imgurl in idea.ideaImg"></image>
+					</view>
+					<view class="img" v-if="idea.ideaImg.length>2">
+						<image @click="previewImage(idea.ideaImg)" style="height: 300rpx;" :src="imgurl" mode="aspectFill" v-if="index<2" v-for="(imgurl,index) in idea.ideaImg"></image>
 					</view>
 				</view>
 			</view>
@@ -42,37 +46,68 @@
 	export default{
 		data(){
 			return{
-				ideas:[]
+				ideas:[],
+				total:0,
+				pagesNum:1
 			}
 		},
 		created() {
-			this.getShareIdea()
+			this.total=0;
+			this.pagesNum=1;
+			this.ideas=[]
+			this.getTotal()
 		},
+		// 下拉到底
 		onReachBottom() {
 			this.getShareIdea()
 		},
+		// 下拉刷新
+		onPullDownRefresh() {
+			this.total=0;
+			this.pagesNum=1;
+			this.ideas=[]
+			this.getTotal()
+			
+		},
 		methods:{
+			// 图片预览
 			previewImage(url){
-				let arr=[]
-				arr.push(url)
+				// let arr=[]
+				console.log(url)
+				// arr.push(url)
 				uni.previewImage({
-				   urls: arr
+				   urls: url
 				});
 			},
+			// 获取总数
+			async getTotal(){
+				const db = uniCloud.database();
+				await db.collection('shareIdea_table').count().then(res=>{
+					console.log(res.result.total)
+					this.total=res.result.total
+				})
+				this.getShareIdea()
+			},
+			// 获取评论
 			getShareIdea(){
 				const db = uniCloud.database();//代码块为cdb
-				uni.showLoading({
-				    title: '加载中'
-				});
-				// 使用uni-clientDB
-				db.collection('shareIdea_table').get().then((res)=>{
-						console.log(res.result.data)
-						this.ideas=res.result.data;
-						uni.hideLoading()
-				  }).catch((err)=>{
-						console.log(err)
-						uni.hideLoading()
-				  })
+				if(this.total>(this.pagesNum-1)*10){
+					uni.showLoading({
+					    title: '加载中'
+					});
+					db.collection('shareIdea_table').orderBy("updataTime", "desc").orderBy("ideaPraise", "asc").skip(10*(this.pagesNum-1)).limit(10).get().then((res)=>{
+							console.log(res.result.data)
+							this.ideas=this.ideas.concat(res.result.data);
+							this.pagesNum=this.pagesNum+1;
+							uni.hideLoading()
+							uni.stopPullDownRefresh()
+					  }).catch((err)=>{
+							console.log(err)
+							uni.hideLoading()
+							uni.stopPullDownRefresh()
+					  })
+				}
+				
 			},
 			toComment(id){
 				uni.navigateTo({

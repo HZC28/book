@@ -18,6 +18,9 @@ exports.main = async (event, context) => {
 			obj.sex=res.data[0].sex
 			obj.headPortrait=res.data[0].headPortrait
 			obj.signature=res.data[0].signature
+			obj.accountId=res.data[0]._id
+			
+			
 			code=200
 		}else{
 			msg="密码有误"

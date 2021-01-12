@@ -92,6 +92,7 @@
 		},{
 			"path": "pages/community/community",
 			"style": {
+				"enablePullDownRefresh": true,
 				"navigationBarTitleText":"社区",
 				"navigationStyle":"custom"
 			}

@@ -10,14 +10,16 @@ exports.main = async (event, context) => {
 		ideaBy:event.ideaBy,
 		ideaTitle:event.ideaTitle,
 		ideaContent:event.ideaContent,
-		ideaPraise:'0',
+		accountId:event.accountId,
+		ideaPraise:0,
 		ideaTime:time,
+		updataTime:ideaId,
 		ideaId:ideaId,
 		ideaImg:event.ideaImg,
 		tabs:event.tabs,
 		headPortrait:event.headPortrait,
 		account:event.account,
-		ideaReply:"0"
+		ideaReply:0
 	})
 	console.log('event : ',res)
 	
