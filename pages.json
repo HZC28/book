@@ -47,8 +47,8 @@
 		},{
 			"path": "pages/search/search",
 			"style": {
-				// "navigationBarTitleText":"搜索",
-				// "navigationStyle":"custom",
+				"navigationBarTitleText":"搜索",
+				"navigationStyle":"custom",
 				"app-plus":{
 					"titleNView":{
 						// "backgroundColor":"#00ffff",

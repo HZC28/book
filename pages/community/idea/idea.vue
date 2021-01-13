@@ -12,7 +12,7 @@
 			<text >评分:</text>
 			<u-rate  style="padding: 20rpx 0;" size="44" v-model="score"></u-rate>
 		</view> -->
-		<u-upload ref="uUpload" upload-text="" @on-choose-complete="uploadImg" :auto-upload="false" @on-remove="removeImg"></u-upload>
+		<u-upload max-count="3" ref="uUpload" upload-text="" @on-choose-complete="uploadImg" :auto-upload="false" @on-remove="removeImg"></u-upload>
 		<u-modal @confirm="addTab" class="model" title="添加标签名" v-model="show" :show-cancel-button="true">
 				<u-form style="padding:30rpx">
 					<u-form-item label="标签名:" label-width="120rpx">
@@ -111,6 +111,10 @@
 					this.toast("没有输入评论内容")
 					return false
 				}
+				if(this.title.length!=0&&this.title.length<6){
+					this.toast("标题文字至少为六位")
+					return false
+				}
 				if(this.tabs.length===0){
 					this.toast("请至少添加一个标签")
 					return false
@@ -154,7 +158,12 @@
 						ideaImg:this.fileList
 					}
 				}).then(res=>{
-					console.log(res)
+					uni.switchTab({
+						url:"/pages/community/community",
+						success() {
+							uni.$emit('updata')
+						}
+					})
 				})
 			}
 		}

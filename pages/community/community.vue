@@ -14,7 +14,7 @@
 				</view>
 			</view>
 			<view class="ci-center">
-				<text @click="toComment(idea.ideaId)">{{idea.ideaTitle}}</text>
+				<view @click="toComment(idea.ideaId)">{{idea.ideaTitle}}</view>
 				<text @click="toComment(idea.ideaId)">{{idea.ideaContent}}</text>
 				<view class="imgbox">
 					<!-- <view class="img" v-if="idea.ideaImg.length==3">
@@ -57,6 +57,18 @@
 			this.ideas=[]
 			this.getTotal()
 		},
+		onLoad() {
+			uni.$on("updata",()=>{
+				this.total=0;
+				this.pagesNum=1;
+				this.ideas=[]
+				this.getTotal()
+			})
+		},
+		onUnload() {  
+		    // 移除监听事件  
+		    uni.$off('updata');  
+		 },
 		// 下拉到底
 		onReachBottom() {
 			this.getShareIdea()

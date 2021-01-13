@@ -64,11 +64,10 @@
 		},
 		onPullDownRefresh() {
 			this.pagesNum=1;
-			this.init()
+			this.getType()
 		},
 		created() {
 			this.getType()
-			this.init()
 		},
 		onNavigationBarSearchInputClicked(){
 			uni.navigateTo({
@@ -79,13 +78,9 @@
 			async init(){
 				let db=uniCloud.database()
 				let collection=db.collection('book')
-				await collection.count().then(res=>{
-					console.log(res.result.total)
-					this.total=res.result.total
-				})
 				if(this.total>(this.pagesNum-1)*10){
 					uni.showLoading({
-						title: '',
+						title: '加载中',
 						mask: false
 					});
 					collection.skip(10*(this.pagesNum-1)).limit(10).get().then(res=>{
@@ -94,8 +89,10 @@
 						// console.log(this.pagesNum)
 						this.books=this.books.concat(res.result.data)
 						uni.hideLoading()
+						uni.stopPullDownRefresh()
 					}).catch(err=>{
 						uni.hideLoading()
+						uni.stopPullDownRefresh()
 					})
 				}else{
 					
@@ -103,8 +100,14 @@
 				
 				
 			},
-			getType(){
-				
+			async getType(){
+				let db=uniCloud.database()
+				let collection=db.collection('book')
+				await collection.count().then(res=>{
+					console.log(res.result.total)
+					this.total=res.result.total
+					this.init()
+				})
 				uniCloud.callFunction({
 					name:'getBookType'
 				}).then(res=>{

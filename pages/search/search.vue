@@ -1,5 +1,13 @@
 <template>
 	<view class="search">
+		<view class="status_bar">
+			<!-- 这里是状态栏 -->
+		</view>
+		<uni-nav-bar @clickLeft="backLast" :border="false" background-color="#f7f7f7" left-icon="back">
+			<view class="">
+				<u-search @custom="search" style="width: 650rpx;" placeholder="输入书名或作者进行搜索" v-model="keyWords"></u-search>
+			</view>
+		</uni-nav-bar>
 		<view class="search-item" v-for="book in books" @click="tobookInfo(book.bookid)">
 			<image :src="book.img" mode=""></image>
 			<view class="">
@@ -14,22 +22,31 @@
 		data(){
 			return{
 				keyWords:"",
-				books:[]
+				books:[],
+				styleInput:{
+					width:"460rpx"
+				},
+				bg:"#f7f7f7"
+			}
+		},
+		onLoad(option) {
+			if(option.keyWord){
+				this.keyWords=option.keyWord
 			}
 		},
 		methods:{
+			backLast(){
+				uni.navigateBack({
+					delta:1
+				})
+			},
 			tobookInfo(bookid){
 				uni.navigateTo({
 					url:"/pages/reader/book-baseinfo/book-baseinfo?id="+bookid
 				})
-			}
-		},
-		onNavigationBarSearchInputChanged(e){
-			this.keyWords=e.text
-			console.log(this.keyWords)
-		},
-		onNavigationBarButtonTap(obj){
-			if(obj.text=="搜索"){
+			},
+			search(){
+				console.log("123")
 				uniCloud.callFunction({
 					name:"query",
 					data:{
@@ -46,6 +63,10 @@
 
 <style lang="less" scoped>
 	.search{
+		.status_bar {
+		      height: var(--status-bar-height);
+		      width: 100%;
+		  }
 		.search-item{
 			display: flex;
 			align-items: center;
