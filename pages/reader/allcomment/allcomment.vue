@@ -1,11 +1,33 @@
 <template>
 	<view class="allcomment">
-		<view class="allcomment-item" v-for="comment in comments" :key="comment._id">
-			<view class="" @click="toCommentDetail">
-				{{comment._id}}
+		<view class="allcomment-item" v-for="comment in comments" :key="comment.commentId">
+			<view class="left" @click="toCommentDetail">
+				<image :src="comment.headPortrait" mode=""></image>
+			</view>
+			<view class="right">
+				<view class="top">
+					<text>{{comment.comentBy}}</text>
+					<u-rate size="22" active-color="#d3d3d3" inactive-color="#e8e8e8" :current="comment.score" :disabled="true"></u-rate>
+				</view>
+				<view class="center">
+					<view class="">
+						{{comment.commentContent}}
+					</view>
+				</view>
+				<view class="bom">
+					<view class="time">
+						<text>{{comment.commentTime}}</text>
+					</view>
+					<view class="num">
+						<text class="reply"><u-icon name="chat" style="margin-right: 10rpx;"></u-icon>{{comment.commentReply}}</text>
+						<text class="praise"><u-icon name="thumb-up" style="margin-right: 10rpx;"></u-icon>{{comment.commentPraise}}</text>
+					</view>
+				</view>
 			</view>
 		</view>
-		<u-button @click="toComment">发表评论</u-button>
+		<view class="edit" @click="toComment">
+			<u-icon size="44" name="edit-pen"></u-icon>
+		</view>
 	</view>
 </template>
 
@@ -62,5 +84,60 @@
 	}
 </script>
 
-<style>
+<style scoped lang="less">
+	.allcomment{
+		padding:10rpx 30rpx;
+	}
+	.allcomment-item{
+		padding-top: 30rpx;
+		display: flex;
+		.left{
+			image{
+				width: 70rpx;
+				height: 70rpx;
+				border-radius: 50%;
+				margin-right: 20rpx;
+			}
+		}
+		.right{
+			flex: 1;
+			padding-bottom: 30rpx;
+			border-bottom: 1rpx solid #cccccc;
+			.top{
+				
+			}
+			.center{
+				margin-top: 10rpx;
+			}
+			.bom{
+				margin-top: 15rpx;
+				display: flex;
+				.time{
+					flex: 1;
+				}
+				.num{
+					flex: 1;
+					display: flex;
+					justify-content: center;
+					text{
+						flex:1;
+						text-align: right;
+					}
+				}
+			}
+		}
+	}
+	.edit{
+		position: fixed;
+		bottom:80rpx;
+		right:30rpx;
+		width: 80rpx;
+		height: 80rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border-radius: 50%;
+		background: #8d8d8d;
+		color:#FFFFFF;
+	}
 </style>

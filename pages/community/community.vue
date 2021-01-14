@@ -17,9 +17,6 @@
 				<view @click="toComment(idea.ideaId)">{{idea.ideaTitle}}</view>
 				<text @click="toComment(idea.ideaId)">{{idea.ideaContent}}</text>
 				<view class="imgbox">
-					<!-- <view class="img" v-if="idea.ideaImg.length==3">
-						<image @click="previewImage(imgurl)" style="height: 200rpx;" :src="imgurl" mode="aspectFill" v-for="imgurl in idea.ideaImg"></image>
-					</view> -->
 					<view class="img" v-if="idea.ideaImg.length==2">
 						<image @click="previewImage(idea.ideaImg)" style="height: 300rpx;" :src="imgurl" mode="aspectFill" v-for="imgurl in idea.ideaImg"></image>
 					</view>
@@ -31,7 +28,7 @@
 					</view>
 				</view>
 			</view>
-			<view class="ci-bom">
+			<view class="ci-bom" v-if="idea.ideaId">
 				<view @click="toComment(idea.ideaId)">评论{{idea.ideaReply}}</view>
 				<view @click="praise">点赞{{idea.ideaPraise}}</view>
 			</view>
