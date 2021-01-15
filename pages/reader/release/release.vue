@@ -68,6 +68,9 @@
 					}
 				}).then(res=>{
 					console.log(res)
+					uni.redirectTo({
+						url:"/pages/reader/allcomment/allcomment"
+					})
 				})
 			}
 		}

@@ -13,9 +13,9 @@
 		</view>
 		<view class="book-operation" v-if="baseInfo.bookName">
 			<!-- heart-fill -->
-			<view><u-icon class="icon" size="32" name="heart"></u-icon>收藏</view>
+			<!-- <view><u-icon class="icon" size="32" name="heart"></u-icon>收藏</view>
 			<view><image class="icon" src="../../../static/icon1/shujia.png" style="width:32rpx;height: 32rpx;"></image>加入书架</view>
-			<view><u-icon class="icon" size="32" name="list-dot"></u-icon>目录</view>
+			<view><u-icon class="icon" size="32" name="list-dot"></u-icon>目录</view> -->
 		</view>
 		<view class="book-comment">
 			<view class="comment-title">
@@ -48,7 +48,11 @@
 				</view>
 			</view>
 		</view>
-		<u-button type="info" class="btn" @click="allComment">点击查看全部评论</u-button>
+		<!-- <u-button type="info" class="btn" @click="allComment">点击查看全部评论</u-button> -->
+		<view class="fixed">
+			<view class="left" @click="addBookshelf(id)">加入书架</view>
+			<view class="right" @click="toreader(id)">点击阅读</view>
+		</view>
 	</view>
 </template>
 
@@ -62,6 +66,11 @@
 			}
 		},
 		methods:{
+			toreader(id){
+				uni.navigateTo({
+					url:"/pages/reader/reader?bookid="+id
+				})
+			},
 			// 获取基本信息
 			init(){
 				const db = uniCloud.database();//代码块为cdb
@@ -96,7 +105,7 @@
 			},
 			allComment(){
 				uni.navigateTo({
-					url:"/pages/reader/allcomment/allcomment"
+					url:"/pages/reader/allcomment/allcomment?id="+this.id
 				})
 			},
 			
@@ -111,15 +120,13 @@
 </script>
 
 <style lang="scss" scoped>
-	page{
-		background: #FFFFFF;
-	}
 	.book-info{
-		padding: 0 30rpx;
+		
+		padding-bottom: 100rpx;
 	}
 	.book-baseinfo{
 		display: flex;
-		padding:10rpx 0rpx;
+		padding:10rpx 30rpx;
 		.book-img{
 			flex: 1;
 			image{
@@ -151,7 +158,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		padding: 15rpx 0rpx;
+		padding: 15rpx 30rpx;
 		font-size: 35rpx;
 		view{
 			.icon{
@@ -162,6 +169,7 @@
 		}
 	}
 	.book-comment{
+		padding: 0 30rpx;
 		margin-top: 30rpx;
 		margin-bottom: 30rpx;
 		// padding: 0 30rpx;
@@ -223,7 +231,38 @@
 		}
 	}
 	.btn{
-		// margin-bottom: 100rpx;
-		// border-radius: 100rpx;
+		width: 690rpx;
+		 // margin-bottom: 100rpx;
+	}
+	.fixed{
+		position: fixed;
+		bottom: 0;
+		display: flex;
+		width: 100%;
+		background: #cccccc;
+		height: 100rpx;
+		justify-content: space-around;
+		align-items: center;
+		font-size: 38rpx;
+		letter-spacing: 5rpx;
+		font-weight: 500;
+		.left{
+			background: #FFFFFF;
+			color:#ff5500;
+			width: 300rpx;
+			border-radius: 40rpx;
+			height: 70rpx;
+			line-height: 70rpx;
+			text-align: center;
+		}
+		.right{
+			background: #ff5500;
+			color:#FFFFFF;
+			width: 300rpx;
+			border-radius: 40rpx;
+			height: 70rpx;
+			line-height: 70rpx;
+			text-align: center;
+		}
 	}
 </style>

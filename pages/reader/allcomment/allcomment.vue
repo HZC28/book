@@ -37,32 +37,48 @@
 			return{
 				bookId:"",
 				comments:[],
-				pageNum:1,
+				pagesNum:1,
 				total:0
 			}
 		},
 		onLoad(option) {
 			this.bookId=option.id;
+			console.log(this.bookId)
+			this.getTotal()
+		},
+		onReachBottom(){
 			this.getComment()
 		},
 		methods:{
-			getComment(){
-				// 获取评论信息
-				const db = uniCloud.database();//代码块为cdb
-				db.collection('comment').skip(10*(this.pageNum-1)).limit(10).where({
-					"bookId":this.bookId
-				}).orderBy('commentTime','asc').get().then((res)=>{
-						this.comments=res.result.data
-						console.log(res.result.data)
-				  }).catch((err)=>{
-						console.log(err)
-				  })
+			getTotal(){
+				let db = uniCloud.database();//代码块为cdb
 				db.collection('comment').where({
 					"bookId":this.bookId
 				}).count().then((res)=>{
 					console.log(res.result.total)
 					this.total=res.result.total
+					this.getComment()
 				})
+			},
+			getComment(){
+				// 获取评论信息
+				let db = uniCloud.database();//代码块为cdb
+				if(this.total>(this.pagesNum-1)*10){
+					uni.showLoading({
+						title:"加载中"
+					})
+					db.collection('comment').skip(10*(this.pagesNum-1)).limit(10).where({
+						"bookId":this.bookId
+					}).orderBy('updataTime','desc').get().then((res)=>{
+							this.comments=res.result.data
+							this.pagesNum++;
+							console.log(res.result.data)
+							uni.hideLoading()
+					  }).catch((err)=>{
+							console.log(err)
+							uni.hideLoading()
+					 })
+				}
 			},
 			onReachBottom(){
 				if(this.total>this.pageNum*10){
