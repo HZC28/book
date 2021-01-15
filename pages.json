@@ -48,26 +48,26 @@
 			"path": "pages/search/search",
 			"style": {
 				"navigationBarTitleText":"搜索",
-				"navigationStyle":"custom",
-				"app-plus":{
-					"titleNView":{
-						// "backgroundColor":"#00ffff",
-						"searchInput":{
-							"backgroundColor": "#fff",
-							"borderRadius": "10px", //输入框圆角
-							"placeholder": "请输入搜索内容",
-							"align":"left",
-							"disabled": false //disable时点击输入框不置焦，可以跳到新页面搜索
-						},
-						"buttons":[
-							{
-								"text":"搜索",
-								"fontSize":"32rpx"
-							}
-						]
+				"navigationStyle":"custom"
+				// "app-plus":{
+				// 	"titleNView":{
+				// 		// "backgroundColor":"#00ffff",
+				// 		"searchInput":{
+				// 			"backgroundColor": "#fff",
+				// 			"borderRadius": "10px", //输入框圆角
+				// 			"placeholder": "请输入搜索内容",
+				// 			"align":"left",
+				// 			"disabled": false //disable时点击输入框不置焦，可以跳到新页面搜索
+				// 		},
+				// 		"buttons":[
+				// 			{
+				// 				"text":"搜索",
+				// 				"fontSize":"32rpx"
+				// 			}
+				// 		]
 						
-					}
-				}
+				// 	}
+				// }
 			}
 			
 		},{

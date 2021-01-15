@@ -1,12 +1,11 @@
 <template>
 	<view class="release">
-		<u-input placeholder="评论标题" class="title" v-model="title" />
+		<u-input placeholder="评论标题(可选)" class="title" v-model="title" />
 		<u-input type="textarea" placeholder="尽情发挥你的想象" v-model="content" class="content"></u-input>
 		<view class="score">
 			<text >评分:</text>
-			<u-rate  style="padding: 20rpx 0;" size="44" v-model="score"></u-rate>
+			<u-rate  style="padding: 20rpx 0;" size="54" v-model="score"></u-rate>
 		</view>
-		<u-upload upload-text=""   @on-choose-complete="uploadImg" :auto-upload="false" @on-remove="removeImg"></u-upload>
 
 	</view>
 </template>
@@ -17,58 +16,10 @@
 			return{
 				title:"",
 				content:"",
-				fileList: [],
-				cloudIds:[],
 				score:""
 			}
 		},
 		methods:{
-			// 上传图片到云存储
-			async uploadImg(lists, name){
-				for(let i=0;i<lists.length;i++){
-					let num=Math.floor(Math.random() * 100)
-					let filename=new Date().getTime()+''+num
-					const result = await uniCloud.uploadFile({
-								filePath: lists[i].url,
-								cloudPath: 'upload/'+filename+".jpg",
-					 }).then(res=>{
-						 let arr=[];
-						 arr.push(res.fileID)
-						 this.cloudIds.push(res.fileID)
-						 uniCloud.getTempFileURL({
-						     fileList: arr
-						 }).then(res1=>{
-							 console.log(res1.fileList[0].tempFileURL)
-							 this.fileList.push(res1.fileList[0].tempFileURL)
-						 })
-					 }).catch(err=>{
-						 console.log(err)
-					 });
-				}
-			},
-			async getUrl(){
-				let result = await uniCloud.getTempFileURL({
-				    fileList: this.fileList
-				});
-				console.log(result.fileList[0].tempFileURL)
-			},
-			removeImg(index, lists, name){
-				console.log(index, lists, name)
-				let ids=[]
-				ids.push(this.cloudIds[index])
-				uniCloud.callFunction({
-					name:"removeImage",
-					data:{
-						ids:ids
-					}
-				}).then(res=>{
-					this.fileList.splice(index,1)
-					this.cloudIds.splice(index,1)
-					console.log(this.fileList)
-				}).catch(err=>{
-					console.log(err,"123")
-				})
-			},
 			vrification(){
 				let userInfo=uni.getStorageSync("userInfo")
 				if(this.content==''){
@@ -102,15 +53,18 @@
 		onNavigationBarButtonTap(obj){
 			if(obj.text=="发布"){
 				if(!this.vrification()){return}
-				console.log(`${new Date().getFullYear()}-${new Date().getMonth()+1}-${new Date().getDate()}`)
 				let userInfo=uni.getStorageSync("userInfo")
 				uniCloud.callFunction({
 					name:"releaseComment",
 					data:{
+						account:userInfo.account,
+						headPortrait:userInfo.headPortrait,
+						accountId:userInfo.accountId,
 						comentBy:userInfo.userName,
 						comentTitle:this.title,
 						commentContent:this.content,
-						score:this.score
+						score:this.score,
+						bookId:"10001"
 					}
 				}).then(res=>{
 					console.log(res)
