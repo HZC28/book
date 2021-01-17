@@ -159,10 +159,11 @@
 			"style": {
 				"navigationBarTextStyle":"black",
 				"navigationBarTitleText":"",
-				"onReachBottomDistance":100,
-				"app-plus":{
-					"titleNView": false
-				}
+				"navigationStyle":"custom"
+				// "onReachBottomDistance":100
+				// "app-plus":{
+					// "titleNView": false
+				// }
 			}
 		}
 	],

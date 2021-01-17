@@ -1,5 +1,8 @@
 <template>
 	<view class="Box" style="">
+		<view class="status_bar">
+			<!-- 这里是状态栏 -->
+		</view>
 		<!-- 网页背景开始 -->
 		<view class="pagbg anmt" :style="{backgroundColor:pageBg}"></view>
 		<view class="zhongMenu" @click="dianjile()"></view>
@@ -15,7 +18,15 @@
 		</view>
 		<!-- 带返回键的导航栏结束 -->
 		<!-- 菜单开始 -->
-		<view class="bottomBox anmt" :style="{color:fontColor,backgroundColor:menuBg,bottom:show?'0':'-150px'}">
+		<view class="bottomBox anmt" :style="{color:fontColor,backgroundColor:menuBg,bottom:show?'0':'-180px'}">
+			<view style="width: 100%;font-weight: 500;font-size: 44rpx;display: flex;text-align: center;padding-top: 30rpx;" class="ddd">
+				<view @click="last()" style="text-align: left;margin-left: 100rpx;">
+					<view style="font-size: 28rpx;">上一章</view>
+				</view>
+				<view @click="next()" style="text-align: right;margin-right: 100rpx;">
+					<view style="font-size: 28rpx;">下一章</view>
+				</view>
+			</view>
 			<view style="overflow: hidden;">
 				<view style="float: left;width: 50%;overflow: hidden;">
 					<view style="float: left;width: 30%;line-height: 70upx;text-align: center;font-size: 24upx;">字体</view>
@@ -82,9 +93,11 @@
 		</view>
 		<!-- 小说正文结束 -->
 		<!-- 目录 -->
-		<u-popup v-model="menuShow">
-			
-			<view v-for="chapter in chapters">
+		<u-popup class="chapterList" length="550rpx" v-model="menuShow">
+			<view class="title">
+				斗破苍穹斗破苍穹斗破苍穹
+			</view>
+			<view v-for="chapter in chapters" class="chapter">
 				<view>{{chapter.chapterName}}</view>
 			</view>
 		</u-popup>
@@ -130,7 +143,27 @@ export default{
 				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00012"},
 				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00013"},
 				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00014"},
-				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00015"}
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00015"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00011"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00012"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00013"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00014"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00011"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00012"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00013"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00014"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00011"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00012"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00013"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00014"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00011"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00012"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00013"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00014"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00011"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00012"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00013"},
+				{chapterName:"第一章 陨落的天才",updataTime:"2020-01-03",chapterId:"00014"},
 			]
 		}
 	},
@@ -209,6 +242,12 @@ export default{
 			this.lineHeight = e.detail.value;
 			uni.setStorageSync('lineHeight',e.detail.value);
 		},
+		last(){
+			console.log("next")
+		},
+		next(){
+			console.log("next")
+		},
 		mulu(){
 			this.menuShow=true
 		},
@@ -270,7 +309,11 @@ export default{
 	}
 }
 </script>
-<style>
+<style lang="less" scoped>
+	.status_bar {
+		height: var(--status-bar-height);
+		width: 100%;
+	}
 	@font-face {font-family: "iconfont";
 	  src: url('../../font/dianliang.ttf') format('truetype');
 	}
@@ -438,5 +481,30 @@ export default{
 		height: 50%;
 		transform: translateY(-50%);
 		z-index: 9;
+	}
+	.chapterList{
+		width: 100%;
+		
+		.title{
+			width: 100%;
+			text-align: center;
+			height: 110rpx;
+			line-height: 80rpx;
+			font-size: 32rpx;
+			padding-top:20rpx;
+			background-color: #cccccc;
+		}
+		.chapter{
+			display: flex;
+			justify-content: space-between;
+			height: 80rpx;
+			align-items: center;
+			line-height: 80rpx;
+			view{
+				width: 100%;
+				padding:0 30rpx;
+				border-top: 1rpx solid #cccccc;
+			}
+		}
 	}
 </style>
