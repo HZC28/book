@@ -5,7 +5,7 @@ exports.main = async (event, context) => {
 	let arr=[]
 	const db=uniCloud.database()
 	const collection=await db.collection("book")
-	collection.limit(6).where({
+	collection.orderBy("score","desc").limit(6).where({
 		type:"经典著作"
 	}).field({
 		'author':true,

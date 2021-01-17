@@ -10,7 +10,7 @@ exports.main = async (event, context) => {
 	const dbCmd = db.command
 	let obj={}
 	obj.chapterName=event.chapterName
-	obj.chapterId="event.chapterId"
+	obj.chapterId=id
 	await db.collection('bookChater').where({
 		bookid:event.bookid
 	}).update({

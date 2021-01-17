@@ -24,6 +24,7 @@ exports.main = async (event, context) => {
 	})
 	await db.collection('bookChater').add({
 		bookid:id,
+		bookName:event.bookName,
 		chapters:[]
 	}).then(res=>{
 		console.log(res.data)

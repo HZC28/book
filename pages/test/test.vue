@@ -41,28 +41,32 @@
 				    }
 				});
 			},
-			async	addChapter(id){
-				// https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/bookInfo/book3188832/chapter/chapter40903692.json
-				let control=true
-				for(let i=0;i<this.chapters.length;i++){
-					await uni.request({
-						url:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/bookInfo/book3188832/chapter/"+this.chapters[i].chapterid+".json",
-						success:(res)=> {
-							// console.log(res.data.chapter)
-							let ret=res.data.chapter
-						  uniCloud.callFunction({
-								name:"uploadChapter",
-								data:{
-										bookName:this.title,
-										bookid:id,
-										chapterContent:ret,
-										chapterName:this.chapters[i].chapter
-								}
-							}).then(res=>{
-								console.log(i)
-							})
-						}
-					})
+			addtoChapter(i,id){
+				uni.request({
+					url:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/bookInfo/book3188832/chapter/"+this.chapters[i].chapterid+".json",
+					success:(res)=> {
+						// console.log(res.data.chapter)
+						let ret=res.data.chapter
+					  uniCloud.callFunction({
+							name:"uploadChapter",
+							data:{
+									bookName:this.title,
+									bookid:id,
+									chapterContent:ret,
+									chapterName:this.chapters[i].chapter
+							}
+						}).then(res=>{
+							console.log(i)
+						})
+					}
+				})
+			},
+			addChapter(id){
+				for(let i=0;i<10;i++){
+					setTimeout(()=>{
+						this.addtoChapter(i,id)
+					},500*i)
+					
 					
 				}
 			}
