@@ -144,7 +144,7 @@
 			flex-wrap: wrap;
 			justify-content: space-between;
 			.bookInfo{
-				// width: 50%;
+				width: 50%;
 				display: flex;
 				align-items: center;
 				margin-bottom: 15rpx;

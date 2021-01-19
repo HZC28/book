@@ -31,8 +31,40 @@
 			<image @click="previewImage(url)" :src="url" mode="widthFix" v-for="url in info.ideaImg"></image>
 		</view>
 		<view class="reply">
-			<u-input border="" class="reply-input"></u-input>
-			<view class="reply-btn">
+			<view class="replyitem" v-for="(reply,index) in replys">
+				<div class="baseinfo">
+					<div class="img"><image :src="reply.headPortrait" mode=""></image></div>
+					<div class="rigth">
+						<div class="createBy">{{reply.createBy}}</div>
+						<div class="time">{{reply.time}}</div>
+					</div>
+				</div>
+				<view class="content">
+					{{reply.content}}
+				</view>
+				<view @click="lookReply(index)" class="child" v-if="reply.children&&reply.children.length!=0">
+					查看{{reply.children.length}}条回复>>
+				</view>
+			</view>
+		</view>
+		<u-popup class="popup" v-model="show" :closeable="true" length="70%" mode="bottom" border-radius="14">
+			<div class="title">回复信息</div>
+			<view class="popupitem" v-for="child in replys[index].children">
+				<div class="baseinfo">
+					<div class="img"><image :src="child.headPortrait" mode=""></image></div>
+					<div class="rigth">
+						<div class="createBy">{{child.createBy}}</div>
+						<div class="time">{{child.time}}</div>
+					</div>
+				</div>
+				<view class="content">
+					{{child.content}}
+				</view>
+			</view>
+		</u-popup>
+		<view class="bom">
+			<u-input border="" class="bom-input"></u-input>
+			<view class="bom-btn">
 				回复
 			</view>
 		</view>
@@ -45,7 +77,68 @@
 			
 			return{
 				id:"",
-				info:{}
+				show:false,
+				info:{},
+				index:0,
+				replys:[
+					{
+						headPortrait:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg",
+						createBy:"createBy",
+						time:"2020-1-1",
+						content:"UI在2020年DCloud插件大赛中荣获一等奖,成功入选2020年GVP,成为GVP-Gitee最具价值开源项目. uView的理念是＂挣脱束缚,向往自由＂,目标是做uni-app生态"
+					},
+					{
+						headPortrait:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg",
+						createBy:"createBy",
+						time:"2020-1-1",
+						content:"createBcreateBcreateBcreateBcreateBcreateB"
+					},
+					{
+						headPortrait:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg",
+						createBy:"createBy",
+						time:"2020-1-1",
+						content:"UI在2020年DCloud插件大赛中荣获一等奖,成功入选2020年GVP,成为GVP-Gitee最具价值开源项目. uView的理念是＂挣脱束缚,向往自由＂,目标是做uni-app生态"
+					},
+					{
+						headPortrait:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg",
+						createBy:"createBy",
+						time:"2020-1-1",
+						content:"createBcreateBcreateBcreateBcreateBcreateB",
+						children:[
+							{
+								headPortrait:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg",
+								createBy:"createBy",
+								time:"2020-1-1",
+								content:"UI在2020年DCloud插件大赛中荣获一等奖,成功入选2020年GVP,成为GVP-Gitee最具价值开源项目. uView的理念是＂挣脱束缚,向往自由＂,目标是做uni-app生态"
+							},
+							{
+								headPortrait:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg",
+								createBy:"createBy",
+								time:"2020-1-1",
+								content:"UI在2020年DCloud插件大赛中荣获一等奖,成功入选2020年GVP,成为GVP-Gitee最具价值开源项目. uView的理念是＂挣脱束缚,向往自由＂,目标是做uni-app生态"
+							},
+							{
+								headPortrait:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg",
+								createBy:"createBy",
+								time:"2020-1-1",
+								content:"UI在2020年DCloud插件大赛中荣获一等奖,成功入选2020年GVP,成为GVP-Gitee最具价值开源项目. uView的理念是＂挣脱束缚,向往自由＂,目标是做uni-app生态"
+							},
+							{
+								headPortrait:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg",
+								createBy:"createBy",
+								time:"2020-1-1",
+								content:"UI在2020年DCloud插件大赛中荣获一等奖,成功入选2020年GVP,成为GVP-Gitee最具价值开源项目. uView的理念是＂挣脱束缚,向往自由＂,目标是做uni-app生态"
+							}
+						]
+					},
+					{
+						headPortrait:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg",
+						createBy:"createBy",
+						time:"2020-1-1",
+						content:"createBcreateBcreateBcreateBcreateBcreateB",
+						children:["1","2"]
+					}
+				]
 			}
 		},
 		onLoad(option) {
@@ -54,6 +147,10 @@
 			this.getIdeaDetail(option.id)
 		},
 		methods:{
+			lookReply(index){
+				this.show=true
+				this.index=index
+			},
 			// 图片预览
 			previewImage(url){
 				let arr=[]
@@ -123,19 +220,113 @@
 				margin-bottom: 20rpx;
 			}
 		}
-		.reply{
+		.bom{
 			position: fixed;
 			bottom: 0;
 			display: flex;
 			background-color: #efefef;
 			align-items: center;
 			width: 100%;
-			.reply-input{
+			.bom-input{
 				flex:6;
 				width: 80%;
 			}
-			.reply-btn{
+			.bom-btn{
 				fleX:1;
+			}
+		}
+	}
+	.reply{
+		background: #FFFFFF;
+		margin-bottom: 100rpx;
+		width: 690rpx;
+		margin:0 auto;
+		border-radius: 20rpx;
+		padding-bottom: 80rpx;
+		.replyitem{
+			
+			padding:20rpx 0;
+			.baseinfo{
+				display: flex;
+				.img{
+					image{
+						margin-left: 20rpx;
+						margin-right: 20rpx;
+						width:80rpx;
+						height: 80rpx;
+						border-radius: 40rpx;
+					}
+				}
+				.right{
+					display: flex;
+					flex-direction: column;
+					justify-content: space-between;
+					.name{
+						flex: 1;
+					}
+					.time{
+						flex: 1;
+					}
+				}
+			}
+			.content{
+				// border-bottom: 1rpx solid #cccccc;
+				margin-left:120rpx;
+				margin-right: 30rpx;
+				word-wrap: break-word;
+				padding-bottom: 20rpx;
+				font-size: 30rpx;
+				letter-spacing: 2rpx;
+				line-height: 36rpx;
+			}
+			.child{
+				margin-left:120rpx;
+				color:#00aaff;
+				font-size: 20rpx;
+			}
+		}
+	}
+	.popup{
+		.title{
+			padding: 30rpx;
+			text-align: center;
+			font-size: 33rpx;
+		}
+		.popupitem{
+			border-bottom: 1rpx solid #cccccc;
+			padding: 20rpx 0;
+			.baseinfo{
+				display: flex;
+				.img{
+					image{
+						margin-left: 20rpx;
+						margin-right: 20rpx;
+						width:80rpx;
+						height: 80rpx;
+						border-radius: 40rpx;
+					}
+				}
+				.right{
+					display: flex;
+					flex-direction: column;
+					justify-content: space-between;
+					.name{
+						flex: 1;
+					}
+					.time{
+						flex: 1;
+					}
+				}
+			}
+			.content{
+				// border-bottom: 1rpx solid #cccccc;
+				margin-left:120rpx;
+				margin-right: 30rpx;
+				word-wrap: break-word;
+				padding-bottom: 20rpx;
+				font-size: 30rpx;
+				letter-spacing: 2rpx;
+				line-height: 36rpx;
 			}
 		}
 	}

@@ -49,6 +49,10 @@
 			</view>
 		</view>
 		<!-- <u-button type="info" class="btn" @click="allComment">点击查看全部评论</u-button> -->
+		<view v-if="comments.length==0" class="empty">
+			<u-empty text="当前没有评论" mode="history"></u-empty>
+			<text class="text" @click="toComment(id)">去评论</text>
+		</view>
 		<view class="fixed">
 			<view class="left" @click="addBookshelf(id)">加入书架</view>
 			<view class="right" @click="toreader(id)">点击阅读</view>
@@ -66,6 +70,11 @@
 			}
 		},
 		methods:{
+			toComment(id){
+				uni.navigateTo({
+					url:"/pages/reader/release/release?bookid="+id
+				})
+			},
 			toreader(id){
 				uni.navigateTo({
 					url:"/pages/reader/reader?bookid="+id
@@ -233,6 +242,17 @@
 	.btn{
 		width: 690rpx;
 		 // margin-bottom: 100rpx;
+	}
+	.empty{
+		// width: 1000%;
+		margin-top: 100rpx;
+		font-size: 36rpx;
+		.text{
+			display: block;
+			text-align: center;
+			color: #FF9900;
+			letter-spacing: 3rpx;
+		}
 	}
 	.fixed{
 		position: fixed;

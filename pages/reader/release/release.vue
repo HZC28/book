@@ -16,8 +16,12 @@
 			return{
 				title:"",
 				content:"",
-				score:""
+				score:"",
+				bookId:''
 			}
+		},
+		onLoad(option) {
+			this.bookId=option.bookid
 		},
 		methods:{
 			vrification(){
@@ -64,12 +68,12 @@
 						comentTitle:this.title,
 						commentContent:this.content,
 						score:this.score,
-						bookId:"10001"
+						bookId:this.bookId
 					}
 				}).then(res=>{
 					console.log(res)
 					uni.redirectTo({
-						url:"/pages/reader/allcomment/allcomment"
+						url:"/pages/reader/allcomment/allcomment?id="+this.bookId
 					})
 				})
 			}

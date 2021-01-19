@@ -88,7 +88,7 @@
 			},
 			toComment(){
 				uni.navigateTo({
-					url:"/pages/reader/release/release"
+					url:"/pages/reader/release/release?bookid="+this.bookId
 				})
 			},
 			toCommentDetail(){
