@@ -22,8 +22,12 @@
 				</view>
 			</view>
 			<view style="text-align: right;">
-				<text style="margin-right: 50rpx;">评论{{info.ideaReply}}</text>
-				<text>评论{{info.ideaPraise}}</text>
+				<text style="margin-right: 50rpx;"><u-icon size="34rpx" name="chat" style="margin-right: 8rpx;"></u-icon>{{info.ideaReply}}</text>
+				<text>
+					<u-icon @click="thumbs()" 
+					name="thumb-up" size="34rpx" style="margin-right: 8rpx;">
+					</u-icon>{{info.ideaPraise}}
+				</text>
 			</view>
 			
 		</view>
@@ -35,7 +39,7 @@
 				<div class="baseinfo">
 					<div class="img"><image :src="reply.headPortrait" mode=""></image></div>
 					<div class="rigth">
-						<div class="createBy">{{reply.createBy}}</div>
+						<div class="createBy">{{reply.userName}}</div>
 						<div class="time">{{reply.time}}</div>
 					</div>
 				</div>
@@ -49,11 +53,11 @@
 		</view>
 		<u-popup class="popup" v-model="show" :closeable="true" length="70%" mode="bottom" border-radius="14">
 			<div class="title">回复信息</div>
-			<view class="popupitem" v-for="child in replys[index].children">
+			<view class="popupitem" v-if="replys[index].children" v-for="child in replys[index].children">
 				<div class="baseinfo">
 					<div class="img"><image :src="child.headPortrait" mode=""></image></div>
 					<div class="rigth">
-						<div class="createBy">{{child.createBy}}</div>
+						<div class="createBy">{{child.originator}}</div>
 						<div class="time">{{child.time}}</div>
 					</div>
 				</div>
@@ -80,73 +84,27 @@
 				show:false,
 				info:{},
 				index:0,
-				replys:[
-					{
-						headPortrait:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg",
-						createBy:"createBy",
-						time:"2020-1-1",
-						content:"UI在2020年DCloud插件大赛中荣获一等奖,成功入选2020年GVP,成为GVP-Gitee最具价值开源项目. uView的理念是＂挣脱束缚,向往自由＂,目标是做uni-app生态"
-					},
-					{
-						headPortrait:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg",
-						createBy:"createBy",
-						time:"2020-1-1",
-						content:"createBcreateBcreateBcreateBcreateBcreateB"
-					},
-					{
-						headPortrait:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg",
-						createBy:"createBy",
-						time:"2020-1-1",
-						content:"UI在2020年DCloud插件大赛中荣获一等奖,成功入选2020年GVP,成为GVP-Gitee最具价值开源项目. uView的理念是＂挣脱束缚,向往自由＂,目标是做uni-app生态"
-					},
-					{
-						headPortrait:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg",
-						createBy:"createBy",
-						time:"2020-1-1",
-						content:"createBcreateBcreateBcreateBcreateBcreateB",
-						children:[
-							{
-								headPortrait:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg",
-								createBy:"createBy",
-								time:"2020-1-1",
-								content:"UI在2020年DCloud插件大赛中荣获一等奖,成功入选2020年GVP,成为GVP-Gitee最具价值开源项目. uView的理念是＂挣脱束缚,向往自由＂,目标是做uni-app生态"
-							},
-							{
-								headPortrait:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg",
-								createBy:"createBy",
-								time:"2020-1-1",
-								content:"UI在2020年DCloud插件大赛中荣获一等奖,成功入选2020年GVP,成为GVP-Gitee最具价值开源项目. uView的理念是＂挣脱束缚,向往自由＂,目标是做uni-app生态"
-							},
-							{
-								headPortrait:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg",
-								createBy:"createBy",
-								time:"2020-1-1",
-								content:"UI在2020年DCloud插件大赛中荣获一等奖,成功入选2020年GVP,成为GVP-Gitee最具价值开源项目. uView的理念是＂挣脱束缚,向往自由＂,目标是做uni-app生态"
-							},
-							{
-								headPortrait:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg",
-								createBy:"createBy",
-								time:"2020-1-1",
-								content:"UI在2020年DCloud插件大赛中荣获一等奖,成功入选2020年GVP,成为GVP-Gitee最具价值开源项目. uView的理念是＂挣脱束缚,向往自由＂,目标是做uni-app生态"
-							}
-						]
-					},
-					{
-						headPortrait:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/book/book1018082.jpg",
-						createBy:"createBy",
-						time:"2020-1-1",
-						content:"createBcreateBcreateBcreateBcreateBcreateB",
-						children:["1","2"]
-					}
-				]
+				replys:[]
 			}
 		},
 		onLoad(option) {
 			console.log(option.id)
 			this.id=option.id
+			// 获取评论的详细信息
 			this.getIdeaDetail(option.id)
+			this.getReply()
 		},
 		methods:{
+			getReply(){
+				let db=uniCloud.database()
+				db.collection('ideaReply').where({
+					ideaId:this.id
+				}).get().then(res=>{
+					console.log(res)
+					this.replys=res.result.data
+				})
+			},
+			// 点击查看回复信息
 			lookReply(index){
 				this.show=true
 				this.index=index
@@ -159,11 +117,13 @@
 				   urls: arr
 				});
 			},
+			// 点击标签到搜索界面搜索图书
 			toSearch(tab){
 				uni.navigateTo({
 					url:"/pages/search/search?keyWord="+tab
 				})
 			},
+			// 获取评论的详细信息
 			getIdeaDetail(){
 				let db=uniCloud.database()
 				let collection=db.collection("shareIdea_table")

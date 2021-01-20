@@ -3,7 +3,7 @@
 		<view class="status_bar">
 			<!-- 这里是状态栏 -->
 		</view>
-		<view v-for="idea in ideas" class="community-item">
+		<view v-for="(idea,index) in ideas" class="community-item" :key="idea._id">
 			<view class="ci-top">
 				<view class="head">
 					<image :src="idea.headPortrait" mode=""></image>
@@ -29,8 +29,8 @@
 				</view>
 			</view>
 			<view class="ci-bom" v-if="idea.ideaId">
-				<view @click="toComment(idea.ideaId)">评论{{idea.ideaReply}}</view>
-				<view @click="praise">点赞{{idea.ideaPraise}}</view>
+				<view @click="toComment(idea.ideaId)"><u-icon size="34rpx" name="chat" style="margin-right: 8rpx;"></u-icon>{{idea.ideaReply}}</view>
+				<view @click="praise"><u-icon @click="thumbs(idea._id,index)" :color="idea.praise?'red':'inherit'" name="thumb-up" size="34rpx" style="margin-right: 8rpx;"></u-icon>{{idea.ideaPraise}}</view>
 			</view>
 		</view>
 		<view class="release" @click="release()">
@@ -44,27 +44,35 @@
 		data(){
 			return{
 				ideas:[],
-				total:0,
-				pagesNum:1
+				total:1,
+				pagesNum:1,
+				praisecolor:"inherit"
 			}
 		},
-		created() {
-			this.total=0;
+		// created() {
+		// 	this.total=1;
+		// 	this.pagesNum=1;
+		// 	this.ideas=[]
+		// 	this.getShareIdea()
+		// },
+		onShow() {
+			console.log(123214)
+			this.total=1;
 			this.pagesNum=1;
 			this.ideas=[]
-			this.getTotal()
+			this.getShareIdea()
 		},
 		onLoad() {
-			uni.$on("updata",()=>{
-				this.total=0;
-				this.pagesNum=1;
-				this.ideas=[]
-				this.getTotal()
-			})
+			// uni.$on("updata",()=>{
+			// 	this.total=0;
+			// 	this.pagesNum=1;
+			// 	this.ideas=[]
+			// 	this.getShareIdea()
+			// })
 		},
 		onUnload() {  
 		    // 移除监听事件  
-		    uni.$off('updata');  
+		    // uni.$off('updata');  
 		 },
 		// 下拉到底
 		onReachBottom() {
@@ -72,13 +80,53 @@
 		},
 		// 下拉刷新
 		onPullDownRefresh() {
-			this.total=0;
+			this.total=1;
 			this.pagesNum=1;
 			this.ideas=[]
-			this.getTotal()
+			this.getShareIdea()
 			
 		},
 		methods:{
+			thumbs(id,index){
+				let userInfo=uni.getStorageSync("userInfo");
+				if(!userInfo){
+					uni.showModal({
+					    title: '提示',
+					    content: '您还没有登录,无法发布评论',
+							confirmText:"去登录",
+					    success: function (res) {
+					        if (res.confirm) {
+					            uni.redirectTo({
+					            	url:"/pages/login/login"
+					            })
+					        } else if (res.cancel) {
+					            console.log('用户点击取消');
+					        }
+					    }
+					});
+					return
+				}
+				this.ideas[index].praise=!this.ideas[index].praise
+				if(this.ideas[index].praise){
+					this.ideas[index].ideaPraise=this.ideas[index].ideaPraise+1
+				}else{
+					this.ideas[index].ideaPraise=this.ideas[index].ideaPraise-1
+				}
+				let type=this.ideas[index].ideaPraise?"add":"del"
+				uniCloud.callFunction({
+					name:'idea_thumbs-up',
+					data:{
+						id:id,
+						type:type,
+						accountId:userInfo.accountId?userInfo.accountId:"",
+						ideaPraise:this.ideas[index].ideaPraise
+					}
+				}).then(res=>{
+					console.log(res)
+				})
+				
+				
+			},
 			// 图片预览
 			previewImage(url){
 				// let arr=[]
@@ -88,29 +136,28 @@
 				   urls: url
 				});
 			},
-			// 获取总数
-			async getTotal(){
-				const db = uniCloud.database();
-				await db.collection('shareIdea_table').count().then(res=>{
-					console.log(res.result.total)
-					this.total=res.result.total
-				})
-				this.getShareIdea()
-			},
 			// 获取评论
-			getShareIdea(){
+			async getShareIdea(){
 				const db = uniCloud.database();//代码块为cdb
+				let userInfo=uni.getStorageSync("userInfo")
 				if(this.total>(this.pagesNum-1)*10){
 					uni.showLoading({
 					    title: '加载中'
 					});
-					db.collection('shareIdea_table').orderBy("updataTime", "desc").orderBy("ideaPraise", "asc").skip(10*(this.pagesNum-1)).limit(10).get().then((res)=>{
-							console.log(res.result.data)
-							this.ideas=this.ideas.concat(res.result.data);
-							this.pagesNum=this.pagesNum+1;
-							uni.hideLoading()
-							uni.stopPullDownRefresh()
-					  }).catch((err)=>{
+					uniCloud.callFunction({
+						name:"getshareIdea",
+						data:{
+							skip:10*(this.pagesNum-1),
+							accountId:userInfo.accountId?userInfo.accountId:""
+						}
+					}).then(res=>{
+						console.log(res.result)
+						this.ideas=this.ideas.concat(res.result.comments);
+						this.total=res.result.total
+						this.pagesNum=this.pagesNum+1;
+						uni.hideLoading()
+						uni.stopPullDownRefresh()
+					}).catch((err)=>{
 							console.log(err)
 							uni.hideLoading()
 							uni.stopPullDownRefresh()

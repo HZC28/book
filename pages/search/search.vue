@@ -14,6 +14,7 @@
 				{{book.bookName}}
 			</view>
 		</view>
+		<u-empty style="margin-top: 300rpx;" v-show="request&&books.length==0" text="找不到相关作者或书籍" mode="search"></u-empty>
 	</view>
 </template>
 
@@ -23,6 +24,7 @@
 			return{
 				keyWords:"",
 				books:[],
+				request:false,
 				styleInput:{
 					width:"460rpx"
 				},
@@ -54,7 +56,8 @@
 					}
 				}).then(res=>{
 					console.log(res.result.data)
-					this.books=res.result.data
+					this.request=true
+					this.books=res.result.data?res.result.data:[]
 				})
 			}
 		}
