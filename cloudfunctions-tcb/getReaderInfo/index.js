@@ -1,6 +1,7 @@
 'use strict';
 exports.main = async (event, context) => {
 	//event为客户端上传的参数
+	// 获取用户阅读记录
 	console.log('event : ', event)
 	const db=uniCloud.database()
 	let chapters=[]

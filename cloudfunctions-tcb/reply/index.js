@@ -1,5 +1,5 @@
 'use strict';
-// 回复
+// 书籍评论的回复
 exports.main = async (event, context) => {
 	const db=uniCloud.database()
 	const collection=db.collection("reply")

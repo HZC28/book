@@ -1,6 +1,7 @@
 <template>
 	<view class="ideaDetail">
 		<view class="ideaBy">
+			<!-- 发布人信息 -->
 			<view class="userInfo">
 				<view class="left">
 					<image :src="info.headPortrait" mode=""></image>
@@ -11,30 +12,37 @@
 				</view>
 			</view>
 			<view class="body">
+				<!-- 标签 -->
 				<view class="tabs" style="margin:10rpx 0;">
 					<u-tag @click="toSearch(tab)" v-for="tab in info.tabs" style="min-width: 140rpx;text-align: center;border-radius: 10rpx;" :text="tab" shape="square" />
 				</view>
+				<!-- 评论标题 -->
 				<view v-if="info.ideaTitle" class="">
 					{{info.ideaTitle}}
 				</view>
+				<!-- 评论内容 -->
 				<view class="">
 					{{info.ideaContent}}
 				</view>
 			</view>
 			<view style="text-align: right;">
+				<!-- 评论 -->
 				<text style="margin-right: 50rpx;"><u-icon size="34rpx" name="chat" style="margin-right: 8rpx;"></u-icon>{{info.ideaReply}}</text>
+				<!-- 点赞 -->
 				<text>
-					<u-icon @click="thumbs()" 
+					<u-icon @click="thumbs(info._id)" :color="praise==true?'red':'inherit'"
 					name="thumb-up" size="34rpx" style="margin-right: 8rpx;">
 					</u-icon>{{info.ideaPraise}}
 				</text>
 			</view>
 			
 		</view>
+		<!-- 发布的图片 -->
 		<view class="ideaImg">
 			<image @click="previewImage(url)" :src="url" mode="widthFix" v-for="url in info.ideaImg"></image>
 		</view>
-		<view class="reply">
+		<!-- 回复信息 -->
+		<view class="reply" v-if="replys!=0">
 			<view class="replyitem" v-for="(reply,index) in replys">
 				<div class="baseinfo">
 					<div class="img"><image :src="reply.headPortrait" mode=""></image></div>
@@ -46,6 +54,7 @@
 				<view class="content">
 					{{reply.content}}
 				</view>
+				<!-- 查看回复信息 -->
 				<view @click="lookReply(index)" class="child" v-if="reply.children&&reply.children.length!=0">
 					查看{{reply.children.length}}条回复>>
 				</view>
@@ -53,18 +62,21 @@
 		</view>
 		<u-popup class="popup" v-model="show" :closeable="true" length="70%" mode="bottom" border-radius="14">
 			<div class="title">回复信息</div>
-			<view class="popupitem" v-if="replys[index].children" v-for="child in replys[index].children">
-				<div class="baseinfo">
-					<div class="img"><image :src="child.headPortrait" mode=""></image></div>
-					<div class="rigth">
-						<div class="createBy">{{child.originator}}</div>
-						<div class="time">{{child.time}}</div>
+			<view v-if="show">
+				<view class="popupitem"  v-for="child in replys[index].children">
+					<div class="baseinfo">
+						<div class="img"><image :src="child.headPortrait" mode=""></image></div>
+						<div class="rigth">
+							<div class="createBy">{{child.originator}}</div>
+							<div class="time">{{child.time}}</div>
+						</div>
 					</div>
-				</div>
-				<view class="content">
-					{{child.content}}
+					<view class="content">
+						{{child.content}}
+					</view>
 				</view>
 			</view>
+			
 		</u-popup>
 		<view class="bom">
 			<u-input border="" class="bom-input"></u-input>
@@ -84,17 +96,62 @@
 				show:false,
 				info:{},
 				index:0,
-				replys:[]
+				replys:[],
+				praise:false
 			}
 		},
 		onLoad(option) {
 			console.log(option.id)
 			this.id=option.id
+			this.praise=option.praise
 			// 获取评论的详细信息
 			this.getIdeaDetail(option.id)
 			this.getReply()
 		},
 		methods:{
+			thumbs(id){
+				let userInfo=uni.getStorageSync("userInfo");
+				// 判断用户是否登录
+				if(!userInfo){
+					uni.showModal({
+					    title: '提示',
+					    content: '您还没有登录,是否登录',
+							confirmText:"去登录",
+					    success: function (res) {
+					        if (res.confirm) {
+					            uni.redirectTo({
+					            	url:"/pages/login/login"
+					            })
+					        } else if (res.cancel) {
+					            console.log('用户点击取消');
+					        }
+					    }
+					});
+					return
+				}
+				this.praise=!this.praise
+				// 点赞数加一还是减一
+				if(this.praise){
+					this.info.ideaPraise=this.info.ideaPraise+1
+				}else{
+					this.info.ideaPraise=this.info.ideaPraise-1
+				}
+				// 添加用户点赞信息或删除该用户的点赞信息
+				let type=this.praise?"add":"del"
+				console.log(type)
+				console.log(this.info.ideaPraise)
+				uniCloud.callFunction({
+					name:'idea_thumbs-up',
+					data:{
+						id:id,
+						type:type,
+						accountId:userInfo.accountId?userInfo.accountId:"",
+						ideaPraise:this.info.ideaPraise
+					}
+				}).then(res=>{
+					console.log(res)
+				})
+			},
 			getReply(){
 				let db=uniCloud.database()
 				db.collection('ideaReply').where({

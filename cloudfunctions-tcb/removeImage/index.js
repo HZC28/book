@@ -1,5 +1,6 @@
 'use strict';
 exports.main = async (event, context) => {
+	// 删除上传的图片
 	let result = await uniCloud.deleteFile({
 	    fileList: event.ids
 	});

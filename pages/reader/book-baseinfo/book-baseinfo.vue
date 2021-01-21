@@ -17,7 +17,7 @@
 			<view><image class="icon" src="../../../static/icon1/shujia.png" style="width:32rpx;height: 32rpx;"></image>加入书架</view>
 			<view><u-icon class="icon" size="32" name="list-dot"></u-icon>目录</view> -->
 		</view>
-		<view class="book-comment">
+		<view class="book-comment" v-if="this.requestComment">
 			<view class="comment-title">
 				<text>评论</text>
 				<text  @click="allComment">全部评论<u-icon name="arrow-right"></u-icon></text>
@@ -49,12 +49,13 @@
 			</view>
 		</view>
 		<!-- <u-button type="info" class="btn" @click="allComment">点击查看全部评论</u-button> -->
-		<view v-if="comments.length==0" class="empty">
+		<view v-if=" this.requestComment&&comments.length==0 " class="empty">
 			<u-empty text="当前没有评论" mode="history"></u-empty>
 			<text class="text" @click="toComment(id)">去评论</text>
 		</view>
-		<view class="fixed">
-			<view class="left" @click="addBookshelf(id)">加入书架</view>
+		<view class="fixed" v-if="requestBookshelf">
+			<view class="left" v-if="addbookshelf==false" @click="addtoBookshelf">加入书架</view>
+			<view class="left" v-if="addbookshelf" @click="toBookshelf">去书架</view>
 			<view class="right" @click="toreader(id)">点击阅读</view>
 		</view>
 	</view>
@@ -66,15 +67,27 @@
 			return{
 				baseInfo:{},
 				comments:[],
-				id:""
+				id:"",
+				// 是否加入书架
+				addbookshelf:false,
+				requestComment:false,
+				// 判断是否加入书架接口请求完毕
+				requestBookshelf:false
 			}
 		},
 		methods:{
+			toBookshelf(){
+				uni.navigateTo({
+					url:"/pages/bookshelf/bookshelf"
+				})
+			},
+			// 去发布评价
 			toComment(id){
 				uni.navigateTo({
 					url:"/pages/reader/release/release?bookid="+id
 				})
 			},
+			// 阅读该书籍
 			toreader(id){
 				uni.navigateTo({
 					url:"/pages/reader/reader?bookid="+id
@@ -96,9 +109,6 @@
 				  }).catch((err)=>{
 						console.log(err)
 				  })
-					
-					
-					
 			},
 			// 获取评论
 			getComments(){
@@ -107,10 +117,71 @@
 					"bookId":this.id
 				}).orderBy('commentTime','asc').get().then((res)=>{
 						this.comments=res.result.data
+						this.requestComment=true
 						console.log(res.result.data)
 				  }).catch((err)=>{
 						console.log(err)
+						this.requestComment=true
 				  })
+			},
+			// 判断该书籍是否已经加入书架
+			getBookshelf(){
+				let userInfo=uni.getStorageSync("userInfo")
+				if(!userInfo){
+					this.requestBookshelf=true
+					return
+				}
+				const db = uniCloud.database();
+				db.collection("bookshelf").where({
+					accountId:userInfo.accountId
+				}).get().then(res=>{
+					let arr=res.result.data[0].books?res.result.data[0].books:[]
+					console.log(res)
+					arr.forEach(val=>{
+						if(val.bookid==this.id){
+							this.addbookshelf=true
+						}
+					})
+					this.requestBookshelf=true
+				})
+			},
+			// 加入书架
+			addtoBookshelf(){
+				let userInfo=uni.getStorageSync("userInfo");
+				// 判断用户是否登录
+				if(!userInfo){
+					uni.showModal({
+					    title: '提示',
+					    content: '您还没有登录,是否登录',
+							confirmText:"去登录",
+					    success: function (res) {
+					        if (res.confirm) {
+					            uni.redirectTo({
+					            	url:"/pages/login/login"
+					            })
+					        } else if (res.cancel) {
+					            console.log('用户点击取消');
+					        }
+					    }
+					});
+					return
+				}
+				let obj={}
+				obj.bookid=this.id;
+				obj.bookName=this.baseInfo.bookName
+				obj.img=this.baseInfo.img
+				console.log(obj)
+				uniCloud.callFunction({
+					name:"addBookshelf",
+					data:{
+						accountId:userInfo.accountId,
+						obj:obj
+					}
+				}).then(res=>{
+					console.log(res)
+					this.toast("已加入书架")
+					this.addbookshelf=true
+				})
 			},
 			allComment(){
 				uni.navigateTo({
@@ -124,6 +195,7 @@
 			// 获取db引用
 			this.init()
 			this.getComments()
+			this.getBookshelf()
 		}
 	}
 </script>

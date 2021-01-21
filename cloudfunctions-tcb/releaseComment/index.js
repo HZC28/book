@@ -1,5 +1,6 @@
 'use strict';
 exports.main = async (event, context) => {
+	// 发布书籍评论
 	//event为客户端上传的参数
 	const db=uniCloud.database()
 	const collection = db.collection('comment');

@@ -14,8 +14,8 @@
 				</view>
 			</view>
 			<view class="ci-center">
-				<view @click="toComment(idea.ideaId)">{{idea.ideaTitle}}</view>
-				<text @click="toComment(idea.ideaId)">{{idea.ideaContent}}</text>
+				<view @click="toComment(idea.ideaId,idea.praise)">{{idea.ideaTitle}}</view>
+				<text @click="toComment(idea.ideaId,idea.praise)">{{idea.ideaContent}}</text>
 				<view class="imgbox">
 					<view class="img" v-if="idea.ideaImg.length==2">
 						<image @click="previewImage(idea.ideaImg)" style="height: 300rpx;" :src="imgurl" mode="aspectFill" v-for="imgurl in idea.ideaImg"></image>
@@ -29,8 +29,10 @@
 				</view>
 			</view>
 			<view class="ci-bom" v-if="idea.ideaId">
-				<view @click="toComment(idea.ideaId)"><u-icon size="34rpx" name="chat" style="margin-right: 8rpx;"></u-icon>{{idea.ideaReply}}</view>
-				<view @click="praise"><u-icon @click="thumbs(idea._id,index)" :color="idea.praise?'red':'inherit'" name="thumb-up" size="34rpx" style="margin-right: 8rpx;"></u-icon>{{idea.ideaPraise}}</view>
+				<!-- 评论 -->
+				<view @click="toComment(idea.ideaId,idea.praise)"><u-icon size="34rpx" name="chat" style="margin-right: 8rpx;"></u-icon>{{idea.ideaReply}}</view>
+				<!-- 点赞 -->
+				<view><u-icon @click="thumbs(idea._id,index)" :color="idea.praise?'red':'inherit'" name="thumb-up" size="34rpx" style="margin-right: 8rpx;"></u-icon>{{idea.ideaPraise}}</view>
 			</view>
 		</view>
 		<view class="release" @click="release()">
@@ -87,12 +89,14 @@
 			
 		},
 		methods:{
+			// 点赞
 			thumbs(id,index){
 				let userInfo=uni.getStorageSync("userInfo");
+				// 判断用户是否登录
 				if(!userInfo){
 					uni.showModal({
 					    title: '提示',
-					    content: '您还没有登录,无法发布评论',
+					    content: '您还没有登录,是否登录',
 							confirmText:"去登录",
 					    success: function (res) {
 					        if (res.confirm) {
@@ -107,11 +111,13 @@
 					return
 				}
 				this.ideas[index].praise=!this.ideas[index].praise
+				// 点赞数加一还是减一
 				if(this.ideas[index].praise){
 					this.ideas[index].ideaPraise=this.ideas[index].ideaPraise+1
 				}else{
 					this.ideas[index].ideaPraise=this.ideas[index].ideaPraise-1
 				}
+				// 添加用户点赞信息或删除该用户的点赞信息
 				let type=this.ideas[index].ideaPraise?"add":"del"
 				uniCloud.callFunction({
 					name:'idea_thumbs-up',
@@ -129,9 +135,7 @@
 			},
 			// 图片预览
 			previewImage(url){
-				// let arr=[]
 				console.log(url)
-				// arr.push(url)
 				uni.previewImage({
 				   urls: url
 				});
@@ -165,18 +169,17 @@
 				}
 				
 			},
-			toComment(id){
+			// 社区评论详情
+			toComment(id,praise){
 				uni.navigateTo({
-					url:"/pages/community/detail/detail?id="+id
+					url:"/pages/community/detail/detail?id="+id+"&praise="+praise
 				})
 			},
+			// 去发布社区评论
 			release(){
 				uni.navigateTo({
 					url:"/pages/community/idea/idea"
 				})
-			},
-			praise(){
-				
 			}
 		}
 	}

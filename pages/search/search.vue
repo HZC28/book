@@ -10,9 +10,12 @@
 		</uni-nav-bar>
 		<view class="search-item" v-for="book in books" @click="tobookInfo(book.bookid)">
 			<image :src="book.img" mode=""></image>
-			<view class="">
-				{{book.bookName}}
+			<view class="bookinfo">
+				<view class="bookName">{{book.bookName}}</view>
+				<view class="author">{{book.author}}</view>
+				
 			</view>
+			<!-- <view>{{book.type}}</view> -->
 		</view>
 		<u-empty style="margin-top: 300rpx;" v-show="request&&books.length==0" text="找不到相关作者或书籍" mode="search"></u-empty>
 	</view>
@@ -80,8 +83,21 @@
 				width: 80rpx;
 				height: 120rpx;
 			}
-			view{
+			.bookinfo{
+				display: flex;
+				height: 100%;
+				flex-direction: column;
+				justify-content: space-between;
 				margin-left: 20rpx;
+				.author{
+					font-size: 22rpx;
+					color: #cccccc;
+					margin-top: 8rpx;
+				}
+				.bookName{
+					font-size: 28rpx;
+					font-weight: 450rpx;
+				}
 			}
 		}
 	}

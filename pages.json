@@ -143,6 +143,27 @@
 			}
 		},
 		{
+			"path": "pages/bookshelf/bookshelf",
+			"style": {
+				"navigationBarTitleText":"我的书架",
+				"enablePullDownRefresh": true,
+				"app-plus":{
+						"padding-right": "15px",
+						"titleNView":{
+							// "backgroundColor":"#00ffff",
+							"searchInput":{
+								"backgroundColor": "#fff",
+								"borderRadius": "10px", //输入框圆角
+								"placeholder": "去搜索图书",
+								"align":"center",
+								"disabled": true //disable时点击输入框不置焦，可以跳到新页面搜索
+							}
+							
+						}
+					}
+			}
+		},
+		{
 			"path": "pages/login/forgetPW",
 			"style": {
 				"navigationBarTitleText":"忘记密码"

@@ -1,7 +1,7 @@
 <template>
   <view class="content">
     <view class="header">
-      <image src="../../static/shilu-login/logo.png"></image>
+      <image src="../../static/shilu-login/133.png"></image>
     </view>
     <view class="list">
       <view class="list-call">
@@ -70,29 +70,30 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+		padding-top: 250rpx;
   }
 
   .header {
-    width: 161rpx;
-    height: 161rpx;
-    background: rgba(63, 205, 235, 1);
-    box-shadow: 0rpx 12rpx 13rpx 0rpx rgba(63, 205, 235, 0.47);
-    border-radius: 50%;
-    margin-top: 30rpx;
+    /* width: 161rpx;
+    height: 161rpx; */
+    /* background: rgba(63, 205, 235, 1); */
+    /* box-shadow: 0rpx 12rpx 13rpx 0rpx rgba(63, 205, 235, 0.47); */
+    /* border-radius: 50%; */
+    /* margin-top: 30rpx; */
     margin-left: auto;
     margin-right: auto;
   }
 
   .header image {
-    width: 161rpx;
-    height: 161rpx;
-    border-radius: 50%;
+    width: 406rpx;
+    height: 300rpx;
+    /* border-radius: 50%; */
   }
 
   .list {
     display: flex;
     flex-direction: column;
-    padding-top: 50rpx;
+    /* padding-top: 50rpx; */
     padding-left: 70rpx;
     padding-right: 70rpx;
   }
