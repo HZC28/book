@@ -13,8 +13,8 @@
 			</view>
 			<view class="body">
 				<!-- 标签 -->
-				<view class="tabs" style="margin:10rpx 0;">
-					<u-tag @click="toSearch(tab)" v-for="tab in info.tabs" style="min-width: 140rpx;text-align: center;border-radius: 10rpx;" :text="tab" shape="square" />
+				<view class="tabs" style="margin:20rpx 0;">
+					<u-tag @click="toSearch(tab)" v-for="tab in info.tabs" style="text-align: center;border-radius: 10rpx;" :text="tab" shape="square" />
 				</view>
 				<!-- 评论标题 -->
 				<view v-if="info.ideaTitle" class="">
@@ -27,13 +27,13 @@
 			</view>
 			<view style="text-align: right;">
 				<!-- 评论 -->
-				<text style="margin-right: 50rpx;"><u-icon size="34rpx" name="chat" style="margin-right: 8rpx;"></u-icon>{{info.ideaReply}}</text>
+				<view style="margin-right: 50rpx;display: inline-block;"><u-icon size="34rpx" name="chat" style="margin-right: 8rpx;"></u-icon>{{info.ideaReply}}</view>
 				<!-- 点赞 -->
-				<text>
+				<view style="display: inline-block;">
 					<u-icon @click="thumbs(info._id)" :color="praise==true?'red':'inherit'"
 					name="thumb-up" size="34rpx" style="margin-right: 8rpx;">
 					</u-icon>{{info.ideaPraise}}
-				</text>
+				</view>
 			</view>
 			
 		</view>
@@ -60,7 +60,7 @@
 				</view>
 			</view>
 		</view>
-		<u-popup class="popup" v-model="show" :closeable="true" length="70%" mode="bottom" border-radius="14">
+		<u-popup z-index="8" class="popup" v-model="show" :closeable="true" length="70%" mode="bottom" border-radius="14">
 			<div class="title">回复信息</div>
 			<view v-if="show">
 				<view class="popupitem"  v-for="child in replys[index].children">
@@ -78,10 +78,21 @@
 			</view>
 			
 		</u-popup>
-		<view class="bom">
-			<u-input border="" class="bom-input"></u-input>
-			<view class="bom-btn">
+		<view class="bom" v-show="openIssue==false">
+			<input @click="openInput" disabled border placeholder="我来评论" class="bom-input"></input>
+			<!-- <view class="bom-btn">
 				回复
+			</view> -->
+		</view>
+		<view v-show="openIssue" class="issue">
+			<view class="responerInfo">
+				回复阿松大：撒大大
+			</view>
+			<view class="issue-main">
+				<textarea class="content" placeholder="我来评论" type="textarea"></textarea>
+				<view class="btn">
+					<view>发表</view>
+				</view>
 			</view>
 		</view>
 	</view>
@@ -97,18 +108,22 @@
 				info:{},
 				index:0,
 				replys:[],
-				praise:false
+				praise:false,
+				openIssue:false
 			}
 		},
 		onLoad(option) {
-			console.log(option.id)
+			// console.log(option.id)
 			this.id=option.id
-			this.praise=option.praise
+			this.praise=option.praise=='true'?true:false
 			// 获取评论的详细信息
 			this.getIdeaDetail(option.id)
 			this.getReply()
 		},
 		methods:{
+			openInput(){
+				this.openIssue=true
+			},
 			thumbs(id){
 				let userInfo=uni.getStorageSync("userInfo");
 				// 判断用户是否登录
@@ -237,22 +252,7 @@
 				margin-bottom: 20rpx;
 			}
 		}
-		.bom{
-			position: fixed;
-			bottom: 0;
-			display: flex;
-			background-color: #efefef;
-			align-items: center;
-			width: 100%;
-			.bom-input{
-				flex:6;
-				width: 80%;
-			}
-			.bom-btn{
-				fleX:1;
-			}
-		}
-	}
+		
 	.reply{
 		background: #FFFFFF;
 		margin-bottom: 100rpx;
@@ -299,7 +299,7 @@
 			.child{
 				margin-left:120rpx;
 				color:#00aaff;
-				font-size: 20rpx;
+				font-size: 26rpx;
 			}
 		}
 	}
@@ -344,6 +344,77 @@
 				font-size: 30rpx;
 				letter-spacing: 2rpx;
 				line-height: 36rpx;
+			}
+		}
+	}
+	.bom{
+			position: fixed;
+			bottom: 0;
+			background-color: #FFFFFF;
+			width: 100%;
+			z-index: 9;
+			height: 100rpx;
+			// line-height: 100rpx;
+			.bom-input{
+				width: 600rpx;
+				height: 60rpx;
+				background-color: #f8f8f8;
+				margin-top: 20rpx;
+				margin-left: 75rpx;
+				border-radius: 30rpx;
+				font-size: 24rpx;
+				padding-left:30rpx;
+				// line-height: 30rpx;
+				
+			}
+		}
+	}
+	.issue{
+		// <view v-show="openIssue" class="issue">
+		// 	<view class="responerInfo">
+		// 		回复阿松大：撒大大
+		// 	</view>
+		// 	<view class="issue-main">
+		// 		<u-input placeholder="我来评论" type="textarea"></u-input>
+		// 		<view class="btn">
+		// 			发表
+		// 		</view>
+		// 	</view>
+		// </view>
+		position: fixed;
+		bottom: 0;
+		background-color: #FFFFFF;
+		width: 100%;
+		z-index: 9;
+		// height: 300rpx;
+		padding:20rpx 30rpx;
+		.responerInfo{
+			padding-bottom: 20rpx;
+			font-size: 24rpx;
+			display: flex;
+		}
+		.issue-main{
+			display: flex;
+			.content{
+				width: 570rpx;
+				height: 90rpx;
+				border-radius: 30rpx;
+				background-color: #f8f8f8;
+				padding: 30rpx;
+				font-size: 28rpx;
+			}
+			.btn{
+				width: 120rpx;
+				text-align: center;
+				margin-left: 20rpx;
+				align-self: flex-end;
+				view{
+					width: 100rpx;
+					background: #ffaaff;
+					color:#FFFFFF;
+					padding:5rpx 20rpx;
+					border-radius: 20rpx;
+				}
 			}
 		}
 	}
