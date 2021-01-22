@@ -2,10 +2,26 @@
 	<!-- 书架 -->
 	<view class="bookshelf">
 		<view class="book">
-			<view class="bookitem" v-for="book in books">
-				<image class="img" :src="book.img" mode=""></image>
-				<!-- <u-checkbox @click="changeStaus" v-show="operate" class="select" shape="circle" v-model="book.checked" active-color="#F29100"></u-checkbox> -->
+			<view class="bookitem" v-for="(book,index) in books">
+				<image @longpress="manageBook()" @click="toreading(book.bookid)" class="img" :src="book.img" mode=""></image>
+				<u-checkbox  v-model="book.checked" @change="changeStaus(index)" v-show="manage" class="select" shape="circle"  active-color="#F29100"></u-checkbox>
 				<view class="bookname">{{book.bookName}}</view>
+			</view>
+		</view>
+		<view class="popup" v-show="manage">
+			<view class="popup-main">
+				<view @click="allSelect">
+					<u-checkbox size="38rpx" v-model="checked" shape="circle" active-color="#F29100">全选</u-checkbox>
+				</view>
+				<view @click="del">
+					<image src="../../static/icon1/del.png" style="width: 38rpx;height: 38rpx;margin-right: 5rpx;" mode=""></image>
+					<text>删除</text>
+				</view>
+				
+				<view @click="cancle">
+					<image src="../../static/icon1/cancle.png" style="width: 38rpx;height: 38rpx;margin-right: 5rpx;" mode=""></image>
+					<text>取消</text>
+				</view>
 			</view>
 		</view>
 	</view>
@@ -16,7 +32,7 @@
 		data(){
 			return{
 				books:[],
-				operate:true,
+				manage:false,
 				checked:false
 			}
 		},
@@ -41,16 +57,75 @@
 					accountId:userInfo.accountId
 				}).get().then(res=>{
 					console.log(res)
-					this.books=res.result.data[0].books
-					this.books.forEach(val=>{
+					
+					res.result.data[0].books.forEach(val=>{
 						val.checked=false
 						console.log(val)
 					})
+					this.books=res.result.data[0].books
 					uni.stopPullDownRefresh()
 				})
 			},
-			changeStaus(){
-				console.log(asd)
+			changeStaus(i){
+				console.log(this.books[i].checked)
+				this.books[i].checked=!this.books[i].checked
+			},
+			cancle(){
+				this.manage=false
+			},
+			// 删除书架书籍
+			async del(){
+				let userInfo=uni.getStorageSync("userInfo")
+				let ids=[]
+				let arr=this.books.filter(val=>{
+					return val.checked==true
+				})
+				if(arr.length==0){
+					this.toast("未选择要删除书籍")
+					return
+				}
+				arr.forEach(val=>{
+					ids.push(val.bookid)
+				})
+				uniCloud.callFunction({
+					name:"delBookshelf",
+					data:{
+						accountId:userInfo.accountId,
+						ids:ids
+					}
+				}).then(async (res)=>{
+					console.log(res)
+					await this.init()
+					this.manage=false
+					this.toast("删除书籍成功")
+				})
+				console.log(ids)
+			},
+			allSelect(){
+				if(this.checked){
+					this.books.forEach(val=>{
+						val.checked=true
+					})
+				}else{
+					this.books.forEach(val=>{
+						val.checked=false
+					})
+				}
+				
+			},
+			toreading(bookid){
+				// this.manage=true
+				if(this.manage==false){
+					uni.navigateTo({
+						url:"/pages/reader/reader?bookid="+bookid
+					})
+				}else{
+					return
+				}
+				
+			},
+			manageBook(){
+				this.manage=true
 			}
 		},
 		created() {
@@ -76,7 +151,7 @@
 			position: relative;
 			.img{
 				width: 200rpx;
-				height:270rpx;
+				height:320rpx;
 			}
 			.select{
 				position: absolute;
@@ -87,6 +162,27 @@
 				margin-top: 10rpx;
 				font-weight: 500;
 				font-size: 32rpx;
+			}
+		}
+	}
+	.popup{
+		position: fixed;
+		background: #FFFFFF;
+		bottom: 0rpx;
+		width: 100%;
+		height: 100rpx;
+		font-size: 32rpx;
+		.popup-main{
+			width: 100%;
+			height: 100%;
+			display: flex;
+			align-items: center;
+			view{
+				flex: 1;
+				text-align: center;
+				display: flex;
+				align-items: center;
+				justify-content: center;
 			}
 		}
 	}

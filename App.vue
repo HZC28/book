@@ -3,7 +3,18 @@
 	@import "uview/index.scss";
 </style>
 <script>
+	import { javaHb } from "@/utils.js";
 	export default {
+		mounted: function () {
+			// #ifdef APP-PLUS
+			setTimeout(() => {
+							 try {
+								 javaHb.plusReady();
+							 } catch (error) {console.log(error)}
+			}, 3000);
+			// #endif
+			 
+		 },
 		onLaunch: function() {
 			console.log('App Launch')
 		},

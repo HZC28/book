@@ -14,7 +14,7 @@
 			<view class="body">
 				<!-- 标签 -->
 				<view class="tabs" style="margin:20rpx 0;">
-					<u-tag @click="toSearch(tab)" v-for="tab in info.tabs" style="text-align: center;border-radius: 10rpx;" :text="tab" shape="square" />
+					<u-tag size="mini" @click="toSearch(tab)" v-for="tab in info.tabs" style="text-align: center;border-radius: 10rpx;" :text="tab" shape="square" />
 				</view>
 				<!-- 评论标题 -->
 				<view v-if="info.ideaTitle" class="">
@@ -84,14 +84,14 @@
 				回复
 			</view> -->
 		</view>
-		<view v-show="openIssue" class="issue">
+		<view @touchend.prevent="" v-show="openIssue" class="issue">
 			<view class="responerInfo">
 				回复阿松大：撒大大
 			</view>
 			<view class="issue-main">
-				<textarea class="content" placeholder="我来评论" type="textarea"></textarea>
+				<textarea v-model="form.content" @blur="hideIssue" :focus="focus" class="content" placeholder="我来评论" type="textarea"></textarea>
 				<view class="btn">
-					<view>发表</view>
+					<view @touchend.prevent="release">发表</view>
 				</view>
 			</view>
 		</view>
@@ -101,16 +101,27 @@
 <script>
 	export default{
 		data(){
-			
 			return{
 				id:"",
+				// 是否显示回复内容
 				show:false,
 				info:{},
+				// 控制回复信息是哪一条的
 				index:0,
 				replys:[],
+				// 判断当前用户是否对该评论点赞
 				praise:false,
-				openIssue:false
+				// 控制回复弹框的显示和隐藏
+				openIssue:false,
+				focus:false,
+				form:{}
 			}
+		},
+		onShow() {
+			// let db=uniCloud.database()
+			// db.collection('PatchManage').doc('79550af2600a410a006b1add689a041d').get().then(res=>{
+			// 	console.log(res.result.data[0])
+			// })
 		},
 		onLoad(option) {
 			// console.log(option.id)
@@ -121,9 +132,49 @@
 			this.getReply()
 		},
 		methods:{
+			// 发布回复信息
+			release(){
+				console.log(this.form)
+			},
+			// 失去焦点
+			hideIssue(){
+				this.openIssue=false
+				this.focus=false
+				console.log(this.focus)
+			},
+			// 显示发表回复框
 			openInput(){
 				this.openIssue=true
+				this.focus=true
+				let userInfo=uni.getStorageSync("userInfo");
+				// 判断用户是否登录
+				if(!userInfo){
+					uni.showModal({
+					    title: '提示',
+					    content: '您还没有登录,是否登录',
+							confirmText:"去登录",
+					    success: function (res) {
+					        if (res.confirm) {
+					            uni.redirectTo({
+					            	url:"/pages/login/login"
+					            })
+					        } else if (res.cancel) {
+					            console.log('用户点击取消');
+					        }
+					    }
+					});
+					return
+				}
+				this.form.originator=userInfo.account
+				this.form.originatorAccount=userInfo.account
+				this.form.headPortrait=userInfo.headPortrait
+				this.form.originatorId=userInfo.accountId
+				// this.form.responder
+				// this.form.responderAccount
+				// this.form.responderId
+				console.log(this.form)
 			},
+			// 点赞
 			thumbs(id){
 				let userInfo=uni.getStorageSync("userInfo");
 				// 判断用户是否登录
@@ -167,6 +218,7 @@
 					console.log(res)
 				})
 			},
+			// 获取回复信息
 			getReply(){
 				let db=uniCloud.database()
 				db.collection('ideaReply').where({

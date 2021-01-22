@@ -90,7 +90,7 @@
 		<!-- 小说正文开始 -->
 		<view class="sview" :style="{paddingTop:'calc('+statusBarHeight+' + 80px)',color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px'}">
 			<!-- <rich-text :nodes="content_text"></rich-text> -->
-			<u-parse :html="content_text"></u-parse>
+			<rich-text :nodes="content_text"></rich-text>
 			<view style="width: 100%;height: 100%;text-align: center;margin-top:300rpx" v-if="content_text==' '">
 				加载中
 			</view>
@@ -142,6 +142,7 @@ export default{
 		clearInterval(timeInter)
 		clearInterval(dianliangInter)
 		uni.hideLoading();
+		console.log("页面卸载")
 		//页面卸载的时候将通知栏显示出来
 		// #ifdef APP-PLUS
 		plus.navigator.setFullscreen(false);
@@ -181,6 +182,7 @@ export default{
 		// #endif
 	},
 	onHide() {
+		console.log("123")
 		//页面隐藏的时候将通知栏显示出来
 		// #ifdef APP-PLUS 
 		plus.navigator.setFullscreen(false);
@@ -195,19 +197,21 @@ export default{
 		this.getData()
 	},
 	methods:{
+		// 根据bookid获取章节,书名信息
 		getData(){
 			let db=uniCloud.database()
 			db.collection('bookChater').where({
 				bookid:this.bookId
 			}).get().then(res=>{
-				console.log(res.result.data[0].chapters)
-				this.chapters=res.result.data[0].chapters
+				// console.log(res.result)
+				this.chapters=res.result.data[0].chapters?res.result.data[0].chapters:[]
 				this.getChapterContent(this.chapters[this.chapterNum].chapterId)
 				this.section_title=this.chapters[this.chapterNum].chapterName
 				this.bookName=res.result.data[0].bookName
 				
 			})
 		},
+		// 根据章节id获取章节内容
 		getChapterContent(chapterId){
 			let db=uniCloud.database()
 			this.content_text=" "
@@ -215,9 +219,10 @@ export default{
 				bookid:this.bookId,
 				chapterId:chapterId
 			}).get().then(res=>{
-				console.log(res.result.data[0].chapterContent)
-				let str=res.result.data[0].chapterContent.replace(/\n/g, "<br>&nbsp&nbsp&nbsp&nbsp")
-				this.content_text=str
+				// console.log(res.result.data[0].chapterContent)
+				let str=res.result.data[0].chapterContent.replace(/\n/g, '</p><p>')
+				// let str=res.result.data[0].chapterContent
+				this.content_text=`<p>${str}</p>`
 				this.menuShow=false
 			})
 		},
@@ -333,6 +338,7 @@ export default{
 		left: 0;
 		width: 100%;
 		height: 100%;
+		
 	}
 	.zuizhong.active{
 		opacity: 1;
@@ -388,7 +394,7 @@ export default{
 		word-break:break-all;
 		word-wrap:break-word;
 		overflow: hidden;
-		padding: 0 20upx 300upx;
+		padding: 0 20upx 100upx;
 	}
 	.titlee{
 		width: 100%;

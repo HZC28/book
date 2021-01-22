@@ -30,7 +30,7 @@
 					<image src="../../static/icon/yue.png" mode=""></image>
 					<text>余额</text>
 				</view>
-				<view class="reader-item">
+				<view class="reader-item" @click="jumpPage('/pages/bookshelf/bookshelf')">
 					<image src="../../static/icon/shujia.png" mode=""></image>
 					<text>书架</text>
 				</view>
@@ -103,8 +103,8 @@
 	export default{
 		data(){
 			return{
-				name:"name",
-				signature:"我们读书,就不孤独我们读书,就不孤独",
+				name:"",
+				signature:"",
 				headPortrait:""
 			}
 		},
@@ -117,6 +117,11 @@
 			}
 		},
 		methods:{
+			jumpPage(url){
+				uni.navigateTo({
+					url:url
+				})
+			},
 			toEdit(){
 				uni.navigateTo({
 					url:"/pages/user/userinfo/userinfo"
