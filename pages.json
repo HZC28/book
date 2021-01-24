@@ -185,13 +185,9 @@
 		{
 			"path": "pages/reader/reader",
 			"style": {
-				"navigationBarTextStyle":"black",
-				"navigationBarTitleText":"",
+				// "navigationBarTextStyle":"black",
+				"navigationBarTitleText":"reader",
 				"navigationStyle":"custom"
-				// "onReachBottomDistance":100
-				// "app-plus":{
-					// "titleNView": false
-				// }
 			}
 		}
 	],

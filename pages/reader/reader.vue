@@ -5,7 +5,7 @@
 		</view>
 		<!-- 网页背景开始 -->
 		<view class="pagbg anmt" :style="{backgroundColor:pageBg}"></view>
-		<view class="zhongMenu" @click="dianjile()"></view>
+		<view class="zhongMenu"  @click.prevent="dianjile()"></view>
 		<!-- 网页背景结束 -->
 		<!-- 带返回键的导航栏开始 -->
 		<view class="topBox anmt" :style="{color:fontColor,backgroundColor:menuBg,top:show?'0':'-150px'}">
@@ -64,7 +64,7 @@
 		</view>
 		<!-- 菜单结束 -->
 		<!-- 顶部开始 -->
-		<view class="anmt" :style="{color:fontColor,lineHeight:statusBarHeight,backgroundColor:show?menuBg:pageBg,position:'fixed',top:'0',left:'0',zIndex:'6',width:'100%',fontSize:'3vw',zIndex:'20'}">
+		<view class="anmt" :style="{color:fontColor,backgroundColor:show?menuBg:pageBg,position:'fixed',top:'0',left:'0',zIndex:'6',width:'100%',fontSize:'3vw',zIndex:'20'}">
 			<!-- 时间电量开始 -->
 			<!-- <view :style="{height:statusBarHeight,padding: '20rpx 10rpx'}">
 				<view style="float: left;letter-spacing:0">
@@ -88,10 +88,11 @@
 		</view>
 		<!-- 顶部结束 -->
 		<!-- 小说正文开始 -->
-		<view class="sview" :style="{paddingTop:'calc('+statusBarHeight+' + 80px)',color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px'}">
-			<!-- <rich-text :nodes="content_text"></rich-text> -->
-			<rich-text :nodes="content_text"></rich-text>
-			<view style="width: 100%;height: 100%;text-align: center;margin-top:300rpx" v-if="content_text==' '">
+		<view @click="dianjile()"  class="sview" :style="{paddingTop:'calc(50rpx)',zIndex:zindex,color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px'}">
+			<!-- <text selectable="true">{{content_text}}</text> -->
+			<!-- <rich-text  :selectable="true" :nodes="content_text"></rich-text> -->
+			<u-parse @longpress="onLongPress" :selectable="false" :tag-style="style"  :html="content_text"></u-parse>
+			<view class="unload" v-if="content_text==' '">
 				加载中
 			</view>
 			<!-- {{content_text}} -->
@@ -99,11 +100,14 @@
 		<!-- 小说正文结束 -->
 		<!-- 目录 -->
 		<u-popup class="chapterList" length="550rpx" v-model="menuShow">
+			<view class="status_bar">
+				<!-- 这里是状态栏 -->
+			</view>
 			<view class="title">
 				{{bookName}}
 			</view>
-			<view v-for="chapter in chapters" class="chapter">
-				<view @click="getChapterContent(chapter.chapterId)">{{chapter.chapterName}}</view>
+			<view v-for="(chapter,index) in chapters" class="chapter">
+				<view @click="getChapterContent(chapter.chapterId,index)">{{chapter.chapterName}}</view>
 			</view>
 		</u-popup>
 	</view>
@@ -114,6 +118,7 @@ import zhuti from '../../zhuti'
 export default{
 	data(){
 		return{
+			zindex:5,
 			section_title:'',//章节标题
 			//正文
 			content_text:'',
@@ -134,7 +139,11 @@ export default{
 			lineHeight:uni.getStorageSync('lineHeight')?uni.getStorageSync('lineHeight'):70,//正文行间距
 			menuShow:false,
 			chapters:[],
-			chapterNum:0
+			chapterNum:0,
+			style: {
+								// 字符串的形式
+								p: 'user-select: text;-webkit-user-select: text;'
+							}
 		}
 	},
 	onUnload() {
@@ -170,7 +179,7 @@ export default{
 		}
 		uni.getSystemInfo({
 			success: res=>{
-				this.statusBarHeight = res.statusBarHeight + 'px';
+				this.statusBarHeight = res.statusBarHeight + 'rpx';
 			}
 		})
 	},
@@ -197,6 +206,10 @@ export default{
 		this.getData()
 	},
 	methods:{
+		onLongPress(e){
+			console.log(e)
+			console.log("onLongPress")
+		},
 		// 根据bookid获取章节,书名信息
 		getData(){
 			let db=uniCloud.database()
@@ -205,14 +218,14 @@ export default{
 			}).get().then(res=>{
 				// console.log(res.result)
 				this.chapters=res.result.data[0].chapters?res.result.data[0].chapters:[]
-				this.getChapterContent(this.chapters[this.chapterNum].chapterId)
-				this.section_title=this.chapters[this.chapterNum].chapterName
+				this.getChapterContent(this.chapters[this.chapterNum].chapterId,this.chapterNum)
+				// this.section_title=this.chapters[this.chapterNum].chapterName
 				this.bookName=res.result.data[0].bookName
 				
 			})
 		},
 		// 根据章节id获取章节内容
-		getChapterContent(chapterId){
+		getChapterContent(chapterId,index){
 			let db=uniCloud.database()
 			this.content_text=" "
 			db.collection('chapters').where({
@@ -223,6 +236,8 @@ export default{
 				let str=res.result.data[0].chapterContent.replace(/\n/g, '</p><p>')
 				// let str=res.result.data[0].chapterContent
 				this.content_text=`<p>${str}</p>`
+				this.section_title=this.chapters[index].chapterName
+				this.chapterNum=index
 				this.menuShow=false
 			})
 		},
@@ -261,7 +276,14 @@ export default{
 			uni.navigateBack({});
 		},
 		dianjile(){
+			// console.log(123)
 			this.show=!this.show;
+			if(this.show){
+				this.zindex=5;
+			}else{
+				this.zindex=10
+			}
+			console.log(this.zindex)
 		},
 		//切换主题
 		qiehuan(e){
@@ -317,7 +339,7 @@ export default{
 </script>
 <style lang="less" scoped>
 	.status_bar {
-		height: var(--status-bar-height);
+		height: 100rpx;
 		width: 100%;
 	}
 	@font-face {font-family: "iconfont";
@@ -394,7 +416,16 @@ export default{
 		word-break:break-all;
 		word-wrap:break-word;
 		overflow: hidden;
-		padding: 0 20upx 100upx;
+		// padding: 0 20upx 100upx;
+		.unload{
+			width: 100%;
+			height: 100%;
+			text-align: center;
+			margin: 0 auto;
+			margin-top:300rpx;
+			text-indent: 0;
+		}
+
 	}
 	.titlee{
 		width: 100%;
