@@ -51,30 +51,30 @@
 				praisecolor:"inherit"
 			}
 		},
-		// created() {
-		// 	this.total=1;
-		// 	this.pagesNum=1;
-		// 	this.ideas=[]
-		// 	this.getShareIdea()
-		// },
-		onShow() {
-			console.log(123214)
+		created() {
 			this.total=1;
 			this.pagesNum=1;
 			this.ideas=[]
 			this.getShareIdea()
 		},
+		onShow() {
+			console.log(123214)
+			// this.total=1;
+			// this.pagesNum=1;
+			// this.ideas=[]
+			// this.getShareIdea()
+		},
 		onLoad() {
-			// uni.$on("updata",()=>{
-			// 	this.total=0;
-			// 	this.pagesNum=1;
-			// 	this.ideas=[]
-			// 	this.getShareIdea()
-			// })
+			uni.$on("updata",()=>{
+				this.total=1;
+				this.pagesNum=1;
+				this.ideas=[]
+				this.getShareIdea()
+			})
 		},
 		onUnload() {  
 		    // 移除监听事件  
-		    // uni.$off('updata');  
+		    uni.$off('updata');  
 		 },
 		// 下拉到底
 		onReachBottom() {

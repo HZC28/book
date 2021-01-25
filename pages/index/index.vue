@@ -75,6 +75,7 @@
 			})
 		},
 		methods: {
+			
 			async init(){
 				let db=uniCloud.database()
 				let collection=db.collection('book')

@@ -45,7 +45,7 @@
 				}).then(res=>{
 					if(res.result.code==200){
 						let userInfo={}
-						console.log(res.result)
+						// console.log(res.result)
 						userInfo.userName=res.result.userName;
 						userInfo.role=res.result.role;
 						userInfo.account=res.result.account;

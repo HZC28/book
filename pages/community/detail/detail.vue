@@ -17,17 +17,20 @@
 					<u-tag size="mini" @click="toSearch(tab)" v-for="tab in info.tabs" style="text-align: center;border-radius: 10rpx;" :text="tab" shape="square" />
 				</view>
 				<!-- 评论标题 -->
-				<view v-if="info.ideaTitle" class="">
+				<view  class="">
 					{{info.ideaTitle}}
 				</view>
 				<!-- 评论内容 -->
-				<view class="">
+				<view class="" @click="openInput(0)">
 					{{info.ideaContent}}
 				</view>
 			</view>
-			<view style="text-align: right;">
+			<view  style="text-align: right;">
 				<!-- 评论 -->
-				<view style="margin-right: 50rpx;display: inline-block;"><u-icon size="34rpx" name="chat" style="margin-right: 8rpx;"></u-icon>{{info.ideaReply}}</view>
+				<view style="margin-right: 50rpx;display: inline-block;">
+					<u-icon size="34rpx" name="chat" style="margin-right: 8rpx;"></u-icon>
+					{{info.ideaReply}}
+				</view>
 				<!-- 点赞 -->
 				<view style="display: inline-block;">
 					<u-icon @click="thumbs(info._id)" :color="praise==true?'red':'inherit'"
@@ -43,7 +46,7 @@
 		</view>
 		<!-- 回复信息 -->
 		<view class="reply" v-if="replys!=0">
-			<view class="replyitem" v-for="(reply,index) in replys">
+			<view class="replyitem" v-for="(reply,index) in replys" :key="reply._id">
 				<div class="baseinfo">
 					<div class="img"><image :src="reply.headPortrait" mode=""></image></div>
 					<div class="rigth">
@@ -51,7 +54,7 @@
 						<div class="time">{{reply.time}}</div>
 					</div>
 				</div>
-				<view class="content">
+				<view class="content" @click="openInput(1)">
 					{{reply.content}}
 				</view>
 				<!-- 查看回复信息 -->
@@ -63,7 +66,7 @@
 		<u-popup z-index="8" class="popup" v-model="show" :closeable="true" length="70%" mode="bottom" border-radius="14">
 			<div class="title">回复信息</div>
 			<view v-if="show">
-				<view class="popupitem"  v-for="child in replys[index].children">
+				<view class="popupitem"  v-for="(child,childIndex) in replys[index].children">
 					<div class="baseinfo">
 						<div class="img"><image :src="child.headPortrait" mode=""></image></div>
 						<div class="rigth">
@@ -71,7 +74,7 @@
 							<div class="time">{{child.time}}</div>
 						</div>
 					</div>
-					<view class="content">
+					<view class="content" @click="openInput(1,childIndex)">
 						{{child.content}}
 					</view>
 				</view>
@@ -79,19 +82,19 @@
 			
 		</u-popup>
 		<view class="bom" v-show="openIssue==false">
-			<input @click="openInput" disabled border placeholder="我来评论" class="bom-input"></input>
+			<input @click="openInput(-1)" disabled border placeholder="我来评论" class="bom-input"></input>
 			<!-- <view class="bom-btn">
 				回复
 			</view> -->
 		</view>
 		<view @touchend.prevent="" v-show="openIssue" class="issue">
 			<view class="responerInfo">
-				回复阿松大：撒大大
+				回复{{form.responder}}：{{this.form.responderContent}}
 			</view>
 			<view class="issue-main">
 				<textarea v-model="form.content" @blur="hideIssue" :focus="focus" class="content" placeholder="我来评论" type="textarea"></textarea>
 				<view class="btn">
-					<view @touchend.prevent="release">发表</view>
+					<view @touchend.prevent="release(type)">发表</view>
 				</view>
 			</view>
 		</view>
@@ -114,7 +117,11 @@
 				// 控制回复弹框的显示和隐藏
 				openIssue:false,
 				focus:false,
-				form:{}
+				form:{},
+				responder:"",//回复人,
+				responderContent:"",//回复内容
+				controlOpenIssue:true,
+				type:0
 			}
 		},
 		onShow() {
@@ -133,20 +140,33 @@
 		},
 		methods:{
 			// 发布回复信息
-			release(){
-				console.log(this.form)
+			release(type){
+				this.form.type=type
+				uniCloud.callFunction({
+					name:"ideaReply",
+					data:this.form
+				}).then(res=>{
+					console.log(res)
+				})
 			},
 			// 失去焦点
-			hideIssue(){
+			hideIssue(e){
 				this.openIssue=false
 				this.focus=false
-				console.log(this.focus)
+				// console.log(e)
+				this.controlOpenIssue=false
 			},
 			// 显示发表回复框
-			openInput(){
+			openInput(i,childIndex){
+				if(!this.controlOpenIssue){
+					// console.log(123)
+					this.controlOpenIssue=true
+					return
+				}
 				this.openIssue=true
 				this.focus=true
 				let userInfo=uni.getStorageSync("userInfo");
+				// let type=0
 				// 判断用户是否登录
 				if(!userInfo){
 					uni.showModal({
@@ -165,14 +185,43 @@
 					});
 					return
 				}
+				console.log(i)
 				this.form.originator=userInfo.account
 				this.form.originatorAccount=userInfo.account
 				this.form.headPortrait=userInfo.headPortrait
 				this.form.originatorId=userInfo.accountId
-				// this.form.responder
+				console.log(childIndex)
+				if(i==0){
+					this.form.responder=this.info.ideaBy
+					this.form.responderContent=this.info.ideaContent
+					this.form.responderAccount=this.info.account
+					this.form.responderId=this.info.accountId
+					this.form.ideaId=this.info.ideaId
+					this.type=0
+				}else if(i==1){
+					if(childIndex!=undefined){
+						this.form.responder=this.replys[this.index].children[childIndex].originator
+						this.form.responderContent=this.replys[this.index].children[childIndex].content
+					}else{
+						this.form.responder=this.replys[this.index].userName
+						this.form.responderContent=this.replys[this.index].content
+					}
+					this.type=1
+				}else{
+					if(this.show){
+						this.form.responder=this.replys[this.index].userName
+						this.from.responderContent=this.replys[this.index].content
+						this.type=1
+					}else{
+						this.form.responder=this.info.ideaBy
+						this.from.responderContent=this.info.ideaContent
+						this.type=0
+					}
+				}
 				// this.form.responderAccount
 				// this.form.responderId
 				console.log(this.form)
+				// this.release(type)
 			},
 			// 点赞
 			thumbs(id){
@@ -422,17 +471,6 @@
 		}
 	}
 	.issue{
-		// <view v-show="openIssue" class="issue">
-		// 	<view class="responerInfo">
-		// 		回复阿松大：撒大大
-		// 	</view>
-		// 	<view class="issue-main">
-		// 		<u-input placeholder="我来评论" type="textarea"></u-input>
-		// 		<view class="btn">
-		// 			发表
-		// 		</view>
-		// 	</view>
-		// </view>
 		position: fixed;
 		bottom: 0;
 		background-color: #FFFFFF;
@@ -443,7 +481,9 @@
 		.responerInfo{
 			padding-bottom: 20rpx;
 			font-size: 24rpx;
-			display: flex;
+			white-space:nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
 		}
 		.issue-main{
 			display: flex;

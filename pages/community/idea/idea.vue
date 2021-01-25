@@ -161,7 +161,7 @@
 					uni.switchTab({
 						url:"/pages/community/community",
 						success() {
-							// uni.$emit('updata')
+							uni.$emit('updata')
 						}
 					})
 				})

@@ -1,7 +1,7 @@
 <template>
 	<view class="allcomment">
-		<view class="allcomment-item" v-for="comment in comments" :key="comment.commentId">
-			<view class="left" @click="toCommentDetail">
+		<view class="allcomment-item" v-for="(comment,index) in comments" :key="comment.commentId">
+			<view class="left">
 				<image :src="comment.headPortrait" mode=""></image>
 			</view>
 			<view class="right">
@@ -10,7 +10,7 @@
 					<u-rate size="22" active-color="#d3d3d3" inactive-color="#e8e8e8" :current="comment.score" :disabled="true"></u-rate>
 				</view>
 				<view class="center">
-					<view class="">
+					<view class="" @click="toCommentDetail">
 						{{comment.commentContent}}
 					</view>
 				</view>
@@ -19,8 +19,8 @@
 						<text>{{comment.commentTime}}</text>
 					</view>
 					<view class="num">
-						<text class="reply"><u-icon name="chat" style="margin-right: 10rpx;"></u-icon>{{comment.commentReply}}</text>
-						<text class="praise"><u-icon name="thumb-up" style="margin-right: 10rpx;"></u-icon>{{comment.commentPraise}}</text>
+						<text  @click="toCommentDetail" class="reply"><u-icon name="chat" style="margin-right: 10rpx;"></u-icon>{{comment.commentReply}}</text>
+						<text class="praise"><u-icon @click="thumbs(comment._id,index)" :color="comment.praise?'red':'inherit'" name="thumb-up" style="margin-right: 10rpx;"></u-icon>{{comment.commentPraise}}</text>
 					</view>
 				</view>
 			</view>
@@ -43,48 +43,92 @@
 		},
 		onLoad(option) {
 			this.bookId=option.id;
+			this.total=1;
+			this.pagesNum=1;
 			console.log(this.bookId)
-			this.getTotal()
+			this.getComment()
 		},
 		onReachBottom(){
 			this.getComment()
+			console.log(this.total)
 		},
 		methods:{
-			getTotal(){
-				let db = uniCloud.database();//代码块为cdb
-				db.collection('comment').where({
-					"bookId":this.bookId
-				}).count().then((res)=>{
-					console.log(res.result.total)
-					this.total=res.result.total
-					this.getComment()
+			thumbs(id,index){
+				let userInfo=uni.getStorageSync("userInfo");
+				// 判断用户是否登录
+				if(!userInfo){
+					uni.showModal({
+					    title: '提示',
+					    content: '您还没有登录,是否登录',
+							confirmText:"去登录",
+					    success: function (res) {
+					        if (res.confirm) {
+					            uni.redirectTo({
+					            	url:"/pages/login/login"
+					            })
+					        } else if (res.cancel) {
+					            console.log('用户点击取消');
+					        }
+					    }
+					});
+					return
+				}
+				this.comments[index].praise=!this.comments[index].praise
+				// 点赞数加一还是减一
+				if(this.comments[index].praise){
+					this.comments[index].commentPraise=this.comments[index].commentPraise+1
+				}else{
+					this.comments[index].commentPraise=this.comments[index].commentPraise-1
+				}
+				// 添加用户点赞信息或删除该用户的点赞信息
+				let type=this.comments[index].commentPraise?"add":"del"
+				uniCloud.callFunction({
+					name:'comment_thumbs-up',
+					data:{
+						id:id,
+						type:type,
+						accountId:userInfo.accountId?userInfo.accountId:"",
+						commentPraise:this.comments[index].commentPraise,
+						bookId:this.bookId
+					}
+				}).then(res=>{
+					console.log(res)
+				}).catch(err=>{
+					console.log(err)
 				})
+				
+				
 			},
 			getComment(){
 				// 获取评论信息
-				let db = uniCloud.database();//代码块为cdb
+				let userInfo=uni.getStorageSync("userInfo")
 				if(this.total>(this.pagesNum-1)*10){
 					uni.showLoading({
-						title:"加载中"
-					})
-					db.collection('comment').skip(10*(this.pagesNum-1)).limit(10).where({
-						"bookId":this.bookId
-					}).orderBy('updataTime','desc').get().then((res)=>{
-							this.comments=res.result.data
-							this.pagesNum++;
-							console.log(res.result.data)
+					    title: '加载中'
+					});
+					uniCloud.callFunction({
+							name:"getComment",
+							data:{
+								skip:10*(this.pagesNum-1),
+								limit:10,
+								accountId:userInfo.accountId?userInfo.accountId:"",
+								bookid:this.bookId
+							}
+						}).then(res=>{
+							console.log(res.result)
+							this.comments=this.comments.concat(res.result.comments);
+							this.pagesNum=this.pagesNum+1;;
+							// this.ideas=this.ideas.concat(res.result.comments);
+							this.total=res.result.total
+							// this.pagesNum=this.pagesNum+1;
 							uni.hideLoading()
-					  }).catch((err)=>{
-							console.log(err)
-							uni.hideLoading()
-					 })
-				}
-			},
-			onReachBottom(){
-				if(this.total>this.pageNum*10){
-					this.pageNum++;
-					this.getComment()
-				}
+							uni.stopPullDownRefresh()
+						}).catch((err)=>{
+								console.log(err)
+								uni.hideLoading()
+								uni.stopPullDownRefresh()
+							})
+					}
 			},
 			toComment(){
 				uni.navigateTo({

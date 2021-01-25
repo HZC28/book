@@ -5,20 +5,20 @@ export const javaHb = new class {
 	}
 	plusReady() {
 		let that = this;   
-		console.log(22) 
+		// console.log(22) 
 		plus.runtime.getProperty(plus.runtime.appid, function(inf) {
-			console.log(33) 
+			// console.log(33) 
 			that.appCheckAppVersion = inf.version;
 			console.log(that.appCheckAppVersion,1)
-			console.log("start")
+			// console.log("start")
 			uni.getSystemInfo({
 			    success(res) {
-						console.log(res.platform);
+						// console.log(res.platform);
 						that.appCheckSystemType=res.platform
 			    }
 			});
 			// that.appCheckSystemType = that.getCurrentSystem(); //系统类型
-			console.log("end")
+			// console.log("end")
 			that.checkFun(); // 更新方法
 		});
 	}   
@@ -106,7 +106,7 @@ export const javaHb = new class {
 	 */
 	downWgt(wgtUrl) {
 		let that = this;
-		console.log(wgtUrl)
+		// console.log(wgtUrl)
 		var downloader = plus.downloader.createDownload(wgtUrl, {}, function(d, status) {
 			if(status == 200) {
 				

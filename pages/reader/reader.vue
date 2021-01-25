@@ -11,9 +11,9 @@
 		<view class="topBox anmt" :style="{color:fontColor,backgroundColor:menuBg,top:show?'0':'-150px'}">
 			<view :style="{height:statusBarHeight}"></view>
 			<!-- <view style="height: 40upx;"></view> -->
-			<view style="height: 100upx;line-height: 100upx;text-overflow: ellipsis;" class="tMain">
+			<view style="height: 100upx;line-height: 100upx;text-overflow: ellipsis;display: flex;" class="tMain">
 				<image src="../../static/yueduBack.png" class="back" @click="back()"></image>
-				<text style="font-size: 24upx;">({{section_title}})</text>
+				<text style="font-size: 24upx;text-align: center;flex: 1;margin-right: 80rpx;">{{section_title}}</text>
 			</view>
 		</view>
 		<!-- 带返回键的导航栏结束 -->
@@ -91,7 +91,7 @@
 		<view @click="dianjile()"  class="sview" :style="{paddingTop:'calc(50rpx)',zIndex:zindex,color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px'}">
 			<!-- <text selectable="true">{{content_text}}</text> -->
 			<!-- <rich-text  :selectable="true" :nodes="content_text"></rich-text> -->
-			<u-parse @longpress="onLongPress" :selectable="false" :tag-style="style"  :html="content_text"></u-parse>
+			<u-parse  :selectable="false" :tag-style="style"  :html="content_text"></u-parse>
 			<view class="unload" v-if="content_text==' '">
 				加载中
 			</view>
@@ -189,6 +189,7 @@ export default{
 		// #ifdef APP-PLUS 
 		plus.navigator.setFullscreen(true);
 		// #endif
+		// this.text()
 	},
 	onHide() {
 		console.log("123")

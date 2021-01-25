@@ -59,7 +59,7 @@
 			</view>
 		</view>
 		<!-- 作家板块 -->
-		<view class="author">
+		<view class="author" v-if="role=='author'">
 			<view class="author-item">
 				<image src="../../static/icon/wdcz.png" mode=""></image>
 				<text>我的创作</text>
@@ -78,7 +78,7 @@
 			</view>
 		</view>
 		<!-- 管理员管理板块 -->
-		<view class="admin">
+		<view class="admin" v-if="role=='admin'">
 			<view class="admin-item">
 				<image src="../../static/icon/sjsh.png" mode=""></image>
 				<text>书籍审核</text>
@@ -105,7 +105,8 @@
 			return{
 				name:"",
 				signature:"",
-				headPortrait:""
+				headPortrait:"",
+				role:""
 			}
 		},
 		onShow() {
@@ -114,6 +115,7 @@
 				this.name=userInfo.userName;
 				this.headPortrait=userInfo.headPortrait;
 				this.signature=userInfo.signature;
+				this.role=userInfo.role
 			}
 		},
 		methods:{
@@ -128,7 +130,8 @@
 				})
 			},
 			exit(){
-				uni.navigateTo({
+				// uni.clearStorageSync()
+				uni.reLaunch({
 					url:"/pages/login/login"
 				})
 			}

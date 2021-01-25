@@ -21,6 +21,7 @@ exports.main = async (event, context) => {
 			headPortrait:event.headPortrait,
 			time:time,
 			praise:0,
+			account:event.account,
 			children:[]
 		})
 		await db.collection('shareIdea_table').where({

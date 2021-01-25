@@ -22,7 +22,7 @@
 				<text>评论</text>
 				<text  @click="allComment">全部评论<u-icon name="arrow-right"></u-icon></text>
 			</view>
-			<view class="allcomment-item" v-for="comment in comments" :key="comment.commentId">
+			<view class="allcomment-item" v-for="(comment,index) in comments" :key="comment.commentId">
 				<view class="left" @click="toCommentDetail">
 					<image :src="comment.headPortrait" mode=""></image>
 				</view>
@@ -42,7 +42,7 @@
 						</view>
 						<view class="num">
 							<text class="reply"><u-icon name="chat" style="margin-right: 10rpx;"></u-icon>{{comment.commentReply}}</text>
-							<text class="praise"><u-icon name="thumb-up" style="margin-right: 10rpx;"></u-icon>{{comment.commentPraise}}</text>
+							<text class="praise"><u-icon  @click="thumbs(comment._id,index)" :color="comment.praise?'red':'inherit'" name="thumb-up" style="margin-right: 10rpx;"></u-icon>{{comment.commentPraise}}</text>
 						</view>
 					</view>
 				</view>
@@ -76,6 +76,52 @@
 			}
 		},
 		methods:{
+			thumbs(id,index){
+				let userInfo=uni.getStorageSync("userInfo");
+				// 判断用户是否登录
+				if(!userInfo){
+					uni.showModal({
+					    title: '提示',
+					    content: '您还没有登录,是否登录',
+							confirmText:"去登录",
+					    success: function (res) {
+					        if (res.confirm) {
+					            uni.redirectTo({
+					            	url:"/pages/login/login"
+					            })
+					        } else if (res.cancel) {
+					            console.log('用户点击取消');
+					        }
+					    }
+					});
+					return
+				}
+				this.comments[index].praise=!this.comments[index].praise
+				// 点赞数加一还是减一
+				if(this.comments[index].praise){
+					this.comments[index].commentPraise=this.comments[index].commentPraise+1
+				}else{
+					this.comments[index].commentPraise=this.comments[index].commentPraise-1
+				}
+				// 添加用户点赞信息或删除该用户的点赞信息
+				let type=this.comments[index].commentPraise?"add":"del"
+				uniCloud.callFunction({
+					name:'comment_thumbs-up',
+					data:{
+						id:id,
+						type:type,
+						accountId:userInfo.accountId?userInfo.accountId:"",
+						commentPraise:this.comments[index].commentPraise,
+						bookId:this.id
+					}
+				}).then(res=>{
+					console.log(res)
+				}).catch(err=>{
+					console.log(err)
+				})
+				
+				
+			},
 			toBookshelf(){
 				uni.navigateTo({
 					url:"/pages/bookshelf/bookshelf"
@@ -112,17 +158,31 @@
 			},
 			// 获取评论
 			getComments(){
-				const db = uniCloud.database();//代码块为cdb
-				db.collection('comment').skip(0).limit(3).where({
-					"bookId":this.id
-				}).orderBy('commentTime','asc').get().then((res)=>{
-						this.comments=res.result.data
-						this.requestComment=true
-						console.log(res.result.data)
-				  }).catch((err)=>{
-						console.log(err)
-						this.requestComment=true
-				  })
+				// const db = uniCloud.database();//代码块为cdb
+				// db.collection('comment').skip(0).limit(3).where({
+				// 	"bookId":this.id
+				// }).orderBy('commentTime','asc').get().then((res)=>{
+				// 		this.comments=res.result.data
+				// 		this.requestComment=true
+				// 		console.log(res.result.data)
+				//   }).catch((err)=>{
+				// 		console.log(err)
+				// 		this.requestComment=true
+				//   })
+					let userInfo=uni.getStorageSync("userInfo")
+					uniCloud.callFunction({
+							name:"getComment",
+							data:{
+								skip:0,
+								limit:3,
+								accountId:userInfo.accountId?userInfo.accountId:"",
+								bookid:this.id
+							}
+						}).then(res=>{
+							console.log(res.result)
+							this.requestComment=true
+							this.comments=res.result.comments;
+						})
 			},
 			// 判断该书籍是否已经加入书架
 			getBookshelf(){
