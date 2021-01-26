@@ -1,6 +1,6 @@
 <template>
 	<view class="ideaDetail">
-		<view class="ideaBy">
+		<view class="ideaBy" v-if="requestInfo">
 			<!-- 发布人信息 -->
 			<view class="userInfo">
 				<view class="left">
@@ -54,7 +54,7 @@
 						<div class="time">{{reply.time}}</div>
 					</div>
 				</div>
-				<view class="content" @click="openInput(1)">
+				<view class="content" @click="openInput(1,index)">
 					{{reply.content}}
 				</view>
 				<!-- 查看回复信息 -->
@@ -74,7 +74,7 @@
 							<div class="time">{{child.time}}</div>
 						</div>
 					</div>
-					<view class="content" @click="openInput(1,childIndex)">
+					<view class="content" @click="openInput(1,index,childIndex)">
 						{{child.content}}
 					</view>
 				</view>
@@ -82,14 +82,14 @@
 			
 		</u-popup>
 		<view class="bom" v-show="openIssue==false">
-			<input @click="openInput(-1)" disabled border placeholder="我来评论" class="bom-input"></input>
+			<input @click="openInput(-1,index)" disabled border placeholder="我来评论" class="bom-input"></input>
 			<!-- <view class="bom-btn">
 				回复
 			</view> -->
 		</view>
 		<view @touchend.prevent="" v-show="openIssue" class="issue">
 			<view class="responerInfo">
-				回复{{form.responder}}：{{this.form.responderContent}}
+				回复{{form.responder}}：{{form.responderContent}}
 			</view>
 			<view class="issue-main">
 				<textarea v-model="form.content" @blur="hideIssue" :focus="focus" class="content" placeholder="我来评论" type="textarea"></textarea>
@@ -108,6 +108,7 @@
 				id:"",
 				// 是否显示回复内容
 				show:false,
+				requestInfo:false,
 				info:{},
 				// 控制回复信息是哪一条的
 				index:0,
@@ -135,34 +136,74 @@
 			this.id=option.id
 			this.praise=option.praise=='true'?true:false
 			// 获取评论的详细信息
-			this.getIdeaDetail(option.id)
+			this.getIdeaDetail(this.id)
 			this.getReply()
 		},
 		methods:{
 			// 发布回复信息
 			release(type){
-				this.form.type=type
-				uniCloud.callFunction({
-					name:"ideaReply",
-					data:this.form
-				}).then(res=>{
-					console.log(res)
-				})
+				let data={}
+				// console.log(this.index)
+				if(type==0){
+					data.type=type
+					data.ideaId=this.form.ideaId
+					data.content=this.form.content
+					data.userName=this.form.originator
+					data.accountId=this.form.originatorId
+					data.account=this.form.originator
+					data.headPortrait=this.form.headPortrait
+					uni.showLoading({})
+					uniCloud.callFunction({
+						name:"ideaReply",
+						data:data
+					}).then(res=>{
+						this.form={}
+						uni.hideLoading()
+						this.hideIssue()
+						this.info.ideaReply++
+						this.getReply()
+					})
+				}else{
+					data.type=type;
+					data.id=this.replys[this.index]._id
+					let obj=this.form
+					data.obj=obj
+					uniCloud.callFunction({
+						name:"ideaReply",
+						data:data
+					}).then(res=>{
+						this.form={}
+						obj.time=res.result
+						// console.log(res.result)
+						this.replys[this.index].children.unshift(obj)
+						// uni.hideLoading()
+						this.hideIssue()
+					})
+				}
+				// console.log(this.replys[this.index].children)
+				
 			},
 			// 失去焦点
 			hideIssue(e){
 				this.openIssue=false
 				this.focus=false
+				this.form={}
 				// console.log(e)
-				this.controlOpenIssue=false
+				// 不能点击
+				this.controlOpenIssue=true
 			},
 			// 显示发表回复框
-			openInput(i,childIndex){
+			openInput(i,index,childIndex){
+				// console.log(this.index)
+				this.index=index 
+				console.log(this.index)
 				if(!this.controlOpenIssue){
 					// console.log(123)
+					// true时显示回复框
 					this.controlOpenIssue=true
 					return
 				}
+				this.controlOpenIssue=false
 				this.openIssue=true
 				this.focus=true
 				let userInfo=uni.getStorageSync("userInfo");
@@ -185,12 +226,12 @@
 					});
 					return
 				}
-				console.log(i)
-				this.form.originator=userInfo.account
+				// console.log(i)
+				this.form.originator=userInfo.userName
 				this.form.originatorAccount=userInfo.account
 				this.form.headPortrait=userInfo.headPortrait
 				this.form.originatorId=userInfo.accountId
-				console.log(childIndex)
+				// console.log(childIndex)
 				if(i==0){
 					this.form.responder=this.info.ideaBy
 					this.form.responderContent=this.info.ideaContent
@@ -199,28 +240,43 @@
 					this.form.ideaId=this.info.ideaId
 					this.type=0
 				}else if(i==1){
+					// 点击回复内容
 					if(childIndex!=undefined){
 						this.form.responder=this.replys[this.index].children[childIndex].originator
 						this.form.responderContent=this.replys[this.index].children[childIndex].content
+						this.form.responderAccount=this.replys[this.index].children[childIndex].originatorAccount
+						this.form.responderId=this.replys[this.index].children[childIndex].originatorId
 					}else{
+						// 点击回复面板的回复内容
 						this.form.responder=this.replys[this.index].userName
+						this.form.responderAccount=this.replys[this.index].account
 						this.form.responderContent=this.replys[this.index].content
+						this.form.responderId=this.replys[this.index].accountId
 					}
 					this.type=1
 				}else{
+					// 直接点击底部评论框
 					if(this.show){
+						// 弹出回复界面的
+						console.log(this.index)
 						this.form.responder=this.replys[this.index].userName
-						this.from.responderContent=this.replys[this.index].content
+						this.form.responderAccount=this.replys[this.index].account
+						this.form.responderContent=this.replys[this.index].content
+						this.form.responderId=this.replys[this.index].accountId
 						this.type=1
 					}else{
+						console.log(this.index)
 						this.form.responder=this.info.ideaBy
-						this.from.responderContent=this.info.ideaContent
+						this.form.responderContent=this.info.ideaContent
+						this.form.responderAccount=this.info.account
+						this.form.responderId=this.info.accountId
+						this.form.ideaId=this.info.ideaId
 						this.type=0
 					}
 				}
 				// this.form.responderAccount
 				// this.form.responderId
-				console.log(this.form)
+				// console.log(this.form)
 				// this.release(type)
 			},
 			// 点赞
@@ -272,7 +328,7 @@
 				let db=uniCloud.database()
 				db.collection('ideaReply').where({
 					ideaId:this.id
-				}).get().then(res=>{
+				}).orderBy("id","desc").get().then(res=>{
 					console.log(res)
 					this.replys=res.result.data
 				})
@@ -298,6 +354,7 @@
 			},
 			// 获取评论的详细信息
 			getIdeaDetail(){
+				this.requestInfo=false
 				let db=uniCloud.database()
 				let collection=db.collection("shareIdea_table")
 				collection.where({
@@ -305,6 +362,9 @@
 				}).get().then(res=>{
 					console.log(res.result.data[0])
 					this.info=res.result.data[0]
+					this.requestInfo=true
+				}).catch(err=>{
+					this.requestInfo=true
 				})
 			}
 		},

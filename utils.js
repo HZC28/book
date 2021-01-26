@@ -87,7 +87,7 @@ export const javaHb = new class {
 			// console.log(33)
 			uni.showModal({
 			    title: '版本更新',
-			    content: '当前app版本号'+that.appCheckAppVersion+",发现新版本"+data.versionNum+",是否升级",
+			    content: '当前app版本号'+that.appCheckAppVersion+",发现新版本"+data.versionNum+","+data.remark+",是否升级",
 					confirmText:"去升级",
 			    success: function (res) {
 			        if (res.confirm) {
