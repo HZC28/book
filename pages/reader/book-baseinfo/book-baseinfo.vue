@@ -49,11 +49,11 @@
 			</view>
 		</view>
 		<!-- <u-button type="info" class="btn" @click="allComment">点击查看全部评论</u-button> -->
-		<view v-if=" this.requestComment&&comments.length==0 " class="empty">
+		<view v-if="this.requestComment&&comments.length==0 " class="empty">
 			<u-empty text="当前没有评论" mode="history"></u-empty>
 			<text class="text" @click="toComment(id)">去评论</text>
 		</view>
-		<view class="fixed" v-if="requestBookshelf">
+		<view class="fixed" v-if="requestBookshelf==true">
 			<view class="left" v-if="addbookshelf==false" @click="addtoBookshelf">加入书架</view>
 			<view class="left" v-if="addbookshelf" @click="toBookshelf">去书架</view>
 			<view class="right" @click="toreader(id)">点击阅读</view>
@@ -203,6 +203,7 @@
 						}
 					})
 					this.requestBookshelf=true
+					console.log(this.requestBookshelf+"this.requestBookshelf")
 				})
 			},
 			// 加入书架
@@ -256,7 +257,12 @@
 			this.init()
 			this.getComments()
 			this.getBookshelf()
-		}
+		},
+		onShow() {
+			console.log(12312)
+			this.getComments()
+			this.getBookshelf()
+		},
 	}
 </script>
 

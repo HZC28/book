@@ -30,7 +30,8 @@ exports.main = async (event, context) => {
 	await db.collection('bookChater').add({
 		bookid:id,
 		bookName:event.bookName,
-		chapters:[]
+		chapters:[],
+		img:event.img
 	}).then(res=>{
 		console.log(res.data)
 		result=res

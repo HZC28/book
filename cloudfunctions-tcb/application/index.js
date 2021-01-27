@@ -8,6 +8,7 @@ exports.main = async (event, context) => {
 	// 姓名
 	// 电话
 	// 身份者证件
+	const db=uniCloud.database()
 	//返回数据给客户端
 	return event
 };

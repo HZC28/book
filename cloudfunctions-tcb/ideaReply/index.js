@@ -31,6 +31,7 @@ exports.main = async (event, context) => {
 			accountId:event.accountId,
 			children:[]
 		})
+		// 回复+1
 		await db.collection('shareIdea_table').where({
 			ideaId:event.ideaId
 		}).update({

@@ -20,6 +20,11 @@
 				"navigationStyle":"custom"
 			}
 		},{
+			"path": "pages/application/application",
+			"style": {
+				"navigationBarTitleText":"申请创作"
+			}
+		},{
 			"path": "pages/community/detail/detail",
 			"style": {
 				"navigationBarTitleText":"评论"

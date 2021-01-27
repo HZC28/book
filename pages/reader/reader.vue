@@ -90,8 +90,8 @@
 		<!-- 小说正文开始 -->
 		<view @click="dianjile()"  class="sview" :style="{paddingTop:'calc(50rpx)',zIndex:zindex,color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px'}">
 			<!-- <text selectable="true">{{content_text}}</text> -->
-			<!-- <rich-text  :selectable="true" :nodes="content_text"></rich-text> -->
-			<u-parse  :selectable="false" :tag-style="style"  :html="content_text"></u-parse>
+			<rich-text  :selectable="true" :nodes="content_text"></rich-text>
+			<!-- <u-parse  :selectable="false" :tag-style="style"  :html="content_text"></u-parse> -->
 			<view class="unload" v-if="content_text==' '">
 				加载中
 			</view>
@@ -140,10 +140,9 @@ export default{
 			menuShow:false,
 			chapters:[],
 			chapterNum:0,
-			style: {
-								// 字符串的形式
-								p: 'user-select: text;-webkit-user-select: text;'
-							}
+			style: {p: 'user-select: text;-webkit-user-select: text;'},
+			addbookshelf:false,
+			bookImg:""
 		}
 	},
 	onUnload() {
@@ -151,7 +150,7 @@ export default{
 		clearInterval(timeInter)
 		clearInterval(dianliangInter)
 		uni.hideLoading();
-		console.log("页面卸载")
+		this.listerUnload()
 		//页面卸载的时候将通知栏显示出来
 		// #ifdef APP-PLUS
 		plus.navigator.setFullscreen(false);
@@ -204,9 +203,83 @@ export default{
 		plus.navigator.setStatusBarBackground('#FF0000');
 		// #endif
 		this.bookId=option.bookid
-		this.getData()
+		const db=uniCloud.database()
+		let userInfo=uni.getStorageSync("userInfo")
+		db.collection('readerRecord').where({
+			accountId:userInfo.accountId,
+			bookid:this.bookId
+		}).get().then(res=>{
+			console.log(res)
+			if(res.result.data.length!=0){
+				this.chapterNum=res.result.data[0].chapterIndex?res.result.data[0].chapterIndex:0
+			}
+			this.getData()
+		})
+		
 	},
+	onBackPress(options) {  
+	  if (options.from === 'backbutton') { 
+				this.back()
+				return true;  
+		}  
+	},
+	
 	methods:{
+		// 判断该书籍是否已经加入书架
+		async getBookshelf(){
+			let userInfo=uni.getStorageSync("userInfo")
+			if(!userInfo){
+				return
+			}
+			const db = uniCloud.database();
+			await db.collection("bookshelf").where({
+				accountId:userInfo.accountId
+			}).get().then((res)=>{
+				let arr=res.result.data[0].books?res.result.data[0].books:[]
+				console.log(res)
+				arr.forEach(val=>{
+					console.log(this.addbookshelf)
+					if(val.bookid==this.bookId){
+						this.addbookshelf=true
+					}
+				})
+			})
+		},
+		// 加入书架
+		addtoBookshelf(){
+			let userInfo=uni.getStorageSync("userInfo");
+			let obj={}
+			obj.bookid=this.bookId
+			obj.bookName=this.bookName
+			obj.img=this.bookImg
+			console.log(obj)
+			uniCloud.callFunction({
+				name:"addBookshelf",
+				data:{
+					accountId:userInfo.accountId,
+					obj:obj
+				}
+			}).then(res=>{
+				console.log(res)
+				this.toast("已加入书架")
+				this.addbookshelf=true
+			})
+		},
+		listerUnload(){
+			console.log("listerUnload")
+			let userInfo=uni.getStorageSync("userInfo")
+			uniCloud.callFunction({
+				name:"readerRecord",
+				data:{
+					accountId:userInfo.accountId,
+					bookid:this.bookId,
+					chapterName:this.chapters[this.chapterNum].chapterName,
+					chapterIndex:this.chapterNum
+				}
+			})
+			console.log(this.chapterNum)
+			console.log(this.chapters[this.chapterNum].chapterName)
+		},
 		onLongPress(e){
 			console.log(e)
 			console.log("onLongPress")
@@ -222,6 +295,7 @@ export default{
 				this.getChapterContent(this.chapters[this.chapterNum].chapterId,this.chapterNum)
 				// this.section_title=this.chapters[this.chapterNum].chapterName
 				this.bookName=res.result.data[0].bookName
+				this.bookImg=res.result.data[0].img
 				
 			})
 		},
@@ -229,6 +303,7 @@ export default{
 		getChapterContent(chapterId,index){
 			let db=uniCloud.database()
 			this.content_text=" "
+			// console.log(index)
 			db.collection('chapters').where({
 				bookid:this.bookId,
 				chapterId:chapterId
@@ -258,7 +333,7 @@ export default{
 			}else{
 				this.chapterNum--;
 				this.section_title=this.chapters[this.chapterNum].chapterName
-				this.getChapterContent(this.chapters[this.chapterNum].chapterId)
+				this.getChapterContent(this.chapters[this.chapterNum].chapterId,this.chapterNum)
 			}
 		},
 		next(){
@@ -267,14 +342,37 @@ export default{
 			}else{
 				this.chapterNum++;
 				this.section_title=this.chapters[this.chapterNum].chapterName
-				this.getChapterContent(this.chapters[this.chapterNum].chapterId)
+				this.getChapterContent(this.chapters[this.chapterNum].chapterId,this.chapterNum)
 			}
 		},
 		mulu(){
 			this.menuShow=true
 		},
-		back(){
-			uni.navigateBack({});
+		async back(){
+			let a=await this.getBookshelf()
+			// 判断用户是否登录
+			console.log(a)
+			if(!this.addbookshelf){
+				console.log(this.addbookshelf)
+				let self=this
+				console.log("123")
+				uni.showModal({
+				    title: '提示',
+				    content: '为方便下次阅读,是否将该图书加入书架?',
+						confirmText:"加入",
+				    success:async function (res) {
+				        if (res.confirm) {
+				           await self.addtoBookshelf()
+									 // self.toast("已加入书架")
+				        } else if (res.cancel) {
+				            console.log('用户点击取消');
+				        }
+								uni.navigateBack({});
+				    }
+				});
+			}else{
+				uni.navigateBack({});
+			}
 		},
 		dianjile(){
 			// console.log(123)
@@ -417,7 +515,7 @@ export default{
 		word-break:break-all;
 		word-wrap:break-word;
 		overflow: hidden;
-		// padding: 0 20upx 100upx;
+		padding: 0 20upx 100upx;
 		.unload{
 			width: 100%;
 			height: 100%;

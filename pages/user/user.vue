@@ -52,7 +52,8 @@
 					<image src="../../static/icon/shucheng.png" mode=""></image>
 					<text>书城</text>
 				</view>
-				<view class="reader-item">
+				<view class="reader-item" @click="jumpPage('/pages/application/application')">
+					<!-- pages/application/application -->
 					<image src="../../static/icon/xssq.png" mode=""></image>
 					<text>申请创作</text>
 				</view>

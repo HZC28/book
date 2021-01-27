@@ -2,6 +2,7 @@
 	<view class="Box">
 		<button type="default" @click="reader">读取文件</button>
 		{{content}}
+		<button type="default" @click="del">删除</button>
 	</view>
 </template>
 
@@ -15,38 +16,7 @@
 				title:""
 			}
 		},
-		onShow(){this.actionSheet()},
 		methods:{
-			text(){
-				// #ifdef APP-PLUS
-				console.log(123)
-					plus.nativeUI.actionSheet(this.actionSheet);
-				// #endif
-			},
-			// 弹出系统选择按钮框
-			// function actionSheet(){
-			// 	var actionbuttons=[{title:"不同意",style:"destructive"},{title:"1"},{title:"2"},{title:"3"}];
-			// 	var actionstyle={title:"Hello HTML5 plus!",cancel:"取消",buttons:actionbuttons};
-			// 	plus.nativeUI.actionSheet(actionstyle, function(e){
-			// 		console.log("User pressed: "+e.index );
-			// 	});
-			// }
-			actionSheet(){
-				plus.nativeUI.actionSheet(
-						{title:"Plus is ready!",
-						cancel:"取消",
-						buttons:[
-							{
-								title:"1"
-							},{
-								title:"2"
-								}
-						]},
-						function(e){
-							console.log("User pressed: "+e.index);
-						}
-					);
-			},
 			reader(){
 				uni.request({
 				    url: 'https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/bookInfo/book3188832/book3188832.json',
@@ -75,10 +45,10 @@
 			addtoChapter(i,id){
 				uni.request({
 					url:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/bookInfo/book3188832/chapter/"+this.chapters[i].chapterid+".json",
-					success:(res)=> {
+					success:async (res)=> {
 						// console.log(res.data.chapter)
 						let ret=res.data.chapter
-					  uniCloud.callFunction({
+					  await uniCloud.callFunction({
 							name:"uploadChapter",
 							data:{
 									bookName:this.title,
@@ -93,13 +63,28 @@
 				})
 			},
 			addChapter(id){
-				for(let i=0;i<10;i++){
+				for(let i=0;i<this.chapters.length;i++){
 					setTimeout(()=>{
 						this.addtoChapter(i,id)
-					},500*i)
-					
-					
+					},900*i)
 				}
+			},
+			async del(){
+				// 清理全部数据
+				const db = uniCloud.database()
+				let bookid='161171948093666'
+				await db.collection('book').where({
+				  bookid: bookid
+				}).remove().then(res=>{
+					console.log(res)
+				})
+				await db.collection('bookChater').where({
+				  bookid: bookid
+				}).remove()
+				await db.collection('chapters').where({
+				  bookid: bookid
+				}).remove()
+				
 			}
 		}
 	}
