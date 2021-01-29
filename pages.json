@@ -155,6 +155,12 @@
 			}
 		},
 		{
+			"path": "pages/readerRecord/readerRecord",
+			"style": {
+				"navigationBarTitleText":"阅读记录"
+			}
+		},
+		{
 			"path": "pages/bookshelf/bookshelf",
 			"style": {
 				"navigationBarTitleText":"我的书架",

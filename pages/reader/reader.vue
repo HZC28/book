@@ -276,7 +276,9 @@ export default{
 					accountId:userInfo.accountId,
 					bookid:this.bookId,
 					chapterName:this.chapters[this.chapterNum].chapterName,
-					chapterIndex:this.chapterNum
+					chapterIndex:this.chapterNum,
+					bookName:this.bookName,
+					bookImg:this.bookImg
 				}
 			})
 			// console.log(this.chapterNum)

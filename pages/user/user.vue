@@ -26,7 +26,7 @@
 					<image src="../../static/icon/qiandao.png" mode=""></image>
 					<text>签到</text>
 				</view> -->
-				<view class="reader-item">
+				<view class="reader-item" @click="jumpPage('/pages/readerRecord/readerRecord')">
 					<image src="../../static/icon/yue.png" mode=""></image>
 					<text>在读</text>
 				</view>
