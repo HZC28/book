@@ -9,9 +9,13 @@
 			</view>
 		</uni-nav-bar>
 		<view class="search-item" v-for="book in books" @click="tobookInfo(book.bookid)">
-			<image :src="book.img" mode=""></image>
+			<div class="img"><image :src="book.img" mode=""></image></div>
 			<view class="bookinfo">
-				<view class="bookName">{{book.bookName}}</view>
+				<view class="bookName">
+					<div class="name">{{book.bookName}}</div>
+					<text class="type">{{book.type}}</text>
+				</view>
+				<view class="introduction">{{book.introduction}}</view>
 				<view class="author">{{book.author}}</view>
 				
 			</view>
@@ -79,9 +83,11 @@
 			padding:5rpx 30rpx;
 			background-color: #FFFFFF;
 			border-bottom: 1rpx solid #f5f5f5;
-			image{
-				width: 80rpx;
-				height: 120rpx;
+			.img{
+				image{
+					width: 120rpx;
+					height: 180rpx;
+				}
 			}
 			.bookinfo{
 				display: flex;
@@ -91,12 +97,34 @@
 				margin-left: 20rpx;
 				.author{
 					font-size: 22rpx;
-					color: #cccccc;
+					// color: #cccccc;
 					margin-top: 8rpx;
 				}
+				.introduction{
+					display:-webkit-box;
+					-webkit-box-orient:vertical;
+					-webkit-line-clamp:2;
+					word-break:break-all;
+					overflow:hidden;
+					color: #7d7d7d;
+					margin-top: 10rpx;
+				}
 				.bookName{
-					font-size: 28rpx;
-					font-weight: 450rpx;
+					display: flex;
+					align-items: center;
+					padding-top: 20rpx;
+					.name{
+						font-size: 28rpx;
+						font-weight: 450rpx;
+					}
+					.type{
+						margin-left:auto;
+						background: #aa5500;
+						display: inline-block;
+						padding: 0 10rpx;
+						color:#FFFFFF;
+						border-radius: 10rpx;
+					}
 				}
 			}
 		}

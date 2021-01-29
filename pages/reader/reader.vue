@@ -191,7 +191,7 @@ export default{
 		// this.text()
 	},
 	onHide() {
-		console.log("123")
+		// console.log("123")
 		//页面隐藏的时候将通知栏显示出来
 		// #ifdef APP-PLUS 
 		plus.navigator.setFullscreen(false);
@@ -209,7 +209,7 @@ export default{
 			accountId:userInfo.accountId,
 			bookid:this.bookId
 		}).get().then(res=>{
-			console.log(res)
+			// console.log(res)
 			if(res.result.data.length!=0){
 				this.chapterNum=res.result.data[0].chapterIndex?res.result.data[0].chapterIndex:0
 			}
@@ -217,6 +217,7 @@ export default{
 		})
 		
 	},
+	// 触发安卓系统返回键时的事件
 	onBackPress(options) {  
 	  if (options.from === 'backbutton') { 
 				this.back()
@@ -236,9 +237,9 @@ export default{
 				accountId:userInfo.accountId
 			}).get().then((res)=>{
 				let arr=res.result.data[0].books?res.result.data[0].books:[]
-				console.log(res)
+				// console.log(res)
 				arr.forEach(val=>{
-					console.log(this.addbookshelf)
+					// console.log(this.addbookshelf)
 					if(val.bookid==this.bookId){
 						this.addbookshelf=true
 					}
@@ -252,7 +253,7 @@ export default{
 			obj.bookid=this.bookId
 			obj.bookName=this.bookName
 			obj.img=this.bookImg
-			console.log(obj)
+			// console.log(obj)
 			uniCloud.callFunction({
 				name:"addBookshelf",
 				data:{
@@ -260,13 +261,14 @@ export default{
 					obj:obj
 				}
 			}).then(res=>{
-				console.log(res)
+				// console.log(res)
 				this.toast("已加入书架")
 				this.addbookshelf=true
 			})
 		},
+		// 监听页面卸载,将阅读章节记录保存
 		listerUnload(){
-			console.log("listerUnload")
+			// console.log("listerUnload")
 			let userInfo=uni.getStorageSync("userInfo")
 			uniCloud.callFunction({
 				name:"readerRecord",
@@ -277,12 +279,8 @@ export default{
 					chapterIndex:this.chapterNum
 				}
 			})
-			console.log(this.chapterNum)
-			console.log(this.chapters[this.chapterNum].chapterName)
-		},
-		onLongPress(e){
-			console.log(e)
-			console.log("onLongPress")
+			// console.log(this.chapterNum)
+			// console.log(this.chapters[this.chapterNum].chapterName)
 		},
 		// 根据bookid获取章节,书名信息
 		getData(){
@@ -327,6 +325,7 @@ export default{
 			this.lineHeight = e.detail.value;
 			uni.setStorageSync('lineHeight',e.detail.value);
 		},
+		// 点击上一章
 		last(){
 			if(this.chapterNum==0){
 				this.toast("已经是第一章了")
@@ -336,6 +335,7 @@ export default{
 				this.getChapterContent(this.chapters[this.chapterNum].chapterId,this.chapterNum)
 			}
 		},
+		// 点击下一章
 		next(){
 			if(this.chapterNum==this.chapters.length-1){
 				this.toast("已经是最后章了")
@@ -345,17 +345,19 @@ export default{
 				this.getChapterContent(this.chapters[this.chapterNum].chapterId,this.chapterNum)
 			}
 		},
+		// 点击目录,显示章节信息
 		mulu(){
 			this.menuShow=true
 		},
+		// 返回上一页触发事件
 		async back(){
 			let a=await this.getBookshelf()
 			// 判断用户是否登录
-			console.log(a)
+			// console.log(a)
 			if(!this.addbookshelf){
-				console.log(this.addbookshelf)
+				// console.log(this.addbookshelf)
 				let self=this
-				console.log("123")
+				// console.log("123")
 				uni.showModal({
 				    title: '提示',
 				    content: '为方便下次阅读,是否将该图书加入书架?',
@@ -365,13 +367,13 @@ export default{
 				           await self.addtoBookshelf()
 									 // self.toast("已加入书架")
 				        } else if (res.cancel) {
-				            console.log('用户点击取消');
+				            // console.log('用户点击取消');
 				        }
-								uni.navigateBack({});
+								uni.navigateBack({delta:1});
 				    }
 				});
 			}else{
-				uni.navigateBack({});
+				uni.navigateBack({delta:1});
 			}
 		},
 		dianjile(){
@@ -382,7 +384,7 @@ export default{
 			}else{
 				this.zindex=10
 			}
-			console.log(this.zindex)
+			// console.log(this.zindex)
 		},
 		//切换主题
 		qiehuan(e){
@@ -640,6 +642,9 @@ export default{
 			view{
 				width: 100%;
 				padding:0 30rpx;
+				overflow: hidden;//盒子溢出隐藏
+				text-overflow:ellipsis;//文字溢出显示省略号
+				white-space: nowrap;//文字不换行
 				border-top: 1rpx solid #cccccc;
 			}
 		}

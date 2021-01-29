@@ -23,7 +23,7 @@
 			</view>
 		</view>
 		<!-- 书籍 -->
-		<view class="thebook" v-for="book in books">
+		<view class="thebook" @click="tobookInfo(book.bookid)" v-for="book in books">
 			<view class="top">
 				<view class="left">
 					<image :src="book.img" mode="widthFix"></image>
@@ -31,7 +31,7 @@
 				<view class="right">
 					<view class="info">
 						<view class="bookName">{{book.bookName}}</view>
-						<view class="classify">{{book.type}}</view>
+						<view class="classify"><view>{{book.type}}</view></view>
 					</view>
 					<view class="author">
 						{{book.author}}
@@ -160,14 +160,22 @@
 					flex-direction: column;
 					margin-left: 30rpx;
 					.name{
+						width: 180rpx;
 						font-size: 32rpx;
 						font-weight: 500;
-						
+						overflow: hidden;//盒子溢出隐藏
+						text-overflow:ellipsis;//文字溢出显示省略号
+						white-space: nowrap;//文字不换行
 					}
 					.author{
+						width: 180rpx;
 						margin-top: 10rpx;
-						font-size: 28rpx;
-						font-weight: 400;
+						font-size: 26rpx;
+						font-weight:500;
+						color: #7d7d7d;
+						overflow: hidden;//盒子溢出隐藏
+						text-overflow:ellipsis;//文字溢出显示省略号
+						white-space: nowrap;//文字不换行
 					}
 				}
 			}
@@ -193,24 +201,42 @@
 		}
 		.right{
 			margin-left: 40rpx;
+			width: 100%;
 			.info{
+				width: 100%;
 				display: flex;
 				align-items: center;
 				.bookName{
+					flex: 1;
+					max-width: 280rpx;
 					font-size: 36rpx;
 					font-weight: 400;
 					letter-spacing: 5rpx;
+					overflow: hidden;//盒子溢出隐藏
+					text-overflow:ellipsis;//文字溢出显示省略号
+					white-space: nowrap;//文字不换行
 				}
 				.classify{
-					font-size: 32rpx;
-					padding: 5rpx 15rpx;
-					border-radius: 10rpx;
-					margin-left: 30rpx;
-					color: #FFFFFF;
-					background: #aa5500;
+					// flex: 1;
+					// flex-basis: 280rpx;
+					// width: 100%;
+					margin-left: auto;
+					view{
+						max-width: 200rpx;
+						font-size: 32rpx;
+						padding: 5rpx 15rpx;
+						border-radius: 10rpx;
+						margin-left: 30rpx;
+						color: #FFFFFF;
+						background: #aa5500;
+						overflow: hidden;//盒子溢出隐藏
+						text-overflow:ellipsis;//文字溢出显示省略号
+						white-space: nowrap;//文字不换行
+					}
 				}
 			}
 			.author{
+				color: #7d7d7d;
 				margin-top: 20rpx;
 				letter-spacing: 3rpx;
 			}

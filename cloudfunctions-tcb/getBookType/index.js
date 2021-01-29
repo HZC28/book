@@ -6,7 +6,7 @@ exports.main = async (event, context) => {
 	const db=uniCloud.database()
 	const collection=await db.collection("book")
 	collection.orderBy("score","desc").limit(6).where({
-		type:"经典著作"
+		type:"玄幻小说"
 	}).field({
 		'author':true,
 		'bookName':true,
@@ -14,13 +14,13 @@ exports.main = async (event, context) => {
 		'img':true
 	}).get().then(res=>{
 		let obj={}
-		obj.type="经典著作"
+		obj.type="玄幻小说"
 		obj.bookList=res.data
 		arr.push(obj)
 	})
 	
-	let res1=await collection.limit(6).where({
-		type:"武侠小说"
+	let res1=await collection.orderBy("score","desc").limit(6).where({
+		type:"末世危机"
 	}).field({
 		'author':true,
 		'bookName':true,
@@ -28,12 +28,12 @@ exports.main = async (event, context) => {
 		'img':true
 	}).get().then(res=>{
 		let obj={}
-		obj.type="武侠小说"
+		obj.type="末世危机"
 		obj.bookList=res.data
 		arr.push(obj)
 	})
 	
-	let res2=await collection.limit(6).where({
+	let res2=await collection.orderBy("score","asc").limit(6).where({
 		type:"悬疑/推理小说"
 	}).field({
 		'author':true,

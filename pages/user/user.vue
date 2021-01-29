@@ -22,21 +22,25 @@
 		<!-- 基本的读者板块 -->
 		<view class="reader">
 			<view class="reader-top">
-				<view class="reader-item">
+				<!-- <view class="reader-item">
 					<image src="../../static/icon/qiandao.png" mode=""></image>
 					<text>签到</text>
-				</view>
+				</view> -->
 				<view class="reader-item">
 					<image src="../../static/icon/yue.png" mode=""></image>
-					<text>余额</text>
+					<text>在读</text>
 				</view>
 				<view class="reader-item" @click="jumpPage('/pages/bookshelf/bookshelf')">
 					<image src="../../static/icon/shujia.png" mode=""></image>
 					<text>书架</text>
 				</view>
-				<view class="reader-item">
+				<!-- <view class="reader-item">
 					<image src="../../static/icon/chongzhi.png" mode=""></image>
 					<text>充值</text>
+				</view> -->
+				<view class="reader-item">
+					<image src="../../static/icon/shouchang.png" mode=""></image>
+					<text>收藏</text>
 				</view>
 			</view>
 			<view class="reader-bom">
@@ -44,11 +48,11 @@
 					<image src="../../static/icon/xiangfa.png" mode=""></image>
 					<text>想法</text>
 				</view>
-				<view class="reader-item">
+				<!-- <view class="reader-item">
 					<image src="../../static/icon/shouchang.png" mode=""></image>
 					<text>收藏</text>
-				</view>
-				<view class="reader-item">
+				</view> -->
+				<view class="reader-item" @click="jumpPage('/pages/bookshop/bookshop')">
 					<image src="../../static/icon/shucheng.png" mode=""></image>
 					<text>书城</text>
 				</view>
@@ -69,10 +73,10 @@
 				<image src="../../static/icon/sczj.png" mode=""></image>
 				<text>上传章节</text>
 			</view>
-			<view class="author-item">
+			<!-- <view class="author-item">
 				<image src="../../static/icon/dzly.png" mode=""></image>
 				<text>读者留言</text>
-			</view>
+			</view> -->
 			<view class="author-item">
 				<image src="../../static/icon/xssq.png" mode=""></image>
 				<text>新书申请</text>
@@ -88,10 +92,10 @@
 				<image src="../../static/icon/zjsp.png" mode=""></image>
 				<text>作家审批</text>
 			</view>
-			<view class="admin-item">
+			<!-- <view class="admin-item">
 				<image src="../../static/icon/sjsj.png" mode=""></image>
 				<text>书籍上架</text>
-			</view>
+			</view> -->
 			<view class="admin-item">
 				<image src="../../static/icon/jbxx.png" mode=""></image>
 				<text>举报信息</text>
@@ -245,7 +249,7 @@
 			text-align: center;
 			image{
 				width: 60rpx;
-				height: 50rpx;
+				height: 60rpx;
 			}
 			text{
 				display: block;
@@ -265,7 +269,7 @@
 			text-align: center;
 			image{
 				width: 60rpx;
-				height: 50rpx;
+				height: 60rpx;
 			}
 			text{
 				display: block;

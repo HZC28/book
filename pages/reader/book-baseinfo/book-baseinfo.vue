@@ -20,7 +20,7 @@
 		<view class="book-comment" v-if="this.requestComment">
 			<view class="comment-title">
 				<text>评论</text>
-				<text  @click="allComment">全部评论<u-icon name="arrow-right"></u-icon></text>
+				<view  @click="allComment">全部评论<u-icon name="arrow-right"></u-icon></view>
 			</view>
 			<view class="allcomment-item" v-for="(comment,index) in comments" :key="comment.commentId">
 				<view class="left" @click="toCommentDetail">
@@ -90,7 +90,7 @@
 					            	url:"/pages/login/login"
 					            })
 					        } else if (res.cancel) {
-					            console.log('用户点击取消');
+					            // console.log('用户点击取消');
 					        }
 					    }
 					});
@@ -115,9 +115,9 @@
 						bookId:this.id
 					}
 				}).then(res=>{
-					console.log(res)
+					// console.log(res)
 				}).catch(err=>{
-					console.log(err)
+					// console.log(err)
 				})
 				
 				
@@ -146,14 +146,14 @@
 				db.collection('book').where({
 					"bookid":this.id
 				}).get({getOne:true}).then((res)=>{
-						console.log(res.result.data.img.toString())
+						// console.log(res.result.data.img.toString())
 						this.baseInfo=res.result.data
 				    // res 为数据库查询结果
 						uni.setNavigationBarTitle({
 								title:this.baseInfo.bookName
 						});
 				  }).catch((err)=>{
-						console.log(err)
+						// console.log(err)
 				  })
 			},
 			// 获取评论
@@ -179,7 +179,7 @@
 								bookid:this.id
 							}
 						}).then(res=>{
-							console.log(res.result)
+							// console.log(res.result)
 							this.requestComment=true
 							this.comments=res.result.comments;
 						})
@@ -196,7 +196,7 @@
 					accountId:userInfo.accountId
 				}).get().then(res=>{
 					let arr=res.result.data[0].books?res.result.data[0].books:[]
-					console.log(res)
+					// console.log(res)
 					arr.forEach(val=>{
 						if(val.bookid==this.id){
 							this.addbookshelf=true
@@ -221,7 +221,7 @@
 					            	url:"/pages/login/login"
 					            })
 					        } else if (res.cancel) {
-					            console.log('用户点击取消');
+					            // console.log('用户点击取消');
 					        }
 					    }
 					});
@@ -231,7 +231,7 @@
 				obj.bookid=this.id;
 				obj.bookName=this.baseInfo.bookName
 				obj.img=this.baseInfo.img
-				console.log(obj)
+				// console.log(obj)
 				uniCloud.callFunction({
 					name:"addBookshelf",
 					data:{
@@ -239,7 +239,7 @@
 						obj:obj
 					}
 				}).then(res=>{
-					console.log(res)
+					// console.log(res)
 					this.toast("已加入书架")
 					this.addbookshelf=true
 				})
@@ -259,7 +259,8 @@
 			this.getBookshelf()
 		},
 		onShow() {
-			console.log(12312)
+			console.log("onshow")
+			this.init()
 			this.getComments()
 			this.getBookshelf()
 		},
