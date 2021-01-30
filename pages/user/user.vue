@@ -38,13 +38,13 @@
 					<image src="../../static/icon/chongzhi.png" mode=""></image>
 					<text>充值</text>
 				</view> -->
-				<view class="reader-item">
+				<view class="reader-item" @click="jumpPage('/pages/collect/collect')">
 					<image src="../../static/icon/shouchang.png" mode=""></image>
 					<text>收藏</text>
 				</view>
 			</view>
 			<view class="reader-bom">
-				<view class="reader-item">
+				<view class="reader-item" @click="jumpPage('/pages/idea/idea')">
 					<image src="../../static/icon/xiangfa.png" mode=""></image>
 					<text>想法</text>
 				</view>

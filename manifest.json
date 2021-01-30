@@ -2,8 +2,8 @@
     "name" : "book",
     "appid" : "__UNI__6232880",
     "description" : "",
-    "versionName" : "1.3.0",
-    "versionCode" : 130,
+    "versionName" : "1.3.1",
+    "versionCode" : 131,
     "transformPx" : false,
     /* 5+App特有相关 */
     "app-plus" : {
@@ -76,5 +76,10 @@
     },
     "uniStatistics" : {
         "enable" : false
+    },
+    "h5" : {
+        "devServer" : {
+            "https" : true
+        }
     }
 }

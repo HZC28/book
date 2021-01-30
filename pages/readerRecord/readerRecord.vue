@@ -18,10 +18,10 @@
 				accountId:userInfo.accountId
 			}).get().then(res=>{
 				// console.log(res.result.data)
-				this.records=res.result.data
+				
 				console.log(res.result.data[0].updateTime)
 				let nowTime=new Date().getTime()
-				this.records.forEach(val=>{
+				res.result.data.forEach(val=>{
 					let updateTime=new Date(val.updateTime).getTime()
 					let IntervalTime=nowTime-updateTime
 					// let minute,hour,day,month;
@@ -35,8 +35,11 @@
 					}else if(60*24*30<IntervalTime/60000 && IntervalTime/60000<(60*24*365)){
 						time=parseInt(IntervalTime/(60000*60*24*30))+"月前"
 					}
-					console.log(time)
+					val.time=time
+					// console.log(time)
 				})
+				this.records=res.result.data
+				console.log(this.records)
 				
 			})
 		},

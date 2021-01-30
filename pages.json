@@ -155,6 +155,18 @@
 			}
 		},
 		{
+			"path": "pages/collect/collect",
+			"style": {
+				"navigationBarTitleText":"收藏"
+			}
+		},
+		{
+			"path": "pages/idea/idea",
+			"style": {
+				"navigationBarTitleText":"想法"
+			}
+		},
+		{
 			"path": "pages/readerRecord/readerRecord",
 			"style": {
 				"navigationBarTitleText":"阅读记录"
