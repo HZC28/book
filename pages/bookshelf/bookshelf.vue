@@ -1,12 +1,16 @@
 <template>
 	<!-- 书架 -->
 	<view class="bookshelf">
-		<view class="book">
+		<view class="book" v-if="requestBooks==true&&books.length!=0">
 			<view class="bookitem" v-for="(book,index) in books">
-				<image @longpress="manageBook()" @click="toreading(book.bookid)" class="img" :src="book.img" mode=""></image>
+				<image @longpress="manageBook()" @click="toreading(book.bookid,index)" class="img" :src="book.img" mode=""></image>
 				<u-checkbox  v-model="book.checked" @change="changeStaus(index)" v-show="manage" class="select" shape="circle"  active-color="#F29100"></u-checkbox>
 				<view class="bookname">{{book.bookName}}</view>
 			</view>
+		</view>
+		<view class="null" v-if="requestBooks==true&&books.length==0">
+			<u-empty style="margin-top: 300rpx;"  text="书架空空如也" mode="search"></u-empty>
+			<view class="btn" @click="toBookshop">去书城</view>
 		</view>
 		<view class="popup" v-show="manage">
 			<view class="popup-main">
@@ -32,11 +36,15 @@
 		data(){
 			return{
 				books:[],
+				requestBooks:false,
 				manage:false,
 				checked:false
 			}
 		},
 		onLoad() {
+			this.init()
+		},
+		onShow() {
 			this.init()
 		},
 		onPullDownRefresh() {
@@ -53,22 +61,28 @@
 				let db=uniCloud.database()
 				let collection=db.collection('bookshelf')
 				let userInfo=uni.getStorageSync("userInfo")
+				this.requestBooks=false
 				collection.where({
 					accountId:userInfo.accountId
 				}).get().then(res=>{
-					console.log(res)
-					
 					res.result.data[0].books.forEach(val=>{
 						val.checked=false
 						console.log(val)
 					})
 					this.books=res.result.data[0].books
+					this.requestBooks=true
 					uni.stopPullDownRefresh()
 				})
 			},
 			changeStaus(i){
 				console.log(this.books[i].checked)
 				this.books[i].checked=!this.books[i].checked
+			},
+			// 去书城
+			toBookshop(){
+				uni.navigateTo({
+					url:"/pages/bookshop/bookshop"
+				})
 			},
 			cancle(){
 				this.manage=false
@@ -101,6 +115,7 @@
 				})
 				console.log(ids)
 			},
+			// 是否全部勾选
 			allSelect(){
 				if(this.checked){
 					this.books.forEach(val=>{
@@ -113,19 +128,25 @@
 				}
 				
 			},
-			toreading(bookid){
+			toreading(bookid,i){
 				// this.manage=true
 				if(this.manage==false){
 					uni.navigateTo({
 						url:"/pages/reader/reader?bookid="+bookid
 					})
 				}else{
+					this.changeStaus(i)
 					return
 				}
 				
 			},
 			manageBook(){
 				this.manage=true
+				uni.vibrateShort({
+				    success: function () {
+				        console.log('success');
+				    }
+				});
 			}
 		},
 		created() {
@@ -151,7 +172,7 @@
 			position: relative;
 			.img{
 				width: 200rpx;
-				height:320rpx;
+				height:280rpx;
 			}
 			.select{
 				position: absolute;
@@ -184,6 +205,21 @@
 				align-items: center;
 				justify-content: center;
 			}
+		}
+	}
+	.null{
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+		.btn{
+			margin: 30rpx auto;
+			width: 240rpx;
+			padding: 10rpx 0;
+			background: #ff557f;
+			text-align: center;
+			border-radius: 30rpx;
+			font-size: 36srpx;
+			color:#FFFFFF;
 		}
 	}
 </style>

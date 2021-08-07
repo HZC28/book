@@ -7,6 +7,12 @@
 	},
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText":"",
+				"navigationStyle":"custom"
+			}
+		},{
 			"path": "pages/index/index",
 			"style": {
 				"enablePullDownRefresh": true,
@@ -25,18 +31,25 @@
 						}
 					}
 			}
-		},{
-			"path": "pages/login/login",
-			"style": {
-				"navigationBarTitleText":"",
-				"navigationStyle":"custom"
-			}
 		},
 		{
 			"path": "pages/bookshop/bookshop",
 			"style": {
-				"navigationBarTitleText":"书城"
-				// "navigationStyle":"custom"
+				"navigationBarTitleText":"书城",
+				"app-plus":{
+						"padding-right": "10px",
+						"titleNView":{
+							// "backgroundColor":"#00ffff",
+							"searchInput":{
+								"backgroundColor": "#fff",
+								"borderRadius": "10px", //输入框圆角
+								"placeholder": "请输入搜索内容",
+								"align":"center",
+								"disabled": true //disable时点击输入框不置焦，可以跳到新页面搜索
+							}
+							
+						}
+					}
 			}
 		},
 		{
@@ -45,10 +58,52 @@
 				"navigationBarTitleText":"",
 				"navigationStyle":"custom"
 			}
-		},{
+		},
+		{
 			"path": "pages/application/application",
 			"style": {
 				"navigationBarTitleText":"申请创作"
+			}
+		},
+		{
+			"path": "pages/authorCheck/authorCheck",
+			"style": {
+				"navigationBarTitleText":"作家审批"
+			}
+		},{
+			"path": "pages/applicationBook/applicationBook",
+			"style": {
+				"navigationBarTitleText":"新书申请"
+			}
+		},{
+			"path": "pages/user/uploadChapter/uploadChapter",
+			"style": {
+				"navigationBarTitleText":"上传章节"
+			}
+		},{
+			"path": "pages/user/uploadChapter/detail/datail",
+			"style": {
+				"navigationBarTitleText":"上传章节"
+			}
+		},{
+			"path": "pages/user/mybook/mybook",
+			"style": {
+				"navigationBarTitleText":"我的创作"
+			}
+		},{
+			"path": "pages/bookCheck/detail/detail",
+			"style": {
+				"navigationBarTitleText":"书籍详情"
+			}
+		},{
+			"path": "pages/bookCheck/bookCheck",
+			"style": {
+				"navigationBarTitleText":"书籍审核"
+			}
+		},{
+			"path": "pages/authorCheck/detail/detail",
+			"style": {
+				"navigationBarTitleText":"作家审批"
 			}
 		},{
 			"path": "pages/community/detail/detail",
@@ -78,8 +133,7 @@
 		},{
 			"path": "pages/reader/comment-detail/comment-detail",
 			"style": {
-				"navigationBarTitleText":"评论",
-				"navigationStyle":"custom"
+				"navigationBarTitleText":"评论详情"
 				
 			}
 		},{
@@ -87,25 +141,6 @@
 			"style": {
 				"navigationBarTitleText":"搜索",
 				"navigationStyle":"custom"
-				// "app-plus":{
-				// 	"titleNView":{
-				// 		// "backgroundColor":"#00ffff",
-				// 		"searchInput":{
-				// 			"backgroundColor": "#fff",
-				// 			"borderRadius": "10px", //输入框圆角
-				// 			"placeholder": "请输入搜索内容",
-				// 			"align":"left",
-				// 			"disabled": false //disable时点击输入框不置焦，可以跳到新页面搜索
-				// 		},
-				// 		"buttons":[
-				// 			{
-				// 				"text":"搜索",
-				// 				"fontSize":"32rpx"
-				// 			}
-				// 		]
-						
-				// 	}
-				// }
 			}
 			
 		},{
@@ -113,7 +148,10 @@
 			"style": {
 				"enablePullDownRefresh": true,
 				"navigationBarTitleText":"社区",
-				"navigationStyle":"custom"
+				"navigationStyle":"custom",
+				"app-plus":{
+					"softinputMode":"adjustPan"
+				}
 			}
 		},{
 			"path": "pages/user/userinfo/userinfo",

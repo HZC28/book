@@ -32,7 +32,7 @@
 						<u-rate size="22" active-color="#d3d3d3" inactive-color="#e8e8e8" :current="comment.score" :disabled="true"></u-rate>
 					</view>
 					<view class="center">
-						<view class="">
+						<view class="" @click="toCommentDetail(comment.commentId,comment.praise,comment.collect)">
 							{{comment.commentContent}}
 						</view>
 					</view>
@@ -53,7 +53,7 @@
 			<u-empty text="当前没有评论" mode="history"></u-empty>
 			<text class="text" @click="toComment(id)">去评论</text>
 		</view>
-		<view class="fixed" v-if="requestBookshelf==true">
+		<view class="fixed" :style="{top:windowHeight}"  v-if="requestBookshelf==true">
 			<view class="left" v-if="addbookshelf==false" @click="addtoBookshelf">加入书架</view>
 			<view class="left" v-if="addbookshelf" @click="toBookshelf">去书架</view>
 			<view class="right" @click="toreader(id)">点击阅读</view>
@@ -72,10 +72,14 @@
 				addbookshelf:false,
 				requestComment:false,
 				// 判断是否加入书架接口请求完毕
-				requestBookshelf:false
+				requestBookshelf:false,
+				windowHeight:"",
+				position:"fixed"
+				
 			}
 		},
 		methods:{
+			// 点赞
 			thumbs(id,index){
 				let userInfo=uni.getStorageSync("userInfo");
 				// 判断用户是否登录
@@ -105,6 +109,7 @@
 				}
 				// 添加用户点赞信息或删除该用户的点赞信息
 				let type=this.comments[index].commentPraise?"add":"del"
+				console.log(id)
 				uniCloud.callFunction({
 					name:'comment_thumbs-up',
 					data:{
@@ -115,13 +120,17 @@
 						bookId:this.id
 					}
 				}).then(res=>{
-					// console.log(res)
+					console.log(res)
 				}).catch(err=>{
 					// console.log(err)
 				})
-				
-				
 			},
+			toCommentDetail(id,praise,collect){
+				uni.navigateTo({
+					url:"/pages/reader/comment-detail/comment-detail?bookId="+this.id+"&commentId="+id+"&praise="+praise+"&collect="+collect
+				})
+			},
+			// 去书架
 			toBookshelf(){
 				uni.navigateTo({
 					url:"/pages/bookshelf/bookshelf"
@@ -158,17 +167,6 @@
 			},
 			// 获取评论
 			getComments(){
-				// const db = uniCloud.database();//代码块为cdb
-				// db.collection('comment').skip(0).limit(3).where({
-				// 	"bookId":this.id
-				// }).orderBy('commentTime','asc').get().then((res)=>{
-				// 		this.comments=res.result.data
-				// 		this.requestComment=true
-				// 		console.log(res.result.data)
-				//   }).catch((err)=>{
-				// 		console.log(err)
-				// 		this.requestComment=true
-				//   })
 					let userInfo=uni.getStorageSync("userInfo")
 					uniCloud.callFunction({
 							name:"getComment",
@@ -254,12 +252,38 @@
 		onLoad(option){
 			this.id=option.id
 			// 获取db引用
+			let self=this
+			uni.getSystemInfo({
+				success(res) {
+					// #ifdef APP-PLUS
+					self.windowHeight=((res.windowHeight+res.statusBarHeight)*2-98)+"rpx"
+					// #endif
+					// #ifdef H5
+					self.windowHeight=res.windowHeight+"px"
+					// #endif
+				}
+			})
 			this.init()
 			this.getComments()
 			this.getBookshelf()
+			
 		},
 		onShow() {
-			console.log("onshow")
+			// this.windowHeight="100rpx"
+			let self=this
+			uni.getSystemInfo({
+				success(res) {
+					// console.log((res.windowHeight+res.statusBarHeight)*2)
+					// #ifdef APP-PLUS
+					self.windowHeight=((res.windowHeight+res.statusBarHeight)*2-98)+"rpx"
+					// #endif
+					// #ifdef H5
+					self.windowHeight=res.windowHeight+"px"
+					// #endif
+					// console.log(res.windowHeight*2)
+					
+				}
+			})
 			this.init()
 			this.getComments()
 			this.getBookshelf()
@@ -269,8 +293,9 @@
 
 <style lang="scss" scoped>
 	.book-info{
-		
-		padding-bottom: 100rpx;
+		// padding-bottom: 100rpx;
+		// background-color: red;
+		height: 100%;
 	}
 	.book-baseinfo{
 		display: flex;
@@ -395,7 +420,7 @@
 	}
 	.fixed{
 		position: fixed;
-		bottom: 0;
+		// top: 1472rpx;
 		display: flex;
 		width: 100%;
 		background: #cccccc;

@@ -57,6 +57,8 @@
 						uni.switchTab({
 							url:"/pages/index/index"
 						})
+					}else{
+						this.toast(res.result.msg)
 					}
 				})
         
@@ -74,12 +76,6 @@
   }
 
   .header {
-    /* width: 161rpx;
-    height: 161rpx; */
-    /* background: rgba(63, 205, 235, 1); */
-    /* box-shadow: 0rpx 12rpx 13rpx 0rpx rgba(63, 205, 235, 0.47); */
-    /* border-radius: 50%; */
-    /* margin-top: 30rpx; */
     margin-left: auto;
     margin-right: auto;
   }

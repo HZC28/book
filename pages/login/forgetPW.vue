@@ -56,7 +56,44 @@
       clear(){
       },
 			changePassword(){
-				
+				if (this.phone.length != 11) {
+				  uni.showToast({
+				    icon: 'none',
+				    title: '手机号不正确'
+				  });
+				  return;
+				}
+				if (this.password.length < 6) {
+				  uni.showToast({
+				    icon: 'none',
+				    title: '密码长度至少为六位'
+				  });
+				  return;
+				}
+					
+				if(this.passwordAgain!=this.password){
+					uni.showToast({
+					  icon: 'none',
+					  title: '两次密码输入不一致'
+					});
+					return;
+				}
+				uniCloud.callFunction({
+					name:"changeUserInfo",
+					data:{
+						account:this.phone,
+						password:this.password
+					}
+				}).then(res=>{
+					console.log(res)
+					if(res.result.msg=="新旧密码一致，请重新修改密码"){
+						this.toast("新旧密码一致，请重新修改密码")
+					}else if(res.result.msg=="该用户不存在"){
+						this.toast("该用户不存在")
+					}else{
+						this.toast("修改密码成功")
+					}
+				})
 			}
     }
   }

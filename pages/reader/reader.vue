@@ -65,20 +65,6 @@
 		<!-- 菜单结束 -->
 		<!-- 顶部开始 -->
 		<view class="anmt" :style="{color:fontColor,backgroundColor:show?menuBg:pageBg,position:'fixed',top:'0',left:'0',zIndex:'6',width:'100%',fontSize:'3vw',zIndex:'20'}">
-			<!-- 时间电量开始 -->
-			<!-- <view :style="{height:statusBarHeight,padding: '20rpx 10rpx'}">
-				<view style="float: left;letter-spacing:0">
-					<text v-text="systemTime"></text>
-				</view>
-				<view style="float: right;letter-spacing:0;">
-					<text class="iconfont icon-80dianliang" style="font-size: 5vw;position: relative;">
-						<text class="dianxin" :style="{backgroundColor:show?menuBg:pageBg}">
-							<text class="dLiang" :style="{backgroundColor:fontColor,width:battery+'%'}"></text>
-						</text>
-					</text>
-				</view>
-			</view> -->
-			<!-- 时间电量结束 -->
 			<!-- 书名章节开始 -->
 			<view v-show="!show" style="height: 40upx;line-height: 40upx;padding: 0 5vw;padding-top:20rpx">
 				<view style="float: left;width: 300upx;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;" v-text="bookName"></view>
@@ -113,7 +99,7 @@
 	</view>
 </template>
 <script>
-let interval,timeInter,dianliangInter;
+let interval,dianliangInter;
 import zhuti from '../../zhuti'
 export default{
 	data(){
@@ -146,15 +132,13 @@ export default{
 		}
 	},
 	onUnload() {
-		// 页面卸载的时候清除定时器
-		clearInterval(timeInter)
-		clearInterval(dianliangInter)
-		uni.hideLoading();
-		this.listerUnload()
 		//页面卸载的时候将通知栏显示出来
 		// #ifdef APP-PLUS
 		plus.navigator.setFullscreen(false);
 		// #endif
+		uni.hideLoading();
+		this.listerUnload()
+		
 	},
 	created() {
 		var this_ = this;
@@ -178,6 +162,7 @@ export default{
 		}
 		uni.getSystemInfo({
 			success: res=>{
+				// console.log(res.statusBarHeight)
 				this.statusBarHeight = res.statusBarHeight + 'rpx';
 			}
 		})
@@ -186,7 +171,7 @@ export default{
 		//页面显示的时候将通知栏隐藏掉
 		// console.log("123")
 		// #ifdef APP-PLUS 
-		plus.navigator.setFullscreen(true);
+		// plus.navigator.setFullscreen(true);
 		// #endif
 		// this.text()
 	},
@@ -372,10 +357,14 @@ export default{
 				            // console.log('用户点击取消');
 				        }
 								uni.navigateBack({delta:1});
+								// uni.reLaunch({
+								// 	url:"/pages/reader/book-baseinfo/book-baseinfo"
+								// })
 				    }
 				});
 			}else{
 				uni.navigateBack({delta:1});
+				
 			}
 		},
 		dianjile(){
@@ -397,39 +386,6 @@ export default{
 			uni.setStorageSync('zhuti',e);
 			this.dqzhuti=e;
 		},
-		//获取系统电量
-		dianliang(){
-			// #ifdef APP-PLUS 
-			var this_ = this;
-			if (uni.getSystemInfoSync().platform != 'ios'){
-				var main = plus.android.runtimeMainActivity();
-				var Intent = plus.android.importClass('android.content.Intent');  
-				var recevier = plus.android.implements('io.dcloud.feature.internal.reflect.BroadcastReceiver', {  
-				          onReceive: function(context, intent) {  
-				        var action = intent.getAction();  
-				        if (action == Intent.ACTION_BATTERY_CHANGED) {  
-				            var level   = intent.getIntExtra("level", 0); //电量  
-				            var voltage = intent.getIntExtra("voltage", 0); //电池电压  
-				            var temperature = intent.getIntExtra("temperature", 0); //电池温度  
-				                        //如需获取别的，在这里继续写，此代码只提供获取电量  
-							this_.battery = level;
-				        }  
-				     }  
-				 });  
-				var IntentFilter = plus.android.importClass('android.content.IntentFilter');  
-				var filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);  
-				main.registerReceiver(recevier, filter); 
-			}else{
-				var UIDevice = plus.ios.import("UIDevice");  
-				var dev = UIDevice.currentDevice();  
-				if (!dev.isBatteryMonitoringEnabled()) {  
-				    dev.setBatteryMonitoringEnabled(true);  
-				}  
-				var level =dev.batteryLevel();
-				this_.battery = level*100;
-			}
-			// #endif
-		},
 		getTimes(){
 			var times = new Date();
 			this.systemTime = (times.getHours()<10?'0'+times.getHours():times.getHours()) + ':' + (times.getMinutes()<10?'0'+times.getMinutes():times.getMinutes());
@@ -442,7 +398,7 @@ export default{
 </script>
 <style lang="less" scoped>
 	.status_bar {
-		height: 100rpx;
+		height: var(--status-bar-height);
 		width: 100%;
 	}
 	@font-face {font-family: "iconfont";

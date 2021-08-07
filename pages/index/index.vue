@@ -1,5 +1,16 @@
 <template>
 	<view class="content">
+		<view class="header">
+			<view class="bookshop" @click="skip('/pages/bookshop/bookshop')">
+				<view class="text">书城<u-icon style="margin-left: 5rpx;" name="arrow-right" size="30"></u-icon></view>
+			</view>
+			<view class="bookshelf" @click="skip('/pages/bookshelf/bookshelf')">
+				<view class="text">书架<u-icon style="margin-left: 5rpx;" name="arrow-right" size="30"></u-icon></view>
+			</view>
+			<view class="readerRecord" @click="skip('/pages/readerRecord/readerRecord')">
+				<view class="text">在读<u-icon style="margin-left: 5rpx;" name="arrow-right" size="30"></u-icon></view>
+			</view>
+		</view>
 		<!-- 书籍分类 -->
 		<view class="theclassify" v-for="classifion in classifions">
 			<view class="title">
@@ -8,7 +19,7 @@
 			<view class="main">
 				<view class="bookInfo" @click="tobookInfo(book.bookid)" v-for="book in classifion.bookList">
 					<view class="left">
-						<image :src="book.img" mode=""></image>
+						<image alt="123" class="img" :src="book.img" mode=""></image>
 					</view>
 					<view class="right">
 						<view class="name">
@@ -26,7 +37,7 @@
 		<view class="thebook" @click="tobookInfo(book.bookid)" v-for="book in books">
 			<view class="top">
 				<view class="left">
-					<image :src="book.img" mode="widthFix"></image>
+					<image alt="123" :src="book.img" mode="widthFix" ></image>
 				</view>
 				<view class="right">
 					<view class="info">
@@ -96,7 +107,8 @@
 						uni.stopPullDownRefresh()
 					})
 				}else{
-					
+					uni.hideLoading()
+					uni.stopPullDownRefresh()
 				}
 				
 				
@@ -120,6 +132,12 @@
 				uni.navigateTo({
 					url:"/pages/reader/book-baseinfo/book-baseinfo?&id="+id
 				})
+			},
+			// 跳转页面
+			skip(url){
+				uni.navigateTo({
+					url:url
+				})
 			}
 		}
 	}
@@ -127,9 +145,59 @@
 
 <style scoped lang="less">
 	.content{
-		padding: 30rpx;
+		padding:0 30rpx;
 	}
-	.theclassify{
+	.header{
+		// color: #FFFFFF;
+		margin-bottom: 20rpx;
+		margin-top: 10rpx;
+		display: flex;
+		justify-content: space-between;
+		.bookshop{
+			flex: 1;
+			text-align: center;
+			font-size: 32rpx;
+			.text{
+				margin: 0 auto;
+				padding: 10rpx 0rpx;
+				width: 160rpx;
+				border-radius: 30rpx;
+				// background:#8ffff2;
+				background:rgba(255, 170, 0, 0.6);
+				
+			}
+		}
+		.bookshelf{
+			flex: 1;
+			text-align: center;
+			font-size: 32rpx;
+			.text{
+				// display: inline-block;
+				margin: 0 auto;
+				padding: 10rpx 0rpx;
+				width: 160rpx;
+				border-radius: 30rpx;
+				background:#8ffff2;
+				background:rgba(170, 170, 127, 0.6)
+				// opacity: 0.6;
+				// color:#FFFFFF;
+			}
+		}
+		.readerRecord{
+			flex: 1;
+			text-align: center;
+			font-size: 32rpx;
+			.text{
+				margin: 0 auto;
+				padding: 10rpx 0rpx;
+				width: 160rpx;
+				border-radius: 30rpx;
+				// background:#8ffff2;
+				background:rgba(255, 170, 127, 0.6)
+			}
+		}
+	}
+.theclassify{
 		width:690rpx;
 		background: #FFFFFF;
 		margin-bottom: 50rpx;
@@ -150,7 +218,7 @@
 				align-items: center;
 				margin-bottom: 15rpx;
 				.left{
-					image{
+					.img{
 						width:110rpx;
 						height: 150rpx;
 					}

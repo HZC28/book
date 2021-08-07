@@ -1,8 +1,11 @@
 <template>
 	<view class="Box">
-		<button type="default" @click="reader">读取文件</button>
-		{{content}}
+		<!-- <button type="default" @click="reader">读取文件</button>
+		{{content}} -->
+		
 		<button type="default" @click="del">删除</button>
+		<button type="error" @click="addnewbook">手动添加一本新图书</button>
+		<button type="default" @click="addLocaltionChapter">添加本地章节</button>
 	</view>
 </template>
 
@@ -16,6 +19,8 @@
 				title:"",
 				bookid:"book3145494"
 			}
+		},
+		mounted() {
 		},
 		methods:{
 			reader(){
@@ -72,10 +77,12 @@
 					},1000*i)
 				}
 			},
+			
 			async del(){
 				// 清理全部数据
+				// "bookid":"161190427615654"
 				const db = uniCloud.database()
-				let bookid='161190421498377'
+				let bookid='162830499123515'
 				await db.collection('book').where({
 				  bookid: bookid
 				}).remove().then(res=>{
@@ -88,7 +95,50 @@
 				  bookid: bookid
 				}).remove()
 				
-			}
+			},
+			// 手动新增一本新的图书
+			addnewbook(){
+				uniCloud.callFunction({
+					name:"newBook",
+					data:{
+						"bookName":'恐怖复苏',
+						"author":"老佛",
+						"img":'https://dss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=4139843464,2828492391&fm=179&app=35&f=JPEG?w=267&h=357&s=BDA0E51445486AEE6EF4CDC90300A0B3',
+						"introduction":`“我叫杨间，当你看到这句话的时候我已经死了......”一张诡异的羊皮卷，一只窥视黑暗的眼睛，这是一个活下来的人经历的故事。`,
+						"type":"灵异小说"
+					}
+				}).then(res=>{
+					console.log(res.result)
+				})
+			},
+			// 获取章节信息
+			async addLocaltionChapter(){
+				uni.request({
+					url:"https://7463-tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcb.qcloud.la/a.json",
+					success:async (res)=> {
+						console.log(res.data)
+						this.chapters=res.data
+						for(let i=0;i<this.chapters.length;i++){
+							await this.loadLocaltion(i,"162830599280037")
+						}
+					}
+				})
+				
+			},
+			// 导入章节
+			async loadLocaltion(i,id){
+				 await uniCloud.callFunction({
+				 	name:"uploadChapter",
+				 	data:{
+				 		bookName:'恐怖复苏',
+				 		bookid:id,
+				 		chapterContent:this.chapters[i].chapterContent,
+				 		chapterName:this.chapters[i].chapterName
+				 	}
+				 }).then(res=>{
+				 	console.log(i)
+				 })
+			},
 		}
 	}
 </script>

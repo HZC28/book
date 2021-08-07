@@ -1,7 +1,7 @@
 <template>
   <view class="content">
     <view class="header">
-      <image src="../../static/shilu-login/logo.png"></image>
+      <image src="../../static/shilu-login/133.png"></image>
     </view>
     <view class="list">
       <view class="list-call">
@@ -41,7 +41,7 @@
       };
     },
     methods: {
-      display() {
+      display(type) {
         if(type=="again"){
         	this.showPasswordAgain=!this.showPasswordAgain
         }else{
@@ -59,10 +59,42 @@
         if (this.password.length < 6) {
           uni.showToast({
             icon: 'none',
-            title: '密码不正确'
+            title: '密码长度至少为六位'
           });
           return;
         }
+					
+				if(this.passwordAgain!=this.password){
+					uni.showToast({
+					  icon: 'none',
+					  title: '两次密码输入不一致'
+					});
+					return;
+				}
+				uniCloud.callFunction({
+					name:"register",
+					data:{
+						account:this.phone,
+						password:this.password
+					}
+				}).then(res=>{
+					if(res.result=="注册成功"){
+						this.toast("注册成功")
+						let self=this
+						setTimeout(()=>{
+							uni.navigateTo({
+								url:"/pages/login/login",
+							})
+						},2000)
+						// uni.navigateTo({
+						// 	url:"/pages/login/login",
+						// })
+					}else{
+						this.toast("注册失败，该账号已存在")
+					}
+					
+					console.log(res)
+				})
       }
     }
   }
@@ -75,27 +107,22 @@
     justify-content: center;
   }
 
-  .header {
-    width: 161rpx;
-    height: 161rpx;
-    background: rgba(63, 205, 235, 1);
-    box-shadow: 0rpx 12rpx 13rpx 0rpx rgba(63, 205, 235, 0.47);
-    border-radius: 50%;
-    margin-top: 30rpx;
+.header {
+		margin-top: 130rpx;
     margin-left: auto;
     margin-right: auto;
   }
 
   .header image {
-    width: 161rpx;
-    height: 161rpx;
-    border-radius: 50%;
+    width: 406rpx;
+    height: 300rpx;
+    /* border-radius: 50%; */
   }
 
   .list {
     display: flex;
     flex-direction: column;
-    padding-top: 50rpx;
+    /* padding-top: 50rpx; */
     padding-left: 70rpx;
     padding-right: 70rpx;
   }

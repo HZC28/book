@@ -14,8 +14,8 @@
 				</view>
 			</view>
 			<view class="ci-center">
-				<view @click="toComment(idea.ideaId,idea.praise)">{{idea.ideaTitle}}</view>
-				<text @click="toComment(idea.ideaId,idea.praise)">{{idea.ideaContent}}</text>
+				<view @click="toComment(idea.ideaId,idea.praise,idea.collect)">{{idea.ideaTitle}}</view>
+				<text @click="toComment(idea.ideaId,idea.praise,idea.collect)">{{idea.ideaContent}}</text>
 				<view class="imgbox">
 					<view class="img" v-if="idea.ideaImg.length==2">
 						<image @click="previewImage(idea.ideaImg)" style="height: 300rpx;" :src="imgurl" mode="aspectFill" v-for="imgurl in idea.ideaImg"></image>
@@ -170,9 +170,9 @@
 				
 			},
 			// 社区评论详情
-			toComment(id,praise){
+			toComment(id,praise,collect){
 				uni.navigateTo({
-					url:"/pages/community/detail/detail?id="+id+"&praise="+praise
+					url:"/pages/community/detail/detail?id="+id+"&praise="+praise+"&collect="+collect
 				})
 			},
 			// 去发布社区评论

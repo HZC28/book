@@ -47,13 +47,13 @@
 		<!-- 回复信息 -->
 		<view class="reply" v-if="replys!=0">
 			<view class="replyitem" v-for="(reply,index) in replys" :key="reply._id">
-				<div class="baseinfo">
-					<div class="img"><image :src="reply.headPortrait" mode=""></image></div>
-					<div class="rigth">
-						<div class="createBy">{{reply.userName}}</div>
-						<div class="time">{{reply.time}}</div>
-					</div>
-				</div>
+				<view class="baseinfo">
+					<view class="img"><image :src="reply.headPortrait" mode=""></image></view>
+					<view class="rigth">
+						<view class="createBy">{{reply.userName}}</view>
+						<view class="time">{{reply.time}}</view>
+					</view>
+				</view>
 				<view class="content" @click="openInput(1,index)">
 					{{reply.content}}
 				</view>
@@ -63,40 +63,52 @@
 				</view>
 			</view>
 		</view>
-		<u-popup z-index="8" class="popup" v-model="show" :closeable="true" length="70%" mode="bottom" border-radius="14">
-			<div class="title">回复信息</div>
-			<view v-if="show">
-				<view class="popupitem"  v-for="(child,childIndex) in replys[index].children">
-					<div class="baseinfo">
-						<div class="img"><image :src="child.headPortrait" mode=""></image></div>
-						<div class="rigth">
-							<div class="createBy">{{child.originator}}</div>
-							<div class="time">{{child.time}}</div>
-						</div>
-					</div>
-					<view class="content" @click="openInput(1,index,childIndex)">
-						{{child.content}}
+		<!-- 回复内容框开始 -->
+		<u-popup z-index="8" class="popup" v-model="show" :closeable="true" length="80%" mode="bottom" border-radius="14">
+			<view class="title">回复信息</view>
+			<scroll-view scroll-y="true" style="height: 75%;">
+					<view v-if="show" style="margin-bottom: 110rpx;">
+						<view class="popupitem"  v-for="(child,childIndex) in replys[index].children">
+							<view class="baseinfo">
+								<view class="img"><image :src="child.headPortrait" mode=""></image></view>
+								<view class="rigth">
+									<view class="createBy">{{child.originator}}</view>
+									<view class="time">{{child.time}}</view>
+								</view>
+							</view>
+							<view class="content" @click="openInput(1,index,childIndex)">
+								{{child.content}}
+							</view>
+						</view>
 					</view>
-				</view>
-			</view>
+			</scroll-view>
+			
 			
 		</u-popup>
+			<!-- 回复内容框结束 -->
 		<view class="bom" v-show="openIssue==false">
-			<input @click="openInput(-1,index)" disabled border placeholder="我来评论" class="bom-input"></input>
-			<!-- <view class="bom-btn">
-				回复
-			</view> -->
+			<input @click="openInput(-1,index)" disabled border placeholder="点击发表评论" class="bom-input"></input>
+			<view class="">
+				<u-icon class="thumb" @click="thumbs(info._id)" :color="praise==true?'red':'inherit'"
+				name="thumb-up" size="44rpx" style="margin-right: 8rpx;">
+				</u-icon>
+				<u-icon class="collect" @click="collect1(info._id)" color="#ffaa00"
+				:name="collect==true?'heart-fill':'heart'" size="44rpx" style="margin-right: 8rpx;">
+				</u-icon>
+			</view>
 		</view>
 		<view @touchend.prevent="" v-show="openIssue" class="issue">
 			<view class="responerInfo">
 				回复{{form.responder}}：{{form.responderContent}}
 			</view>
+			
 			<view class="issue-main">
-				<textarea v-model="form.content" @blur="hideIssue" :focus="focus" class="content" placeholder="我来评论" type="textarea"></textarea>
+				<textarea  cursor-spacing="100"  v-model="content" @blur="hideIssue" :focus="focus" class="content" placeholder="我来评论" type="textarea"></textarea>
 				<view class="btn">
 					<view @touchend.prevent="release(type)">发表</view>
 				</view>
 			</view>
+			
 		</view>
 	</view>
 </template>
@@ -112,6 +124,7 @@
 				info:{},
 				// 控制回复信息是哪一条的
 				index:0,
+				content:"",
 				replys:[],
 				// 判断当前用户是否对该评论点赞
 				praise:false,
@@ -122,7 +135,8 @@
 				responder:"",//回复人,
 				responderContent:"",//回复内容
 				controlOpenIssue:true,
-				type:0
+				type:0,
+				collect:false
 			}
 		},
 		onShow() {
@@ -135,6 +149,7 @@
 			// console.log(option.id)
 			this.id=option.id
 			this.praise=option.praise=='true'?true:false
+			this.collect=option.collect=='true'?true:false
 			// 获取评论的详细信息
 			this.getIdeaDetail(this.id)
 			this.getReply()
@@ -144,10 +159,14 @@
 			release(type){
 				let data={}
 				// console.log(this.index)
+				if(this.content==''||this.content==undefined){
+					this.toast('未输入任何评论信息')
+					return
+				}
 				if(type==0){
 					data.type=type
 					data.ideaId=this.form.ideaId
-					data.content=this.form.content
+					data.content=this.content
 					data.userName=this.form.originator
 					data.accountId=this.form.originatorId
 					data.account=this.form.originator
@@ -158,6 +177,7 @@
 						data:data
 					}).then(res=>{
 						this.form={}
+						this.content=""
 						uni.hideLoading()
 						this.hideIssue()
 						this.info.ideaReply++
@@ -166,6 +186,7 @@
 				}else{
 					data.type=type;
 					data.id=this.replys[this.index]._id
+					this.form.content=this.content
 					let obj=this.form
 					data.obj=obj
 					uniCloud.callFunction({
@@ -173,6 +194,7 @@
 						data:data
 					}).then(res=>{
 						this.form={}
+						this.content=""
 						obj.time=res.result
 						// console.log(res.result)
 						this.replys[this.index].children.unshift(obj)
@@ -188,6 +210,7 @@
 				this.openIssue=false
 				this.focus=false
 				this.form={}
+				// this.content=""
 				// console.log(e)
 				// 不能点击
 				this.controlOpenIssue=true
@@ -278,6 +301,46 @@
 				// this.form.responderId
 				// console.log(this.form)
 				// this.release(type)
+			},
+			collect1(id){
+				let userInfo=uni.getStorageSync("userInfo");
+				// 判断用户是否登录
+				if(!userInfo){
+					uni.showModal({
+					    title: '提示',
+					    content: '您还没有登录,是否登录',
+							confirmText:"去登录",
+					    success: function (res) {
+					        if (res.confirm) {
+					            uni.redirectTo({
+					            	url:"/pages/login/login"
+					            })
+					        } else if (res.cancel) {
+					            console.log('用户点击取消');
+					        }
+					    }
+					});
+					return
+				}
+				this.collect=!this.collect
+				// 判断是否加入收藏
+				let type=this.collect?"add":"del"
+				console.log(type)
+				// console.log(userInfo.accountId)
+				uniCloud.callFunction({
+					name:'idea_collect',
+					data:{
+						id:id,
+						type:type,
+						accountId:userInfo.accountId
+					}
+				}).then(res=>{
+					if(type=='add'){this.toast('已收藏')}
+					if(type=='del'){this.toast('已取消收藏')}
+					console.log(res)
+				}).catch(err=>{
+					this.collect=!this.collect
+				})
 			},
 			// 点赞
 			thumbs(id){
@@ -416,13 +479,13 @@
 		
 	.reply{
 		background: #FFFFFF;
-		margin-bottom: 100rpx;
 		width: 690rpx;
 		margin:0 auto;
+		margin-bottom: 120rpx;
 		border-radius: 20rpx;
-		padding-bottom: 80rpx;
+		padding-top: 20rpx;
+		padding-bottom: 20rpx;
 		.replyitem{
-			
 			padding:20rpx 0;
 			.baseinfo{
 				display: flex;
@@ -514,19 +577,26 @@
 			background-color: #FFFFFF;
 			width: 100%;
 			z-index: 9;
-			height: 100rpx;
+			height: 110rpx;
+			display: flex;
+			align-items: center;
+			justify-content: center;
 			// line-height: 100rpx;
 			.bom-input{
-				width: 600rpx;
-				height: 60rpx;
-				background-color: #f8f8f8;
-				margin-top: 20rpx;
-				margin-left: 75rpx;
+				width: 500rpx;
+				height: 70rpx;
+				background-color: #eaeaea;
+				// margin-top: 20rpx;
+				// margin-left: 75rpx;
 				border-radius: 30rpx;
-				font-size: 24rpx;
+				font-size: 28rpx;
 				padding-left:30rpx;
-				// line-height: 30rpx;
-				
+			}
+			.thumb{
+				margin-left: 20rpx;
+			}
+			.collect{
+				margin-left: 20rpx;
 			}
 		}
 	}
@@ -537,18 +607,20 @@
 		width: 100%;
 		z-index: 9;
 		// height: 300rpx;
-		padding:20rpx 30rpx;
+		padding:25rpx 30rpx;
 		.responerInfo{
 			padding-bottom: 20rpx;
-			font-size: 24rpx;
+			font-size: 26rpx;
 			white-space:nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
 		}
 		.issue-main{
 			display: flex;
+			// margin-bottom: 30rpx;
+			// height: 200rpx;
 			.content{
-				width: 570rpx;
+				width: 550rpx;
 				height: 90rpx;
 				border-radius: 30rpx;
 				background-color: #f8f8f8;
@@ -556,14 +628,16 @@
 				font-size: 28rpx;
 			}
 			.btn{
-				width: 120rpx;
+				width: 140rpx;
 				text-align: center;
 				margin-left: 20rpx;
 				align-self: flex-end;
 				view{
-					width: 100rpx;
+					width: 120rpx;
 					background: #ffaaff;
 					color:#FFFFFF;
+					font-weight: 500;
+					font-size: 32rpx;
 					padding:5rpx 20rpx;
 					border-radius: 20rpx;
 				}

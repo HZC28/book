@@ -10,7 +10,7 @@
 					<u-rate size="22" active-color="#d3d3d3" inactive-color="#e8e8e8" :current="comment.score" :disabled="true"></u-rate>
 				</view>
 				<view class="center">
-					<view class="" @click="toCommentDetail">
+					<view class="" @click="toCommentDetail(comment.commentId,comment.praise,comment.collect)">
 						{{comment.commentContent}}
 					</view>
 				</view>
@@ -43,9 +43,15 @@
 		},
 		onLoad(option) {
 			this.bookId=option.id;
+			// this.total=1;
+			// this.pagesNum=1;
+			// console.log(this.bookId)
+			// this.getComment()
+		},
+		onShow() {
 			this.total=1;
 			this.pagesNum=1;
-			console.log(this.bookId)
+			this.comments=[]
 			this.getComment()
 		},
 		onReachBottom(){
@@ -135,9 +141,9 @@
 					url:"/pages/reader/release/release?bookid="+this.bookId
 				})
 			},
-			toCommentDetail(){
+			toCommentDetail(id,praise,collect){
 				uni.navigateTo({
-					url:"/pages/reader/comment-detail/comment-detail"
+					url:"/pages/reader/comment-detail/comment-detail?bookId="+this.bookId+"&commentId="+id+"&praise="+praise+"&collect="+collect
 				})
 			}
 		}

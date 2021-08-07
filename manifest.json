@@ -2,8 +2,8 @@
     "name" : "book",
     "appid" : "__UNI__6232880",
     "description" : "",
-    "versionName" : "1.3.1",
-    "versionCode" : 131,
+    "versionName" : "1.3.5",
+    "versionCode" : 135,
     "transformPx" : false,
     /* 5+App特有相关 */
     "app-plus" : {
@@ -78,8 +78,7 @@
         "enable" : false
     },
     "h5" : {
-        "devServer" : {
-            "https" : true
-        }
+        "title" : "book",
+        "domain" : "tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcloudbaseapp.com"
     }
 }
