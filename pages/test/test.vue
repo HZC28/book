@@ -82,7 +82,7 @@
 				// 清理全部数据
 				// "bookid":"161190427615654"
 				const db = uniCloud.database()
-				let bookid='162830499123515'
+				let bookid='162832145157538'
 				await db.collection('book').where({
 				  bookid: bookid
 				}).remove().then(res=>{
@@ -101,11 +101,11 @@
 				uniCloud.callFunction({
 					name:"newBook",
 					data:{
-						"bookName":'恐怖复苏',
-						"author":"老佛",
-						"img":'https://dss0.baidu.com/6ONWsjip0QIZ8tyhnq/it/u=4139843464,2828492391&fm=179&app=35&f=JPEG?w=267&h=357&s=BDA0E51445486AEE6EF4CDC90300A0B3',
-						"introduction":`“我叫杨间，当你看到这句话的时候我已经死了......”一张诡异的羊皮卷，一只窥视黑暗的眼睛，这是一个活下来的人经历的故事。`,
-						"type":"灵异小说"
+						"bookName":'大主宰',
+						"author":"天蚕土豆",
+						"img":'https://www.biquwx.la/files/article/image/0/921/921s.jpg',
+						"introduction":`大千世界，位面交汇，万族林立，群雄荟萃，一位位来自下位面的天之至尊，在这无尽世界，演绎着令人向往的传奇，追求着那主宰之路。`,
+						"type":"玄幻小说"
 					}
 				}).then(res=>{
 					console.log(res.result)
@@ -119,7 +119,7 @@
 						console.log(res.data)
 						this.chapters=res.data
 						for(let i=0;i<this.chapters.length;i++){
-							await this.loadLocaltion(i,"162830599280037")
+							await this.loadLocaltion(i,"16283216441767")
 						}
 					}
 				})
@@ -130,7 +130,7 @@
 				 await uniCloud.callFunction({
 				 	name:"uploadChapter",
 				 	data:{
-				 		bookName:'恐怖复苏',
+				 		bookName:'大主宰',
 				 		bookid:id,
 				 		chapterContent:this.chapters[i].chapterContent,
 				 		chapterName:this.chapters[i].chapterName
