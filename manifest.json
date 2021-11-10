@@ -79,6 +79,10 @@
     },
     "h5" : {
         "title" : "book",
-        "domain" : "tcb-pko5yqgb8bfjobuecbade-03b550-1304438654.tcloudbaseapp.com"
+        "domain" : "www.nandao.tect",
+        "router" : {
+            "base" : "/ss/",
+            "mode" : "hash"
+        }
     }
 }

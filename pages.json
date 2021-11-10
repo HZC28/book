@@ -66,6 +66,12 @@
 			}
 		},
 		{
+			"path": "pages/user/Crawling/Crawling",
+			"style": {
+				"navigationBarTitleText":"爬取书籍"
+			}
+		},
+		{
 			"path": "pages/authorCheck/authorCheck",
 			"style": {
 				"navigationBarTitleText":"作家审批"

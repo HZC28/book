@@ -12,6 +12,17 @@ exports.main = async (event, context) => {
 	let time=`${targetDate.getFullYear()}-${targetDate.getMonth()+1}-${targetDate.getDate()} ${targetDate.getHours()}:${targetDate.getMinutes()}`
 	let id=new Date().getTime()+''+num
 	let result;
+	let res1=await db.collection("book").where({
+		bookName:event.bookName
+	}).get()
+	console.log(res1)
+	if(res1.data.length!=0){
+		return {
+			code:100,
+			msg:"书籍名已存在",
+			id:res1.data[0].bookid
+		}
+	}
 	await db.collection('book').add({
 		bookid:id,
 		chapter:0,
@@ -45,9 +56,12 @@ exports.main = async (event, context) => {
 				chapterName:"简介"
 		}
 	})
-	await db.collection('applicationBook').doc(event._id).update({
-		bookid:id
-	})
+	if(event._id){
+		await db.collection('applicationBook').doc(event._id).update({
+			bookid:id
+		})
+	}
+	
 	//返回数据给客户端
 	return id
 };

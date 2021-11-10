@@ -94,9 +94,9 @@
 				<image src="../../static/icon/zjsp.png" mode=""></image>
 				<text>作家审批</text>
 			</view>
-			<view class="admin-item">
+			<view class="admin-item" @click="jumpPage('/pages/user/Crawling/Crawling')">
 				<image src="../../static/icon/jbxx.png" mode=""></image>
-				<text>举报信息</text>
+				<text>爬取书籍</text>
 			</view>
 		</view>
 	</view>
