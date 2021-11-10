@@ -56,7 +56,6 @@
 		},
 		methods:{
 			confirm(e){
-				console.log(e)
 				this.bookType=e[0].label
 			},
 			// 获取章节信息
@@ -97,12 +96,10 @@
 								let array=await this.getChapterArr(i);
 								this.chapters=[...this.chapters,...array]
 							}
-							console.log(this.chapters)
-							for(let i=0;i<3;i++){
+							for(let i=0;i<this.chapters.length;i++){
 								await this.loadLocaltion(i,this.form.bookId,this.form.bookName)
 							}
 							this.begin=false
-							console.log("测试",345)
 						}
 						
 					}
@@ -120,7 +117,6 @@
 							addressId:this.form.address
 						},
 						success:async (res)=> {
-							console.log(res)
 							reslove(res.result.chapter)
 						}
 					})
@@ -137,7 +133,7 @@
 				 		chapterName:this.chapters[i].chapterName
 				 	}
 				 }).then(res=>{
-				 	console.log(i)
+					 
 				 })
 			},
 			// 删除图书
@@ -157,7 +153,6 @@
 					}else{
 						this.toast("删除成功")
 					}
-					console.log(res)
 				})
 				await db.collection('bookChater').where({
 				  bookid: bookid
@@ -187,7 +182,6 @@
 				}
 				this.form.type=this.bookType
 				this.form.img=this.imgUrl
-				console.log(this.form)
 				uniCloud.callFunction({
 					name:"newBook",
 					data:{
@@ -204,8 +198,8 @@
 						this.$forceUpdate()
 					}else{
 						this.form.bookId=res.result+''
+						this.toast("新增图书成功！！！")
 					}
-					console.log(res)
 				})
 			},
 			newbook(){
@@ -229,7 +223,6 @@
 				    count: 1, //默认9
 				    sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
 				    success: function (res) {
-				        console.log(JSON.stringify(res.tempFilePaths));
 								self.uploadImg(res.tempFilePaths)
 				    }
 				});
@@ -244,19 +237,14 @@
 							cloudPath: 'book/text'+filename+".jpg",
 				 }).then(res=>{
 					 let arr=[]
-					 console.log(res)
 					 arr.push(res.fileID)
 					 uniCloud.getTempFileURL({
 					     fileList: arr
 					 }).then(res1=>{
-						 console.log(res1)
 						 this.imgUrl=res1.fileList[0].tempFileURL
 						 this.imgText="更改图片"
-						 // console.log(res1.fileList[0].tempFileURL)
 					 })
-				 }).catch(err=>{
-					 console.log(err)
-				 });
+				 })
 			}
 		}
 	}

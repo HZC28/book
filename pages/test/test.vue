@@ -155,9 +155,9 @@
 								this.chapters=[...this.chapters,...array]
 							}
 							console.log(this.chapters)
-							// for(let i=0;i<this.chapters.length;i++){
-							// 	await this.loadLocaltion(i,bookid,bookname)
-							// }
+							for(let i=0;i<this.chapters.length;i++){
+								await this.loadLocaltion(i,bookid,bookname)
+							}
 						}
 						
 					}
