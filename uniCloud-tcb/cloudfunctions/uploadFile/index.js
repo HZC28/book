@@ -94,8 +94,6 @@ exports.main = async (event, context) => {
 	} else {
 		result = await start(event)
 	}
-
-	console.log(result)
 	// let result = await uniCloud.uploadFile({
 	// 	 cloudPath: "/json/b.json",
 	// 	 fileContent: fs.createReadStream(`./a.json`)

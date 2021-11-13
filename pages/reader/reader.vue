@@ -6,7 +6,8 @@
 		<!-- 网页背景开始 -->
 		<view class="pagbg anmt" :style="{backgroundColor:pageBg}"></view>
 		<!-- #ifdef APP-PLUS -->
-		<view class="zhongMenu" @longpress.prevent="dianjile()" ></view>
+		<!-- longpress -->
+		<view class="zhongMenu" @click.prevent="dianjile()" ></view>
 		<!-- #endif -->
 		<!-- #ifdef H5 -->
 		<view class="zhongMenu" @click.prevent="dianjile()" ></view>
@@ -84,11 +85,11 @@
 		<view class="anmt"
 			:style="{color:fontColor,backgroundColor:show?menuBg:pageBg,position:'fixed',top:'0',left:'0',zIndex:'6',width:'100%',fontSize:'3vw',zIndex:'20'}">
 			<!-- 书名章节开始 -->
-			<view v-show="!show" style="height: 40upx;line-height: 40upx;padding: 0 5vw;padding-top:20rpx">
+			<view v-show="!show" style="height: 60upx;line-height: 60upx;box-sizing: border-box;padding:0 20rpx;">
 				<view style="float: left;width: 300upx;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;"
 					v-text="bookName"></view>
 				<view v-text="section_title"
-					style="float: right;width: 300upx;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;text-align: right;">
+					style="float: right;height: 60upx;line-height: 60upx;width: 300upx;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;text-align: right;">
 				</view>
 			</view>
 			<!-- 书名章节结束 -->
@@ -97,22 +98,11 @@
 		<!-- 小说正文开始 -->
 		<!-- @click="dianjile()" -->
 		<!-- #ifdef APP-PLUS -->
-		<view @longpress="dianjile()" @touchstart="start" @touchend="end" class="sview"
-			:style="{paddingTop:'calc(50rpx)',zIndex:zindex,color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px'}">
+		<view @click="dianjile()" @touchstart="start" @touchend="end" id="bookview" class="sview app_view"
+			:style="{zIndex:zindex,color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px'}">
 			<!-- <text selectable="true">{{content_text}}</text> -->
-			<rich-text :selectable="true" :nodes="content_text"></rich-text>
-			<!-- <u-parse  :selectable="false" :tag-style="style"  :html="content_text"></u-parse> -->
-			<view class="unload" v-if="content_text==' '">
-				加载中
-			</view>
-			<!-- {{content_text}} -->
-		</view>
-		<!-- #endif -->ifdef APP-PLUS
-		<!-- #ifdef H5 -->
-		<view @click="dianjile()" class="sview"
-			:style="{paddingTop:'calc(50rpx)',zIndex:zindex,color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px'}">
-			<!-- <text selectable="true">{{content_text}}</text> -->
-			<rich-text :selectable="true" :nodes="content_text"></rich-text>
+			<rich-text :selectable="true" :nodes="content_text" class="parsehtml"></rich-text>
+			<!-- <rich-text :selectable="true" :nodes="showChapter" class="parsehtml"></rich-text> -->
 			<!-- <u-parse  :selectable="false" :tag-style="style"  :html="content_text"></u-parse> -->
 			<view class="unload" v-if="content_text==' '">
 				加载中
@@ -120,7 +110,24 @@
 			<!-- {{content_text}} -->
 		</view>
 		<!-- #endif -->
-		
+		<!-- #ifdef H5 -->
+		<!-- <view @click="dianjile()" @touchstart="start" @touchend="end" id="bookview" class="sview app_view"
+			:style="{zIndex:zindex,color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px'}">
+			<rich-text :selectable="true" :nodes="showChapter" class="parsehtml"></rich-text>
+			<view class="unload" v-if="content_text==' '">
+				加载中
+			</view>
+		</view> -->
+		<!-- #endif -->
+		<!-- #ifdef H5 -->
+		<view @click="dianjile()"  class="sview"
+			:style="{zIndex:zindex,color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px'}">
+			<rich-text :selectable="true" :nodes="content_text" class="parsehtml"></rich-text>
+			<view class="unload" v-if="content_text==' '">
+				加载中
+			</view>
+		</view>
+		<!-- #endif -->
 		<!-- 小说正文结束 -->
 		<!-- 目录 -->
 		<u-popup class="chapterList" length="550rpx" v-model="menuShow">
@@ -169,7 +176,16 @@
 				},
 				addbookshelf: false,
 				bookImg: "",
-				startData: {}
+				startData: {},
+				
+				DomBoxHeight: 0,
+				ChapterHeight: 0,
+				pageArray:[],
+				query: '',
+				page:1,
+				sliceNum: 0,
+				showChapter: "",
+				
 			}
 		},
 		onUnload() {
@@ -202,25 +218,25 @@
 			}
 			uni.getSystemInfo({
 				success: res => {
-					// console.log(res.statusBarHeight)
 					this.statusBarHeight = res.statusBarHeight + 'rpx';
 				}
 			})
 		},
 		onShow() {
 			//页面显示的时候将通知栏隐藏掉
-			// console.log("123")
 			// #ifdef APP-PLUS 
 			// plus.navigator.setFullscreen(true);
 			// #endif
 			// this.text()
 		},
 		onHide() {
-			// console.log("123")
 			//页面隐藏的时候将通知栏显示出来
 			// #ifdef APP-PLUS 
 			plus.navigator.setFullscreen(false);
 			// #endif
+		},
+		mounted() {
+			this.query = uni.createSelectorQuery().in(this);
 		},
 		onLoad(option) {
 			// #ifdef APP-PLUS 
@@ -262,10 +278,17 @@
 					console.log('上下滑')
 				} else {
 					if (subX > 70) {
-						this.last()
+						if(this.page==1){
+							this.last()
+						}
+						this.page--
 						console.log('右滑')
 					} else if (subX < -70) {
-						this.next()
+						if(this.page==this.pageArray.length){
+							this.next()
+						}
+						this.page++
+						
 						console.log('左滑')
 					} else {
 						console.log('无效')
@@ -283,9 +306,7 @@
 					accountId: userInfo.accountId
 				}).get().then((res) => {
 					let arr = res.result.data[0].books ? res.result.data[0].books : []
-					// console.log(res)
 					arr.forEach(val => {
-						// console.log(this.addbookshelf)
 						if (val.bookid == this.bookId) {
 							this.addbookshelf = true
 						}
@@ -299,7 +320,6 @@
 				obj.bookid = this.bookId
 				obj.bookName = this.bookName
 				obj.img = this.bookImg
-				// console.log(obj)
 				uniCloud.callFunction({
 					name: "addBookshelf",
 					data: {
@@ -307,14 +327,12 @@
 						obj: obj
 					}
 				}).then(res => {
-					// console.log(res)
 					this.toast("已加入书架")
 					this.addbookshelf = true
 				})
 			},
 			// 监听页面卸载,将阅读章节记录保存
 			listerUnload() {
-				// console.log("listerUnload")
 				let userInfo = uni.getStorageSync("userInfo")
 				uniCloud.callFunction({
 					name: "readerRecord",
@@ -327,8 +345,6 @@
 						bookImg: this.bookImg
 					}
 				})
-				// console.log(this.chapterNum)
-				// console.log(this.chapters[this.chapterNum].chapterName)
 			},
 			// 根据bookid获取章节,书名信息
 			getData() {
@@ -336,33 +352,173 @@
 				db.collection('bookChater').where({
 					bookid: this.bookId
 				}).get().then(res => {
-					// console.log(res.result)
 					this.chapters = res.result.data[0].chapters ? res.result.data[0].chapters : []
 					this.getChapterContent(this.chapters[this.chapterNum].chapterId, this.chapterNum)
 					// this.section_title=this.chapters[this.chapterNum].chapterName
 					this.bookName = res.result.data[0].bookName
 					this.bookImg = res.result.data[0].img
-
 				})
 			},
 			// 根据章节id获取章节内容
 			getChapterContent(chapterId, index) {
 				let db = uniCloud.database()
 				this.content_text = " "
-				// console.log(index)
 				db.collection('chapters').where({
 					bookid: this.bookId,
 					chapterId: chapterId
 				}).get().then(res => {
-					// console.log(res.result.data[0].chapterContent)
 					let str = res.result.data[0].chapterContent.replace(/\n/g, '</p><p>')
-					// let str=res.result.data[0].chapterContent
+					str = str.replace(/<\/p><p><\/p><p>/g, '</p><p>')
 					this.content_text = `<p>${str}</p>`
+					// let str = res.result.data[0].chapterContent.replace(/\n/g, '<br>')
+					// str= str.replace(/<br><br>/g, '<br>')
+					// let str=res.result.data[0].chapterContent
+					
+					// this.content_text = str
 					this.section_title = this.chapters[index].chapterName
 					this.chapterNum = index
 					this.menuShow = false
+					
+					
+					//app端章节分页
+					// #ifdef APP-PLUS
+					//分页显示的内容
+					this.showChapter = this.content_text
+					this.$nextTick(() => {
+						//计算分页
+						this.computePage()
+					})
+					// #endif
+					
+					
+					
 				})
 			},
+			
+			
+			//新增加
+			async computePage() {
+				//获取容器高度和章节分页后的高度
+				await this.getHeight()
+				let multiple = parseInt(parseInt(this.ChapterHeight) / parseInt(this.DomBoxHeight))
+				let chapterLength = this.content_text.length
+				//每一页大致上的字数
+				this.base_num=parseInt(chapterLength / multiple)
+				this.sliceNum=0
+				// console.log(this.base_num)
+				this.getPageArray()
+			},
+			async getPageArray(){
+				for(let i=1;i<100;i++){
+					console.log(i)
+					console.log(last_sliceNum)
+					let last_sliceNum=this.sliceNum
+					this.sliceNum=this.base_num*i
+					// this.sliceNum=this.sliceNum+260
+					if(this.sliceNum>=this.content_text.length){
+						this.sliceNum=this.content_text.length
+					}
+					this.showChapter = this.content_text.slice(last_sliceNum, this.sliceNum)
+					await this.Adjustment(last_sliceNum, this.sliceNum)
+					// console.log(this.DomBoxHeight,this.ChapterHeight)
+					// console.log(this.sliceNum,this.content_text.length)
+					if(this.sliceNum>=this.content_text.length){
+						break
+					}
+				}
+				console.log(this.pageArray,12334)
+				this.page=1
+				this.showChapter = this.content_text.slice(this.pageArray[this.page-1].min, this.pageArray[this.page-1].max)
+			},
+			// type=0是下一页，type=1是上一页
+			async Adjustment(MIN_SLICE,MAX_SLICE) {
+				let numberlength=12
+				return new Promise(async (resolve,reject)=>{
+					this.showChapter = this.content_text.slice(MIN_SLICE, this.sliceNum)
+					await this.getHeight()
+					console.log(this.DomBoxHeight,this.ChapterHeight,"ok")
+					if (this.DomBoxHeight > this.ChapterHeight) {
+						// console.log("容器高度超出") 
+						for (let i = 0; i < 50; i++) {
+							this.sliceNum += numberlength
+							if(this.sliceNum>=this.content_text.length){
+								console.log("end1")
+								this.sliceNum=this.content_text.length
+								this.showChapter = this.content_text.slice(MIN_SLICE, this.sliceNum)
+								await this.getHeight()
+								this.pageArray.push({min:MIN_SLICE,max:this.sliceNum,content:this.showChapter,last:this.showChapter[this.showChapter.length]})
+								resolve()
+								return
+								// if (this.DomBoxHeight < this.ChapterHeight) {
+								// 	this.pageArray.push({min:MIN_SLICE,max:this.sliceNum})
+								// 	resolve()
+								// 	return
+								// }
+							}
+							console.log(this.showChapter,"this.showChapter1")
+							this.showChapter = this.content_text.slice(MIN_SLICE, this.sliceNum)
+							await this.getHeight()
+							console.log(this.DomBoxHeight,this.ChapterHeight,"change1",i)
+							if (this.DomBoxHeight < this.ChapterHeight) {
+								this.sliceNum -= numberlength
+								this.pageArray.push({min:MIN_SLICE,max:this.sliceNum,content:this.showChapter,last:this.showChapter[this.showChapter.length]})
+								resolve()
+								return
+							}
+						}
+					} else {
+						// console.log("章节高度超出")
+						for (let i = 0; i <150; i++) {
+							this.sliceNum -= numberlength
+							if(this.sliceNum>=this.content_text.length){
+								console.log("end")
+								this.sliceNum=this.content_text.length
+								this.showChapter = this.content_text.slice(MIN_SLICE, this.sliceNum)
+								await this.getHeight()
+								this.pageArray.push({min:MIN_SLICE,max:this.sliceNum,content:this.showChapter,last:this.showChapter[this.showChapter.length]})
+								resolve()
+								return
+								// if (this.DomBoxHeight > this.ChapterHeight) {
+								// 	this.pageArray.push({min:MIN_SLICE,max:this.sliceNum})
+								// 	resolve()
+								// 	return
+								// }
+							}
+							this.showChapter = this.content_text.slice(MIN_SLICE, this.sliceNum)
+							await this.getHeight()
+							console.log(this.DomBoxHeight,this.ChapterHeight,"change2",i)
+							if (this.DomBoxHeight > this.ChapterHeight) {
+								// this.sliceNum -= 20
+								this.pageArray.push({min:MIN_SLICE,max:this.sliceNum,content:this.showChapter,last:this.showChapter[this.showChapter.length]})
+								resolve()
+								return
+							}
+						}
+					}
+				})
+				
+			},
+			getHeight() {
+				return new Promise((resolve,reject)=>{
+					this.$nextTick(()=>{
+						this.query.select('#bookview>.parsehtml').boundingClientRect(data => {
+							// console.log("章节节点高度" + data.height);
+							this.ChapterHeight = data.height
+						}).exec();
+						this.query.select('#bookview').boundingClientRect(data => {
+							// console.log("节点高度" + data.height);
+							this.DomBoxHeight = data.height
+						}).exec();
+						resolve(true)
+					})
+				})
+				
+				
+			},
+			
+			//新增加
+			
+			
 			//修改正文字体大小
 			changeFontSize(e) {
 				this.size = e.detail.value;
@@ -401,11 +557,8 @@
 			async back() {
 				let a = await this.getBookshelf()
 				// 判断用户是否登录
-				// console.log(a)
 				if (!this.addbookshelf) {
-					// console.log(this.addbookshelf)
 					let self = this
-					// console.log("123")
 					uni.showModal({
 						title: '提示',
 						content: '为方便下次阅读,是否将该图书加入书架?',
@@ -413,9 +566,7 @@
 						success: async function(res) {
 							if (res.confirm) {
 								await self.addtoBookshelf()
-								// self.toast("已加入书架")
 							} else if (res.cancel) {
-								// console.log('用户点击取消');
 							}
 							uni.navigateBack({
 								delta: 1
@@ -429,18 +580,15 @@
 					uni.navigateBack({
 						delta: 1
 					});
-
 				}
 			},
 			dianjile() {
-				// console.log(123)
 				this.show = !this.show;
 				if (this.show) {
 					this.zindex = 5;
 				} else {
 					this.zindex = 10
 				}
-				// console.log(this.zindex)
 			},
 			//切换主题
 			qiehuan(e) {
@@ -540,19 +688,19 @@
 	}
 
 	.sview {
-		width: calc(100% - 40upx);
+		width: calc(100% - 40rpx);
 		font-size: 45upx;
-		line-height: 90upx;
+		// line-height: 90upx;
 		position: relative;
 		text-indent: calc(2em + 12upx);
-		margin: 0 auto;
+		margin: 0 auto 0;
 		z-index: 5;
 		white-space: normal;
 		word-break: break-all;
 		word-wrap: break-word;
 		overflow: hidden;
-		padding: 0 20upx 100upx;
-
+		padding: 60rpx 0 0rpx;
+		// padding: 15rpx 0rpx 15rpx;
 		.unload {
 			width: 100%;
 			height: 100%;
@@ -561,8 +709,20 @@
 			margin-top: 300rpx;
 			text-indent: 0;
 		}
+		.parsehtml{
+			
+		}
 
 	}
+	#bookview{
+		box-sizing: border-box;
+		height: calc(100vh);
+		// background: red;
+		overflow: hidden;
+		.parsehtml{
+		}
+	}
+	
 
 	.titlee {
 		width: 100%;
@@ -676,7 +836,6 @@
 
 	.chapterList {
 		width: 100%;
-
 		.title {
 			width: 100%;
 			text-align: center;
@@ -686,14 +845,12 @@
 			padding-top: 20rpx;
 			background-color: #cccccc;
 		}
-
 		.chapter {
 			display: flex;
 			justify-content: space-between;
 			height: 80rpx;
 			align-items: center;
 			line-height: 80rpx;
-
 			view {
 				width: 100%;
 				padding: 0 30rpx;

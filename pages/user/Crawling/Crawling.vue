@@ -15,7 +15,7 @@
 					<text class="imgtext" @click="changeHeadPortrait">{{imgText}}</text>
 				</u-form-item>
 				<u-form-item label-width="140" label="简介:">
-					<u-input maxlength="1000" :disabled="this.form.status!=undefined&&this.form.status!=-1" laceholder="请输入图书简介" border type="textarea" v-model="form.introduction" />
+					<u-input maxlength="1000" laceholder="请输入图书简介" border type="textarea" v-model="form.introduction" />
 				</u-form-item>
 				<u-button  style="margin-top: 20rpx;" @click="submit" type="success">另开新书</u-button>
 				<u-button  style="margin-top: 20rpx;" @click="del" type="error">删除图书</u-button>
