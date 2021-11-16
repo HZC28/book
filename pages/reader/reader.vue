@@ -85,20 +85,20 @@
 		<view class="anmt"
 			:style="{color:fontColor,backgroundColor:show?menuBg:pageBg,position:'fixed',top:'0',left:'0',zIndex:'6',width:'100%',fontSize:'3vw',zIndex:'20'}">
 			<!-- 书名章节开始 -->
-			<view v-show="!show" style="height: 60upx;line-height: 60upx;box-sizing: border-box;padding:0 20rpx;">
+			<!-- <view v-show="!show" style="height: 60upx;line-height: 60upx;box-sizing: border-box;padding:0 20rpx;">
 				<view style="float: left;width: 300upx;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;"
 					v-text="bookName"></view>
 				<view v-text="section_title"
 					style="float: right;height: 60upx;line-height: 60upx;width: 300upx;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;text-align: right;">
 				</view>
-			</view>
+			</view> -->
 			<!-- 书名章节结束 -->
 		</view>
 		<!-- 顶部结束 -->
 		<!-- 小说正文开始 -->
 		<!-- @click="dianjile()" -->
 		<!-- #ifdef APP-PLUS -->
-		<view @click="dianjile()" @touchstart="start" @touchend="end" id="bookview" class="sview app_view"
+		<view @click="dianjile()" @touchstart="start" @touchend="end" id="bookview1" class="sview app_view1"
 			:style="{zIndex:zindex,color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px'}">
 			<!-- <text selectable="true">{{content_text}}</text> -->
 			<rich-text :selectable="true" :nodes="content_text" class="parsehtml"></rich-text>
@@ -185,7 +185,7 @@
 				page:1,
 				sliceNum: 0,
 				showChapter: "",
-				
+				page_direction:"next"
 			}
 		},
 		onUnload() {
@@ -279,16 +279,23 @@
 				} else {
 					if (subX > 70) {
 						if(this.page==1){
+							this.page_direction="last"
 							this.last()
+							
+							return
 						}
 						this.page--
+						this.showChapter = this.content_text.slice(this.pageArray[this.page-1].min, this.pageArray[this.page-1].max)
+						this.toast(this.ChapterHeight+"已经是第一章了"+this.DomBoxHeight)
 						console.log('右滑')
 					} else if (subX < -70) {
 						if(this.page==this.pageArray.length){
+							this.page_direction="next"
 							this.next()
+							return
 						}
 						this.page++
-						
+						this.showChapter = this.content_text.slice(this.pageArray[this.page-1].min, this.pageArray[this.page-1].max)
 						console.log('左滑')
 					} else {
 						console.log('无效')
@@ -378,16 +385,19 @@
 					this.section_title = this.chapters[index].chapterName
 					this.chapterNum = index
 					this.menuShow = false
-					
-					
+					this.showChapter = this.content_text
+					// this.$nextTick(() => {
+					// 	//计算分页
+					// 	this.computePage()
+					// })
 					//app端章节分页
 					// #ifdef APP-PLUS
 					//分页显示的内容
-					this.showChapter = this.content_text
-					this.$nextTick(() => {
-						//计算分页
-						this.computePage()
-					})
+					// this.showChapter = this.content_text
+					// this.$nextTick(() => {
+					// 	//计算分页
+					// 	this.computePage()
+					// })
 					// #endif
 					
 					
@@ -400,6 +410,7 @@
 			async computePage() {
 				//获取容器高度和章节分页后的高度
 				await this.getHeight()
+				
 				let multiple = parseInt(parseInt(this.ChapterHeight) / parseInt(this.DomBoxHeight))
 				let chapterLength = this.content_text.length
 				//每一页大致上的字数
@@ -427,19 +438,19 @@
 					}
 				}
 				console.log(this.pageArray,12334)
-				this.page=1
+				this.page=this.page_direction=="next"?1:this.pageArray.length
 				this.showChapter = this.content_text.slice(this.pageArray[this.page-1].min, this.pageArray[this.page-1].max)
 			},
 			// type=0是下一页，type=1是上一页
 			async Adjustment(MIN_SLICE,MAX_SLICE) {
-				let numberlength=12
+				let numberlength=5
 				return new Promise(async (resolve,reject)=>{
 					this.showChapter = this.content_text.slice(MIN_SLICE, this.sliceNum)
 					await this.getHeight()
 					console.log(this.DomBoxHeight,this.ChapterHeight,"ok")
 					if (this.DomBoxHeight > this.ChapterHeight) {
-						// console.log("容器高度超出") 
-						for (let i = 0; i < 50; i++) {
+						// console.log("容器高度超出")
+						for (let i = 0; i < 150; i++) {
 							this.sliceNum += numberlength
 							if(this.sliceNum>=this.content_text.length){
 								console.log("end1")
@@ -470,7 +481,7 @@
 						// console.log("章节高度超出")
 						for (let i = 0; i <150; i++) {
 							this.sliceNum -= numberlength
-							if(this.sliceNum>=this.content_text.length){
+							if(this.sliceNum>=this.content_text.length&&(this.DomBoxHeight > this.ChapterHeight)){
 								console.log("end")
 								this.sliceNum=this.content_text.length
 								this.showChapter = this.content_text.slice(MIN_SLICE, this.sliceNum)
@@ -699,7 +710,6 @@
 		word-break: break-all;
 		word-wrap: break-word;
 		overflow: hidden;
-		padding: 60rpx 0 0rpx;
 		// padding: 15rpx 0rpx 15rpx;
 		.unload {
 			width: 100%;
@@ -716,7 +726,10 @@
 	}
 	#bookview{
 		box-sizing: border-box;
-		height: calc(100vh);
+		position: relative;
+		top:60upx;
+		height: calc(100vh - 60upx);
+		// height: calc(100vh);
 		// background: red;
 		overflow: hidden;
 		.parsehtml{
