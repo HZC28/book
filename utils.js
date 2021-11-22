@@ -31,7 +31,7 @@ export const javaHb = new class {
 		// console.log(11111) 
 		let staus=this.appCheckSystemType=='android'?0:1;
 		let db=uniCloud.database()
-		db.collection('PatchManage').doc('79550af2600a410a006b1add689a041d').get().then(res=>{
+		db.collection('PatchManage').doc('9e7190f16198c58806e5916f3bbdff78').get().then(res=>{
 			// console.log(res.result.data[0])
 			this.checkJudge(res.result.data[0]);
 		})

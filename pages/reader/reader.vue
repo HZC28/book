@@ -7,10 +7,10 @@
 		<view class="pagbg anmt" :style="{backgroundColor:pageBg}"></view>
 		<!-- #ifdef APP-PLUS -->
 		<!-- longpress -->
-		<view class="zhongMenu" @click.prevent="dianjile()" ></view>
+		<view class="zhongMenu" @click.prevent="dianjile()"></view>
 		<!-- #endif -->
 		<!-- #ifdef H5 -->
-		<view class="zhongMenu" @click.prevent="dianjile()" ></view>
+		<view class="zhongMenu" @click.prevent="dianjile()"></view>
 		<!-- #endif -->
 		<!-- 网页背景结束 -->
 		<!-- 带返回键的导航栏开始 -->
@@ -85,13 +85,13 @@
 		<view class="anmt"
 			:style="{color:fontColor,backgroundColor:show?menuBg:pageBg,position:'fixed',top:'0',left:'0',zIndex:'6',width:'100%',fontSize:'3vw',zIndex:'20'}">
 			<!-- 书名章节开始 -->
-			<!-- <view v-show="!show" style="height: 60upx;line-height: 60upx;box-sizing: border-box;padding:0 20rpx;">
+			<view v-show="!show" style="height: 60upx;line-height: 60upx;box-sizing: border-box;padding:0 20rpx;">
 				<view style="float: left;width: 300upx;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;"
 					v-text="bookName"></view>
 				<view v-text="section_title"
 					style="float: right;height: 60upx;line-height: 60upx;width: 300upx;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;text-align: right;">
 				</view>
-			</view> -->
+			</view>
 			<!-- 书名章节结束 -->
 		</view>
 		<!-- 顶部结束 -->
@@ -99,20 +99,16 @@
 		<!-- @click="dianjile()" -->
 		<!-- #ifdef APP-PLUS -->
 		<view @click="dianjile()" @touchstart="start" @touchend="end" id="bookview" class="sview app_view"
-			:style="{zIndex:zindex,color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px'}">
-			<!-- <text selectable="true">{{content_text}}</text> -->
+			:style="{zIndex:zindex,color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px',opacity:whetherFinish?1:0}">
 			<rich-text :selectable="true" :nodes="showChapter" class="parsehtml"></rich-text>
-			<!-- <rich-text :selectable="true" :nodes="showChapter" class="parsehtml"></rich-text> -->
-			<!-- <u-parse  :selectable="false" :tag-style="style"  :html="content_text"></u-parse> -->
 			<view class="unload" v-if="content_text==' '">
 				加载中
 			</view>
-			<!-- {{content_text}} -->
 		</view>
 		<!-- #endif -->
 		<!-- #ifdef H5 -->
 		<view @click="dianjile()" @touchstart="start" @touchend="end" id="bookview" class="sview app_view"
-			:style="{zIndex:zindex,color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px'}">
+			:style="{zIndex:zindex,color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px',opacity:whetherFinish?1:0}">
 			<rich-text :selectable="true" :nodes="showChapter" class="parsehtml"></rich-text>
 			<view class="unload" v-if="content_text==' '">
 				加载中
@@ -176,15 +172,16 @@
 				},
 				addbookshelf: false,
 				bookImg: "",
-				startData: {},	
+				startData: {},
 				DomBoxHeight: 0,
 				ChapterHeight: 0,
-				pageArray:[],
+				pageArray: [],
 				query: '',
-				page:1,
+				page: 1,
 				sliceNum: 0,
 				showChapter: "",
-				page_direction:"next"
+				page_direction: "next",
+				whetherFinish: false
 			}
 		},
 		onUnload() {
@@ -277,23 +274,25 @@
 					console.log('上下滑')
 				} else {
 					if (subX > 70) {
-						if(this.page==1){
-							this.page_direction="last"
+						if (this.page == 1) {
+							this.page_direction = "last"
 							this.last()
 							return
 						}
 						this.page--
-						this.showChapter = this.content_text.slice(this.pageArray[this.page-1].min, this.pageArray[this.page-1].max)
+						this.showChapter = this.content_text.slice(this.pageArray[this.page - 1].min, this.pageArray[this
+							.page - 1].max)
 						// this.toast(this.ChapterHeight+"已经是第一章了"+this.DomBoxHeight)
 						console.log('右滑')
 					} else if (subX < -70) {
-						if(this.page==this.pageArray.length){
-							this.page_direction="next"
+						if (this.page == this.pageArray.length) {
+							this.page_direction = "next"
 							this.next()
 							return
 						}
 						this.page++
-						this.showChapter = this.content_text.slice(this.pageArray[this.page-1].min, this.pageArray[this.page-1].max)
+						this.showChapter = this.content_text.slice(this.pageArray[this.page - 1].min, this.pageArray[this
+							.page - 1].max)
 						console.log('左滑')
 					} else {
 						console.log('无效')
@@ -351,6 +350,9 @@
 					}
 				})
 			},
+			/*
+				
+			*/
 			// 根据bookid获取章节,书名信息
 			getData() {
 				let db = uniCloud.database()
@@ -378,101 +380,108 @@
 					// let str = res.result.data[0].chapterContent.replace(/\n/g, '<br>')
 					// str= str.replace(/<br><br>/g, '<br>')
 					// let str=res.result.data[0].chapterContent
-					
+
 					// this.content_text = str
 					this.section_title = this.chapters[index].chapterName
 					this.chapterNum = index
 					this.menuShow = false
 					this.showChapter = this.content_text
 					this.$nextTick(() => {
-						this.pageArray=[]
+						this.pageArray = []
+						this.whetherFinish = false
 						//计算分页
 						this.computePage()
 					})
 					//app端章节分页
 					// #ifdef APP-PLUS
 					//分页显示的内容
-					// this.showChapter = this.content_text
 					// this.$nextTick(() => {
 					// 	//计算分页
-					// this.pageArray=[]
+					// 	this.pageArray = []
+					// 	this.whetherFinish = false
 					// 	this.computePage()
 					// })
 					// #endif
-					
-					
-					
+
+
+
 				})
 			},
-			
-			
+
+
 			//新增加
 			async computePage() {
 				//获取容器高度和章节分页后的高度
 				await this.getHeight()
-				console.log(parseInt(this.DomBoxHeight),"parseInt(this.DomBoxHeight)")
+				console.log(parseInt(this.DomBoxHeight), "parseInt(this.DomBoxHeight)")
 				let multiple = parseInt(parseInt(this.ChapterHeight) / parseInt(this.DomBoxHeight))
 				let chapterLength = this.content_text.length
 				//每一页大致上的字数
-				this.base_num=parseInt(parseInt(this.DomBoxHeight)/2)
-				this.sliceNum=0
+				this.base_num = parseInt(parseInt(this.DomBoxHeight) / 2)
+				this.sliceNum = 0
 				// console.log(this.base_num)
 				this.getPageArray()
+				
 			},
-			async getPageArray(){
-				for(let i=1;i<100;i++){
+			async getPageArray() {
+				for (let i = 1; i < 100; i++) {
 					console.log(i)
-					let last_sliceNum=this.sliceNum
+					let last_sliceNum = this.sliceNum
 					console.log(last_sliceNum)
-					this.sliceNum=this.base_num*i
-					if(this.sliceNum>=this.content_text.length){
-						this.sliceNum=this.content_text.length
+					
+					this.sliceNum = this.base_num * i
+					if (this.sliceNum >= this.content_text.length) {
+						this.sliceNum = this.content_text.length
 					}
 					this.showChapter = this.content_text.slice(last_sliceNum, this.sliceNum)
 					await this.Adjustment(last_sliceNum, this.sliceNum)
-					if(this.sliceNum>=this.content_text.length){
+					if (this.sliceNum >= this.content_text.length) {
 						break
 					}
 				}
-				console.log(this.pageArray,12334)
-				this.page=this.page_direction=="next"?1:this.pageArray.length
-				this.showChapter = this.content_text.slice(this.pageArray[this.page-1].min, this.pageArray[this.page-1].max)
+				console.log(this.pageArray, 12334)
+				this.whetherFinish = true
+				this.page = this.page_direction == "next" ? 1 : this.pageArray.length
+				this.showChapter = this.content_text.slice(this.pageArray[this.page - 1].min, this.pageArray[this
+					.page - 1].max)
+				this.toast("断点",this.pageArray.length)
+				this.$forceUpdate()
 			},
-			getSliceNum(num){
-				let number=this.sliceNum+num
-				let finallySliceNum=this.sliceNum
-				let str=this.content_text.slice(0, number)
-				let reg=/(<p)$/
-				if(reg.test(str)){
-					finallySliceNum=number-2
+			getSliceNum(num) {
+				let number = this.sliceNum + num
+				let finallySliceNum = this.sliceNum
+				let str = this.content_text.slice(0, number)
+				let reg = /(<p)$/
+				if (reg.test(str)) {
+					finallySliceNum = number - 2
 					return finallySliceNum
 				}
-				reg=/(<p>)$/
-				if(reg.test(str)){
-					finallySliceNum=number-3
+				reg = /(<p>)$/
+				if (reg.test(str)) {
+					finallySliceNum = number - 3
 					return finallySliceNum
 				}
-				reg=/(<\/p)$/
-				if(reg.test(str)){
-					finallySliceNum=number+1
+				reg = /(<\/p)$/
+				if (reg.test(str)) {
+					finallySliceNum = number + 1
 					return finallySliceNum
 				}
-				reg=/(<\/)$/
-				if(reg.test(str)){
-					finallySliceNum=number+2
+				reg = /(<\/)$/
+				if (reg.test(str)) {
+					finallySliceNum = number + 2
 					return finallySliceNum
 				}
-				reg=/(<)$/
-				if(reg.test(str)){
-					number=number+1
-					str=this.content_text.slice(0, number)
-					finallySliceNum=number-2
-					if(/(<\/)$/.test(str)){
-						finallySliceNum=number+2
+				reg = /(<)$/
+				if (reg.test(str)) {
+					number = number + 1
+					str = this.content_text.slice(0, number)
+					finallySliceNum = number - 2
+					if (/(<\/)$/.test(str)) {
+						finallySliceNum = number + 2
 						return finallySliceNum
 					}
-					if(/(<p)$/.test(str)){
-						finallySliceNum=number-1
+					if (/(<p)$/.test(str)) {
+						finallySliceNum = number - 1
 						return finallySliceNum
 					}
 					return finallySliceNum
@@ -482,70 +491,95 @@
 				// if(this.content_text[number-1]=='')
 			},
 			// type=0是下一页，type=1是上一页
-			async Adjustment(MIN_SLICE,MAX_SLICE) {
-				let numberlength=15
-				return new Promise(async (resolve,reject)=>{
+			async Adjustment(MIN_SLICE, MAX_SLICE) {
+				// 每一次计算章节页数高度增加或减少的字符串数量
+				let numberlength = 15
+				return new Promise(async (resolve, reject) => {
 					this.showChapter = this.content_text.slice(MIN_SLICE, this.sliceNum)
 					// console.log(this.showChapter,this.sliceNum,"123345")
 					await this.getHeight()
-					console.log(this.DomBoxHeight,this.ChapterHeight,"ok")
+					console.log(this.DomBoxHeight, this.ChapterHeight, "ok")
+					// 容器高度超出时执行
 					if (this.DomBoxHeight > this.ChapterHeight) {
 						console.log("容器高度超出")
+						// 遍历直到章节高度小于容器高度或者章节结束时返回
 						for (let i = 0; i < 150; i++) {
 							this.sliceNum += numberlength
 							// this.sliceNum=this.getSliceNum(numberlength)
 							this.showChapter = this.content_text.slice(MIN_SLICE, this.sliceNum)
 							await this.getHeight()
-							if(this.sliceNum>=this.content_text.length&&(this.DomBoxHeight > this.ChapterHeight)){
+							if (this.sliceNum >= this.content_text.length && (this.DomBoxHeight > this.ChapterHeight)) {
 								console.log("end1")
-								this.sliceNum=this.content_text.length
+								this.sliceNum = this.content_text.length
 								this.showChapter = this.content_text.slice(MIN_SLICE, this.sliceNum)
 								await this.getHeight()
-								this.pageArray.push({min:MIN_SLICE,max:this.sliceNum,content:this.showChapter,last:this.showChapter[this.showChapter.length-1]})
+								this.pageArray.push({
+									min: MIN_SLICE,
+									max: this.sliceNum,
+									content: this.showChapter,
+									last: this.showChapter[this.showChapter.length - 1]
+								})
 								// console.log(MIN_SLICE, this.sliceNum, this.content_text.slice(MIN_SLICE, this.sliceNum),"长度")
 								resolve()
 								return
 							}
-							console.log(this.DomBoxHeight,this.ChapterHeight,"change1",i)
+							console.log(this.DomBoxHeight, this.ChapterHeight, "change1", i)
 							if (this.DomBoxHeight < this.ChapterHeight) {
 								this.sliceNum -= numberlength
 								this.showChapter = this.content_text.slice(MIN_SLICE, this.sliceNum)
 								await this.getHeight()
-								if (this.DomBoxHeight < this.ChapterHeight){
+								if (this.DomBoxHeight < this.ChapterHeight) {
 									await this.Adjustment(MIN_SLICE, this.sliceNum)
 									console.log("await")
 									resolve()
 									return
-								}else{
-									this.pageArray.push({min:MIN_SLICE,max:this.sliceNum,content:this.showChapter,last:this.showChapter[this.showChapter.length-1]})
+								} else {
+									this.pageArray.push({
+										min: MIN_SLICE,
+										max: this.sliceNum,
+										content: this.showChapter,
+										last: this.showChapter[this.showChapter.length - 1]
+									})
 									// console.log(MIN_SLICE, this.sliceNum, this.content_text.slice(MIN_SLICE, this.sliceNum),"长度")
 									resolve()
 									return
 								}
 								// numberlength=-numberlength
 								// this.sliceNum=this.getSliceNum(numberlength)
-								
+
 							}
 						}
 					} else {
+						// 章节高度超出时执行
 						console.log("章节高度超出")
-						for (let i = 0; i <150; i++) {
+						for (let i = 0; i < 150; i++) {
 							this.sliceNum -= numberlength
 							this.showChapter = this.content_text.slice(MIN_SLICE, this.sliceNum)
 							await this.getHeight()
-							if(this.sliceNum>=this.content_text.length&&(this.DomBoxHeight > this.ChapterHeight)){
-								this.sliceNum=this.content_text.length
+							if (this.sliceNum >= this.content_text.length && (this.DomBoxHeight > this
+									.ChapterHeight)) {
+								this.sliceNum = this.content_text.length
 								this.showChapter = this.content_text.slice(MIN_SLICE, this.sliceNum)
 								await this.getHeight()
-								this.pageArray.push({min:MIN_SLICE,max:this.sliceNum,content:this.showChapter,last:this.showChapter[this.showChapter.length-1]})
+								this.pageArray.push({
+									min: MIN_SLICE,
+									max: this.sliceNum,
+									content: this.showChapter,
+									last: this.showChapter[this.showChapter.length - 1]
+								})
 								console.log("cs1")
 								resolve()
 								return
 							}
-							console.log(this.DomBoxHeight,this.ChapterHeight,"change2",i)
+							console.log(this.DomBoxHeight, this.ChapterHeight, "change2", i)
 							if (this.DomBoxHeight > this.ChapterHeight) {
 								console.log("cs")
-								this.pageArray.push({min:MIN_SLICE,max:this.sliceNum,content:this.showChapter,last:this.showChapter[this.showChapter.length-1]})
+								this.pageArray.push({
+									min: MIN_SLICE,
+									max: this.sliceNum,
+									content: this.showChapter,
+									last: this.showChapter[this.showChapter.length - 1]
+								})
 								resolve()
 								return
 							}
@@ -554,8 +588,8 @@
 				})
 			},
 			getHeight() {
-				return new Promise((resolve,reject)=>{
-					this.$nextTick(()=>{
+				return new Promise((resolve, reject) => {
+					this.$nextTick(() => {
 						this.query.select('#bookview>.parsehtml').boundingClientRect(data => {
 							// console.log("章节节点高度" + data.height);
 							this.ChapterHeight = data.height
@@ -564,14 +598,19 @@
 							// console.log("节点高度" + data.height);
 							this.DomBoxHeight = data.height
 						}).exec();
+						/*
+						
+						
+						
+						*/
 						resolve(true)
 					})
 				})
 			},
-			
+
 			//新增加
-			
-			
+
+
 			//修改正文字体大小
 			changeFontSize(e) {
 				this.size = e.detail.value;
@@ -588,7 +627,7 @@
 					this.toast("已经是第一章了")
 				} else {
 					this.chapterNum--;
-					this.page_direction="last"
+					this.page_direction = "last"
 					this.section_title = this.chapters[this.chapterNum].chapterName
 					this.getChapterContent(this.chapters[this.chapterNum].chapterId, this.chapterNum)
 				}
@@ -599,7 +638,7 @@
 					this.toast("已经是最后章了")
 				} else {
 					this.chapterNum++;
-					this.page_direction=="next"
+					this.page_direction == "next"
 					this.section_title = this.chapters[this.chapterNum].chapterName
 					this.getChapterContent(this.chapters[this.chapterNum].chapterId, this.chapterNum)
 				}
@@ -621,8 +660,7 @@
 						success: async function(res) {
 							if (res.confirm) {
 								await self.addtoBookshelf()
-							} else if (res.cancel) {
-							}
+							} else if (res.cancel) {}
 							uni.navigateBack({
 								delta: 1
 							});
@@ -754,6 +792,7 @@
 		word-break: break-all;
 		word-wrap: break-word;
 		overflow: hidden;
+
 		// padding: 15rpx 0rpx 15rpx;
 		.unload {
 			width: 100%;
@@ -763,23 +802,23 @@
 			margin-top: 300rpx;
 			text-indent: 0;
 		}
-		.parsehtml{
-			
-		}
+
+		.parsehtml {}
 
 	}
-	#bookview{
+
+	#bookview {
 		box-sizing: border-box;
 		position: relative;
-		top:60upx;
+		top: 60upx;
 		height: calc(100vh - 60upx);
 		// height: calc(100vh);
 		// background: red;
 		overflow: hidden;
-		.parsehtml{
-		}
+
+		.parsehtml {}
 	}
-	
+
 
 	.titlee {
 		width: 100%;
@@ -893,6 +932,7 @@
 
 	.chapterList {
 		width: 100%;
+
 		.title {
 			width: 100%;
 			text-align: center;
@@ -902,12 +942,14 @@
 			padding-top: 20rpx;
 			background-color: #cccccc;
 		}
+
 		.chapter {
 			display: flex;
 			justify-content: space-between;
 			height: 80rpx;
 			align-items: center;
 			line-height: 80rpx;
+
 			view {
 				width: 100%;
 				padding: 0 30rpx;
