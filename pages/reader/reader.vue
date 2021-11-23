@@ -100,7 +100,7 @@
 		<!-- #ifdef APP-PLUS -->
 		<view @click="dianjile()" @touchstart="start" @touchend="end" id="bookview" class="sview app_view"
 			:style="{zIndex:zindex,color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px',opacity:whetherFinish?1:0}">
-			<rich-text :selectable="true" :nodes="showChapter" class="parsehtml"></rich-text>
+			<rich-text :selectable="true" :nodes="showChapter" id="parsehtml" class="parsehtml"></rich-text>
 			<view class="unload" v-if="content_text==' '">
 				加载中
 			</view>
@@ -109,7 +109,7 @@
 		<!-- #ifdef H5 -->
 		<view @click="dianjile()" @touchstart="start" @touchend="end" id="bookview" class="sview app_view"
 			:style="{zIndex:zindex,color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px',opacity:whetherFinish?1:0}">
-			<rich-text :selectable="true" :nodes="showChapter" class="parsehtml"></rich-text>
+			<rich-text :selectable="true" :nodes="showChapter" id="parsehtml" class="parsehtml"></rich-text>
 			<view class="unload" v-if="content_text==' '">
 				加载中
 			</view>
@@ -181,7 +181,7 @@
 				sliceNum: 0,
 				showChapter: "",
 				page_direction: "next",
-				whetherFinish: false
+				whetherFinish: true
 			}
 		},
 		onUnload() {
@@ -231,15 +231,17 @@
 			plus.navigator.setFullscreen(false);
 			// #endif
 		},
-		mounted() {
-			this.query = uni.createSelectorQuery().in(this);
-		},
+
 		onLoad(option) {
+			
 			// #ifdef APP-PLUS 
 			plus.navigator.setStatusBarStyle('dark');
 			plus.navigator.setStatusBarBackground('#FF0000');
 			// #endif
 			this.bookId = option.bookid
+		},
+		onReady(){
+			this.query = uni.createSelectorQuery().in(this);
 			const db = uniCloud.database()
 			let userInfo = uni.getStorageSync("userInfo")
 			db.collection('readerRecord').where({
@@ -252,7 +254,6 @@
 				}
 				this.getData()
 			})
-
 		},
 		// 触发安卓系统返回键时的事件
 		onBackPress(options) {
@@ -420,6 +421,7 @@
 				this.base_num = parseInt(parseInt(this.DomBoxHeight) / 2)
 				this.sliceNum = 0
 				// console.log(this.base_num)
+				this.toast("容器"+this.DomBoxHeight+"章节"+this.ChapterHeight)
 				this.getPageArray()
 				
 			},
@@ -428,7 +430,6 @@
 					console.log(i)
 					let last_sliceNum = this.sliceNum
 					console.log(last_sliceNum)
-					
 					this.sliceNum = this.base_num * i
 					if (this.sliceNum >= this.content_text.length) {
 						this.sliceNum = this.content_text.length
@@ -444,7 +445,6 @@
 				this.page = this.page_direction == "next" ? 1 : this.pageArray.length
 				this.showChapter = this.content_text.slice(this.pageArray[this.page - 1].min, this.pageArray[this
 					.page - 1].max)
-				this.toast("断点",this.pageArray.length)
 				this.$forceUpdate()
 			},
 			getSliceNum(num) {
@@ -487,8 +487,6 @@
 					return finallySliceNum
 				}
 				return finallySliceNum
-				// <p></P>
-				// if(this.content_text[number-1]=='')
 			},
 			// type=0是下一页，type=1是上一页
 			async Adjustment(MIN_SLICE, MAX_SLICE) {
@@ -509,7 +507,6 @@
 							this.showChapter = this.content_text.slice(MIN_SLICE, this.sliceNum)
 							await this.getHeight()
 							if (this.sliceNum >= this.content_text.length && (this.DomBoxHeight > this.ChapterHeight)) {
-								console.log("end1")
 								this.sliceNum = this.content_text.length
 								this.showChapter = this.content_text.slice(MIN_SLICE, this.sliceNum)
 								await this.getHeight()
@@ -530,7 +527,6 @@
 								await this.getHeight()
 								if (this.DomBoxHeight < this.ChapterHeight) {
 									await this.Adjustment(MIN_SLICE, this.sliceNum)
-									console.log("await")
 									resolve()
 									return
 								} else {
@@ -567,13 +563,11 @@
 									content: this.showChapter,
 									last: this.showChapter[this.showChapter.length - 1]
 								})
-								console.log("cs1")
 								resolve()
 								return
 							}
 							console.log(this.DomBoxHeight, this.ChapterHeight, "change2", i)
 							if (this.DomBoxHeight > this.ChapterHeight) {
-								console.log("cs")
 								this.pageArray.push({
 									min: MIN_SLICE,
 									max: this.sliceNum,
@@ -587,30 +581,25 @@
 					}
 				})
 			},
+			
 			getHeight() {
 				return new Promise((resolve, reject) => {
 					this.$nextTick(() => {
-						this.query.select('#bookview>.parsehtml').boundingClientRect(data => {
+						this.query.select('#parsehtml').boundingClientRect(data => {
 							// console.log("章节节点高度" + data.height);
+							
 							this.ChapterHeight = data.height
 						}).exec();
 						this.query.select('#bookview').boundingClientRect(data => {
 							// console.log("节点高度" + data.height);
+							// this.toast("容器"+data.height)
 							this.DomBoxHeight = data.height
 						}).exec();
-						/*
-						
-						
-						
-						*/
 						resolve(true)
 					})
 				})
 			},
-
 			//新增加
-
-
 			//修改正文字体大小
 			changeFontSize(e) {
 				this.size = e.detail.value;

@@ -3,6 +3,7 @@ let getAllBook=require("./api/getAllBook.js")
 let getBookChapter=require("./api/getBookChapter.js")
 let getBookComment=require("./api/getBookComment.js")
 let test=require("./api/test.js")
+let shareIdea=require("./api/shareIdea.js")
 exports.main = async (event, context) => {
 	//event为客户端上传的参数
 	let result;
@@ -19,6 +20,9 @@ exports.main = async (event, context) => {
 	if(event.type=="test"){
 		let z=await test()
 		result=await test()
+	}
+	if(event.type=="shareIdea"){
+		result=await shareIdea()
 	}
 	//返回数据给客户端
 	return result
