@@ -83,13 +83,13 @@
 		<!-- 菜单结束 -->
 		<!-- 顶部开始 -->
 		<view class="anmt"
-			:style="{color:fontColor,backgroundColor:show?menuBg:pageBg,position:'fixed',top:'0',left:'0',zIndex:'6',width:'100%',fontSize:'3vw',zIndex:'20'}">
+			:style="{color:fontColor,backgroundColor:show?menuBg:pageBg,boxSizing:'border-box',position:'fixed',top:'0',left:'0',zIndex:'6',width:'100%',fontSize:'3vw',zIndex:'20'}">
 			<!-- 书名章节开始 -->
 			<view v-show="!show" style="height: 60upx;line-height: 60upx;box-sizing: border-box;padding:0 20rpx;">
 				<view style="float: left;width: 300upx;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;"
 					v-text="bookName"></view>
 				<view v-text="section_title"
-					style="float: right;height: 60upx;line-height: 60upx;width: 300upx;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;text-align: right;">
+					style="float: right;height: 60upx;line-height: 60upx;width: 300upx;box-sizing: border-box;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;text-align: right;">
 				</view>
 			</view>
 			<!-- 书名章节结束 -->
@@ -98,18 +98,18 @@
 		<!-- 小说正文开始 -->
 		<!-- @click="dianjile()" -->
 		<!-- #ifdef APP-PLUS -->
-		<view @click="dianjile()" @touchstart="start" @touchend="end" id="bookview" class="sview app_view"
+		<view @click="dianjile()" class="sview bookview"
 			:style="{zIndex:zindex,color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px',opacity:whetherFinish?1:0}">
-			<rich-text :selectable="true" :nodes="showChapter" id="parsehtml" class="parsehtml"></rich-text>
+			<rich-text :selectable="true" :nodes="showChapter" class="parsehtml"></rich-text>
 			<view class="unload" v-if="content_text==' '">
 				加载中
 			</view>
 		</view>
 		<!-- #endif -->
 		<!-- #ifdef H5 -->
-		<view @click="dianjile()" @touchstart="start" @touchend="end" id="bookview" class="sview app_view"
+		<view @click="dianjile()" @touchstart="start" @touchend="end" class="sview bookview"
 			:style="{zIndex:zindex,color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px',opacity:whetherFinish?1:0}">
-			<rich-text :selectable="true" :nodes="showChapter" id="parsehtml" class="parsehtml"></rich-text>
+			<rich-text :selectable="true" :nodes="showChapter" class="parsehtml"></rich-text>
 			<view class="unload" v-if="content_text==' '">
 				加载中
 			</view>
@@ -137,6 +137,11 @@
 				<view @click="getChapterContent(chapter.chapterId,index)">{{chapter.chapterName}}</view>
 			</view>
 		</u-popup>
+		<view class="clickMask">
+			<view @click="leftRight(0)">1</view>
+			<view class="mask_middle" @click="dianjile()">2</view>
+			<view @click="leftRight(1)">3</view>
+		</view>
 	</view>
 </template>
 <script>
@@ -233,7 +238,6 @@
 		},
 
 		onLoad(option) {
-			
 			// #ifdef APP-PLUS 
 			plus.navigator.setStatusBarStyle('dark');
 			plus.navigator.setStatusBarBackground('#FF0000');
@@ -241,7 +245,6 @@
 			this.bookId = option.bookid
 		},
 		onReady(){
-			this.query = uni.createSelectorQuery().in(this);
 			const db = uniCloud.database()
 			let userInfo = uni.getStorageSync("userInfo")
 			db.collection('readerRecord').where({
@@ -264,6 +267,30 @@
 		},
 
 		methods: {
+			leftRight(num){
+				this.show=false
+				if(num==0){
+					if (this.page == 1) {
+						this.page_direction = "last"
+						this.last()
+						return
+					}
+					this.page--
+					this.showChapter = this.content_text.slice(this.pageArray[this.page - 1].min, this.pageArray[this
+						.page - 1].max)
+				}else{
+					if (this.page == this.pageArray.length) {
+						this.page_direction = "next"
+						this.next()
+						return
+					}
+					this.page++
+					this.showChapter = this.content_text.slice(this.pageArray[this.page - 1].min, this.pageArray[this
+						.page - 1].max)
+					console.log('左滑')
+				}
+				
+			},
 			start(e) {
 				this.startData.clientX = e.changedTouches[0].clientX
 				this.startData.clientY = e.changedTouches[0].clientY
@@ -271,10 +298,10 @@
 			end(e) {
 				const subX = e.changedTouches[0].clientX - this.startData.clientX;
 				const subY = e.changedTouches[0].clientY - this.startData.clientY;
-				if (subY > 50 || subY < -50) {
+				if (subY > 20 || subY < -20) {
 					console.log('上下滑')
 				} else {
-					if (subX > 70) {
+					if (subX > 20) {
 						if (this.page == 1) {
 							this.page_direction = "last"
 							this.last()
@@ -285,7 +312,7 @@
 							.page - 1].max)
 						// this.toast(this.ChapterHeight+"已经是第一章了"+this.DomBoxHeight)
 						console.log('右滑')
-					} else if (subX < -70) {
+					} else if (subX < -20) {
 						if (this.page == this.pageArray.length) {
 							this.page_direction = "next"
 							this.next()
@@ -301,6 +328,9 @@
 				}
 			},
 			// 判断该书籍是否已经加入书架
+			/*
+			
+			*/
 			async getBookshelf() {
 				let userInfo = uni.getStorageSync("userInfo")
 				if (!userInfo) {
@@ -381,7 +411,6 @@
 					// let str = res.result.data[0].chapterContent.replace(/\n/g, '<br>')
 					// str= str.replace(/<br><br>/g, '<br>')
 					// let str=res.result.data[0].chapterContent
-
 					// this.content_text = str
 					this.section_title = this.chapters[index].chapterName
 					this.chapterNum = index
@@ -403,9 +432,6 @@
 					// 	this.computePage()
 					// })
 					// #endif
-
-
-
 				})
 			},
 
@@ -420,8 +446,8 @@
 				//每一页大致上的字数
 				this.base_num = parseInt(parseInt(this.DomBoxHeight) / 2)
 				this.sliceNum = 0
-				// console.log(this.base_num)
-				this.toast("容器"+this.DomBoxHeight+"章节"+this.ChapterHeight)
+				// console.log(this.base_num)918
+				
 				this.getPageArray()
 				
 			},
@@ -437,7 +463,13 @@
 					this.showChapter = this.content_text.slice(last_sliceNum, this.sliceNum)
 					await this.Adjustment(last_sliceNum, this.sliceNum)
 					if (this.sliceNum >= this.content_text.length) {
-						break
+						this.whetherFinish = true
+						this.page = this.page_direction == "next" ? 1 : this.pageArray.length
+						this.showChapter = this.content_text.slice(this.pageArray[this.page - 1].min, this.pageArray[this
+							.page - 1].max)
+						// this.toast("容器"+this.DomBoxHeight+"章节"+this.ChapterHeight)
+						this.$forceUpdate()
+						return
 					}
 				}
 				console.log(this.pageArray, 12334)
@@ -445,6 +477,7 @@
 				this.page = this.page_direction == "next" ? 1 : this.pageArray.length
 				this.showChapter = this.content_text.slice(this.pageArray[this.page - 1].min, this.pageArray[this
 					.page - 1].max)
+				this.toast(this.page)
 				this.$forceUpdate()
 			},
 			getSliceNum(num) {
@@ -491,7 +524,7 @@
 			// type=0是下一页，type=1是上一页
 			async Adjustment(MIN_SLICE, MAX_SLICE) {
 				// 每一次计算章节页数高度增加或减少的字符串数量
-				let numberlength = 15
+				let numberlength = 30
 				return new Promise(async (resolve, reject) => {
 					this.showChapter = this.content_text.slice(MIN_SLICE, this.sliceNum)
 					// console.log(this.showChapter,this.sliceNum,"123345")
@@ -583,23 +616,45 @@
 			},
 			
 			getHeight() {
+				this.query = uni.createSelectorQuery().in(this);
 				return new Promise((resolve, reject) => {
-					this.$nextTick(() => {
-						this.query.select('#parsehtml').boundingClientRect(data => {
-							// console.log("章节节点高度" + data.height);
-							
-							this.ChapterHeight = data.height
-						}).exec();
-						this.query.select('#bookview').boundingClientRect(data => {
-							// console.log("节点高度" + data.height);
-							// this.toast("容器"+data.height)
-							this.DomBoxHeight = data.height
-						}).exec();
+					this.$nextTick(async () => {
+						let i=0
+						await this.getChapterHeight()
+						await this.getDomBoxHeight()
 						resolve(true)
 					})
 				})
 			},
+			getChapterHeight(){
+				return new Promise((resolve, reject) => {
+					this.query.select('.parsehtml').boundingClientRect(async (data )=> {
+						console.log("章节节点高度" + data.height)
+						this.ChapterHeight = data.height
+						if(this.ChapterHeight==0){
+							await this.getChapterHeight()
+						}
+						resolve()
+					}).exec();
+				})
+				
+			},
+			getDomBoxHeight(){
+				return new Promise((resolve, reject) => {
+					this.query.select('.bookview').boundingClientRect(async data => {
+						console.log("节点高度" + data.height);
+						this.DomBoxHeight = data.height
+						if(this.DomBoxHeight == 0){
+							await this.getDomBoxHeight()
+						}
+						resolve()
+					}).exec();
+				})
+				
+			},
 			//新增加
+			
+			
 			//修改正文字体大小
 			changeFontSize(e) {
 				this.size = e.detail.value;
@@ -612,9 +667,13 @@
 			},
 			// 点击上一章
 			last() {
+				if(!this.whetherFinish){
+					return
+				}
 				if (this.chapterNum == 0) {
 					this.toast("已经是第一章了")
 				} else {
+					this.whetherFinish=false
 					this.chapterNum--;
 					this.page_direction = "last"
 					this.section_title = this.chapters[this.chapterNum].chapterName
@@ -623,9 +682,13 @@
 			},
 			// 点击下一章
 			next() {
+				if(!this.whetherFinish){
+					return
+				}
 				if (this.chapterNum == this.chapters.length - 1) {
 					this.toast("已经是最后章了")
 				} else {
+					this.whetherFinish=false
 					this.chapterNum++;
 					this.page_direction == "next"
 					this.section_title = this.chapters[this.chapterNum].chapterName
@@ -720,7 +783,6 @@
 		left: 0;
 		width: 100%;
 		height: 100%;
-
 	}
 
 	.zuizhong.active {
@@ -781,34 +843,37 @@
 		word-break: break-all;
 		word-wrap: break-word;
 		overflow: hidden;
-
 		// padding: 15rpx 0rpx 15rpx;
 		.unload {
-			width: 100%;
-			height: 100%;
-			text-align: center;
-			margin: 0 auto;
-			margin-top: 300rpx;
+			width: 100vw;
+			height: 100vh;
+			position: absolute;
+			top:0;
+			left:0;
+			display: flex;
+			justify-content: center;
+			line-height: 80vh;
 			text-indent: 0;
 		}
-
-		.parsehtml {}
-
 	}
-
-	#bookview {
+	
+	.bookview {
 		box-sizing: border-box;
+		/* #ifdef H5 */
 		position: relative;
 		top: 60upx;
-		height: calc(100vh - 60upx);
-		// height: calc(100vh);
-		// background: red;
+		/* #endif */
+		// position: relative;
+		// top: 60upx;
+		height: calc(100vh - 65upx) !important;
 		overflow: hidden;
-
-		.parsehtml {}
+		// background-color: red;
+		.parsehtml{
+			/deep/ div{
+				// background: #2B85E4;
+			}
+		}
 	}
-
-
 	.titlee {
 		width: 100%;
 		font-size: 45upx;
@@ -916,9 +981,21 @@
 		width: 100%;
 		height: 50%;
 		transform: translateY(-50%);
-		z-index: 9;
+		z-index: 7;
 	}
-
+	.clickMask{
+		position: fixed;
+		top:0;
+		left:0;
+		width: 100vw;
+		height: 100vh;
+		display: flex;
+		z-index:8;
+		view{
+			flex: 1;
+			height: 100vh;
+		}
+	}
 	.chapterList {
 		width: 100%;
 
