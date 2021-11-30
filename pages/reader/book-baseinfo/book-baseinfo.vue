@@ -87,7 +87,7 @@
 					uni.showModal({
 					    title: '提示',
 					    content: '您还没有登录,是否登录',
-							confirmText:"去登录",
+						confirmText:"去登录",
 					    success: function (res) {
 					        if (res.confirm) {
 					            uni.redirectTo({

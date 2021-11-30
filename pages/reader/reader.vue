@@ -101,18 +101,22 @@
 		<view @click="dianjile()" class="sview bookview"
 			:style="{zIndex:zindex,color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px',opacity:whetherFinish?1:0}">
 			<rich-text :selectable="true" :nodes="showChapter" class="parsehtml"></rich-text>
-			<view class="unload" v-if="content_text==' '">
+			<!-- <view class="unload" v-if="content_text==' '">
 				加载中
-			</view>
+			</view> -->
+		</view>
+		<view class="unload" v-if="!whetherFinish">
+			加载中
 		</view>
 		<!-- #endif -->
 		<!-- #ifdef H5 -->
-		<view @click="dianjile()" @touchstart="start" @touchend="end" class="sview bookview"
+		 <!-- @click="dianjile()" @touchstart="start" @touchend="end" -->
+		<view class="sview bookview"
 			:style="{zIndex:zindex,color:textColor,fontSize:forUpx(size)+'px',lineHeight:forUpx(lineHeight)+'px',opacity:whetherFinish?1:0}">
-			<rich-text :selectable="true" :nodes="showChapter" class="parsehtml"></rich-text>
-			<view class="unload" v-if="content_text==' '">
-				加载中
-			</view>
+			<rich-text :selectable="true"  :nodes="showChapter" class="parsehtml"></rich-text>
+		</view>
+		<view class="unload" v-if="!whetherFinish">
+			加载中
 		</view>
 		<!-- #endif -->
 		<!-- #ifdef H5 -->
@@ -186,7 +190,7 @@
 				sliceNum: 0,
 				showChapter: "",
 				page_direction: "next",
-				whetherFinish: true
+				whetherFinish: false
 			}
 		},
 		onUnload() {
@@ -390,7 +394,8 @@
 				db.collection('bookChater').where({
 					bookid: this.bookId
 				}).get().then(res => {
-					this.chapters = res.result.data[0].chapters ? res.result.data[0].chapters : []
+					this.chapters = res.result.data[0].chapters ? res.result.data[0].chapters : [],
+					this.page_direction = "next"
 					this.getChapterContent(this.chapters[this.chapterNum].chapterId, this.chapterNum)
 					// this.section_title=this.chapters[this.chapterNum].chapterName
 					this.bookName = res.result.data[0].bookName
@@ -439,12 +444,12 @@
 			//新增加
 			async computePage() {
 				//获取容器高度和章节分页后的高度
-				await this.getHeight()
-				console.log(parseInt(this.DomBoxHeight), "parseInt(this.DomBoxHeight)")
-				let multiple = parseInt(parseInt(this.ChapterHeight) / parseInt(this.DomBoxHeight))
-				let chapterLength = this.content_text.length
+				// await this.getHeight()
+				// console.log(parseInt(this.DomBoxHeight), "parseInt(this.DomBoxHeight)")
+				// let multiple = parseInt(parseInt(this.ChapterHeight) / parseInt(this.DomBoxHeight))
+				// let chapterLength = this.content_text.length
 				//每一页大致上的字数
-				this.base_num = parseInt(parseInt(this.DomBoxHeight) / 2)
+				this.base_num = 250
 				this.sliceNum = 0
 				// console.log(this.base_num)918
 				
@@ -453,10 +458,16 @@
 			},
 			async getPageArray() {
 				for (let i = 1; i < 100; i++) {
-					console.log(i)
+					// console.log(i,"afgfdg")
 					let last_sliceNum = this.sliceNum
-					console.log(last_sliceNum)
-					this.sliceNum = this.base_num * i
+					// console.log(last_sliceNum)
+					// this.sliceNum = this.base_num * i
+					if(i==1){
+						this.sliceNum = this.base_num * i
+					}else{
+						this.sliceNum =parseInt(last_sliceNum/(i-1))*i
+					}
+					// console.log(this.sliceNum)
 					if (this.sliceNum >= this.content_text.length) {
 						this.sliceNum = this.content_text.length
 					}
@@ -467,17 +478,20 @@
 						this.page = this.page_direction == "next" ? 1 : this.pageArray.length
 						this.showChapter = this.content_text.slice(this.pageArray[this.page - 1].min, this.pageArray[this
 							.page - 1].max)
+							console.log(this.page_direction,"zxing0")
+							// this.toast(this.page+'')
 						// this.toast("容器"+this.DomBoxHeight+"章节"+this.ChapterHeight)
 						this.$forceUpdate()
 						return
 					}
 				}
-				console.log(this.pageArray, 12334)
+				// console.log(this.pageArray, 12334)
 				this.whetherFinish = true
 				this.page = this.page_direction == "next" ? 1 : this.pageArray.length
 				this.showChapter = this.content_text.slice(this.pageArray[this.page - 1].min, this.pageArray[this
 					.page - 1].max)
-				this.toast(this.page)
+				console.log(this.page_direction,"zxing1")
+				// this.toast(this.page)
 				this.$forceUpdate()
 			},
 			getSliceNum(num) {
@@ -529,10 +543,10 @@
 					this.showChapter = this.content_text.slice(MIN_SLICE, this.sliceNum)
 					// console.log(this.showChapter,this.sliceNum,"123345")
 					await this.getHeight()
-					console.log(this.DomBoxHeight, this.ChapterHeight, "ok")
+					// console.log(this.DomBoxHeight, this.ChapterHeight, "ok")
 					// 容器高度超出时执行
 					if (this.DomBoxHeight > this.ChapterHeight) {
-						console.log("容器高度超出")
+						// console.log("容器高度超出")
 						// 遍历直到章节高度小于容器高度或者章节结束时返回
 						for (let i = 0; i < 150; i++) {
 							this.sliceNum += numberlength
@@ -553,7 +567,7 @@
 								resolve()
 								return
 							}
-							console.log(this.DomBoxHeight, this.ChapterHeight, "change1", i)
+							// console.log(this.DomBoxHeight, this.ChapterHeight, "change1", i)
 							if (this.DomBoxHeight < this.ChapterHeight) {
 								this.sliceNum -= numberlength
 								this.showChapter = this.content_text.slice(MIN_SLICE, this.sliceNum)
@@ -580,7 +594,7 @@
 						}
 					} else {
 						// 章节高度超出时执行
-						console.log("章节高度超出")
+						// console.log("章节高度超出")
 						for (let i = 0; i < 150; i++) {
 							this.sliceNum -= numberlength
 							this.showChapter = this.content_text.slice(MIN_SLICE, this.sliceNum)
@@ -599,7 +613,7 @@
 								resolve()
 								return
 							}
-							console.log(this.DomBoxHeight, this.ChapterHeight, "change2", i)
+							// console.log(this.DomBoxHeight, this.ChapterHeight, "change2", i)
 							if (this.DomBoxHeight > this.ChapterHeight) {
 								this.pageArray.push({
 									min: MIN_SLICE,
@@ -615,13 +629,30 @@
 				})
 			},
 			
+			// getHeight() {
+			// 	this.query = uni.createSelectorQuery().in(this);
+			// 	return new Promise((resolve, reject) => {
+			// 		this.$nextTick(async () => {
+			// 			let i=0
+			// 			await this.getChapterHeight()
+			// 			await this.getDomBoxHeight()
+			// 			resolve(true)
+			// 		})
+			// 	})
+			// },
 			getHeight() {
 				this.query = uni.createSelectorQuery().in(this);
 				return new Promise((resolve, reject) => {
 					this.$nextTick(async () => {
-						let i=0
-						await this.getChapterHeight()
-						await this.getDomBoxHeight()
+						this.query.select('.parsehtml').boundingClientRect(async (data )=> {
+							this.ChapterHeight = data.height
+						}).exec();
+						this.query.select('.bookview').boundingClientRect(async data => {
+							this.DomBoxHeight = data.height
+						}).exec();
+						if(this.DomBoxHeight==0||this.ChapterHeight==0){
+							await this.getHeight()
+						}
 						resolve(true)
 					})
 				})
@@ -629,7 +660,7 @@
 			getChapterHeight(){
 				return new Promise((resolve, reject) => {
 					this.query.select('.parsehtml').boundingClientRect(async (data )=> {
-						console.log("章节节点高度" + data.height)
+						// console.log("章节节点高度" + data.height)
 						this.ChapterHeight = data.height
 						if(this.ChapterHeight==0){
 							await this.getChapterHeight()
@@ -642,7 +673,7 @@
 			getDomBoxHeight(){
 				return new Promise((resolve, reject) => {
 					this.query.select('.bookview').boundingClientRect(async data => {
-						console.log("节点高度" + data.height);
+						// console.log("节点高度" + data.height);
 						this.DomBoxHeight = data.height
 						if(this.DomBoxHeight == 0){
 							await this.getDomBoxHeight()
@@ -690,7 +721,7 @@
 				} else {
 					this.whetherFinish=false
 					this.chapterNum++;
-					this.page_direction == "next"
+					this.page_direction = "next"
 					this.section_title = this.chapters[this.chapterNum].chapterName
 					this.getChapterContent(this.chapters[this.chapterNum].chapterId, this.chapterNum)
 				}
@@ -772,7 +803,6 @@
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
 	}
-
 	.icon-80dianliang:before {
 		content: "\e617";
 	}
@@ -856,7 +886,17 @@
 			text-indent: 0;
 		}
 	}
-	
+	.unload {
+		width: 100vw;
+		height: 100vh;
+		position: absolute;
+		top:0;
+		left:0;
+		display: flex;
+		justify-content: center;
+		line-height: 80vh;
+		text-indent: 0;
+	}
 	.bookview {
 		box-sizing: border-box;
 		/* #ifdef H5 */
@@ -994,6 +1034,7 @@
 		view{
 			flex: 1;
 			height: 100vh;
+			opacity: 0;
 		}
 	}
 	.chapterList {

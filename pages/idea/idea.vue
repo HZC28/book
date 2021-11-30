@@ -25,7 +25,6 @@
 					</view>
 				</view>
 			</view>
-			
 			<view v-if="tabIndex==1" class="bookComment">
 				<u-empty style="margin-top: 300rpx;" v-show="requestData&&comments.length==0" text="您未发布任何书评" mode="search"></u-empty>
 				<view @click="toCommentDetail(comment.bookInfo.bookid,comment.commentId,comment.praise,comment.collect)" class="bookCommentItem" v-for="comment in comments">
