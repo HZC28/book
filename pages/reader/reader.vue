@@ -142,9 +142,9 @@
 			</view>
 		</u-popup>
 		<view class="clickMask">
-			<view @click="leftRight(0)">1</view>
-			<view class="mask_middle" @click="dianjile()">2</view>
-			<view @click="leftRight(1)">3</view>
+			<view  @tap="leftRight(0)">1</view>
+			<view class="mask_middle" @tap="dianjile()">2</view>
+			<view @tap="leftRight(1)">3</view>
 		</view>
 	</view>
 </template>
